@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Template
+labels: 
+  template: ${PIPELINE_NAME}-pipeline
+metadata: 
+  name: ${PIPELINE_NAME}-pipeline
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata: 
+    name: "${PIPELINE_NAME}-pipeline"
+  spec:
+    source:
+      git:
+        uri: "${PIPELINE_REPO}",
+        ref: "${PIPELINE_REF}"
+    strategy:
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: ${PIPELINE_PATH}
+parameters:
+- name: PIPELINE_NAME
+  description: Pipeline identifier
+  required: true
+- name: PIPELINE_REPO
+  description: The repository (github) where the Jenkinsfile is located (eg. https://github.com/bcgov/EDUC-PEN-REQUEST)
+  required: true
+- name: PIPELINE_PATH
+  description: the path within the repo where the jenkinsfile is located (eg. /tools/openshift/Jenkinsfile)
+  value: ''
+  required: true
+- name: PIPELINE_REF
+  description: Branch of source code
+  value: 'master'
+  required: false
