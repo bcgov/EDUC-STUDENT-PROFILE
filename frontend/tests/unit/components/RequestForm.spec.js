@@ -22,9 +22,21 @@ describe('RequestForm.vue', () => {
       {label:'Gender Diverse', genderCode:'X'},
       {label:'Unknown', genderCode:'U'},
     ];
+
+    let student = {
+      pen: '123456',
+      legalFirstName: 'James',
+      legalMiddleNames: 'Wayne',
+      legalLastName: 'Duke',
+      sexCode: 'M',
+      sexLabel: 'Male',
+      genderCode: 'M',
+      dob: '1989-06-04'
+    };
     
     const requestGetters = {
       genders: jest.fn().mockReturnValue(genderCodes),
+      student: jest.fn().mockReturnValue(student),
     };
 
     const authGetters = {

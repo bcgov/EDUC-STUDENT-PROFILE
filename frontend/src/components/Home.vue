@@ -33,7 +33,7 @@
     </article>
   </v-container>
 
-  <v-container fluid class="full-height" v-else-if="isAuthenticated && !hasPen && !hasRequest">
+  <v-container fluid class="full-height" v-else-if="isAuthenticated && !hasRequest">
     <!-- request form -->
     <article id="request-form-container" class="top-banner full-height">
         <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
@@ -71,8 +71,8 @@ export default {
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'userInfo', 'isLoading']),
     ...mapGetters('request', ['request', 'student']),
-    hasPen() {
-      return !!this.student && !!this.student.pen;
+    hasStudentRecord() {
+      return !!this.student;
     },
     hasRequest() {
       return !!this.request;

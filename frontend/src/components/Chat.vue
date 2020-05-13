@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-0">
+  <v-container class="pa-0" fluid>
     <!-- <v-row class="pb-5" v-if="requestComment"> -->
       <v-card class="mb-5" v-if="status === requestStatuses.RETURNED">
         <v-toolbar flat color="#036" class="white--text" height="45rem">

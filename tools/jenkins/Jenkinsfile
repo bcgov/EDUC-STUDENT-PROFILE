@@ -233,7 +233,7 @@ pipeline{
                 script{
                     openshift.withCluster(){
                         openshift.withProject(){
-                            def e2e = openshift.selector("bc", "pen-request-e2e-master-pipeline")
+                            def e2e = openshift.selector("bc", "student-profile-e2e-master-pipeline")
                             e2e.startBuild('-w')
                         }
                     }
