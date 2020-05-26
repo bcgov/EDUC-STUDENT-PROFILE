@@ -44,9 +44,6 @@ nconf.defaults({
     clientId: process.env.STUDENT_PROFILE_CLIENT_ID,
     clientSecret: process.env.STUDENT_PROFILE_CLIENT_SECRET,
   },
-  document: {
-    apiEndpoint: process.env.DOCUMENT_API_ENDPOINT,
-  },
   tokenGenerate: {
     privateKey: process.env.UI_PRIVATE_KEY,
     publicKey: process.env.UI_PUBLIC_KEY,
@@ -62,6 +59,7 @@ nconf.defaults({
   email: {
     apiEndpoint: process.env.STUDENT_PROFILE_EMAIL_API_ENDPOINT,
     secretKey: process.env.STUDENT_PROFILE_EMAIL_SECRET_KEY,
+    tokenTTL: process.env.TOKEN_TTL_MINUTES
   },
   demographics: {
     apiEndpoint: process.env.STUDENT_DEMOG_API_ENDPOINT,
