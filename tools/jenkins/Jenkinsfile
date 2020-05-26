@@ -9,11 +9,11 @@ pipeline{
         TEST = "${NAMESPACE}-test"
         PROD = "${NAMESPACE}-prod"
 
-        REPO_NAME = 'educ-pen-request'
+        REPO_NAME = 'educ-student-profile'
         OWNER = 'bcgov'
         JOB_NAME = 'master'
         
-        APP_NAME = 'pen-request'
+        APP_NAME = 'student-profile'
         APP_DOMAIN = 'pathfinder.gov.bc.ca'
 
         SOURCE_REPO_RAW = 'https://github.com/${OWNER}/${REPO_NAME}/master'
@@ -116,12 +116,12 @@ pipeline{
         }
         stage('Deploy to Dev'){
 			environment {
-			   APP_NAME = "pen-request"
-			   DC_URL_FRONTEND = "https://raw.githubusercontent.com/bcgov/EDUC-PEN-REQUEST/master/tools/openshift/frontend-static.dc.yaml"
-			   DC_URL_BACKEND = "https://raw.githubusercontent.com/bcgov/EDUC-PEN-REQUEST/master/tools/openshift/backend.dc.yaml"
+			   APP_NAME = "student-profile"
+			   DC_URL_FRONTEND = "https://raw.githubusercontent.com/bcgov/EDUC-STUDENT-PROFILE/master/tools/openshift/frontend-static.dc.yaml"
+			   DC_URL_BACKEND = "https://raw.githubusercontent.com/bcgov/EDUC-STUDENT-PROFILE/master/tools/openshift/backend.dc.yaml"
             }
             steps{
-                deployStage('Dev', DEV, 'educ-pen-request', 'pen-request', 'master', 'dev', TOOLS, DEV, APP_DOMAIN, "${DC_URL_FRONTEND}", "${DC_URL_BACKEND}")
+                deployStage('Dev', DEV, 'educ-student-profile', 'student-profile', 'master', 'dev', TOOLS, DEV, APP_DOMAIN, "${DC_URL_FRONTEND}", "${DC_URL_BACKEND}")
             }
             post{
                 success{
@@ -134,7 +134,7 @@ pipeline{
         }
         stage('Create/Update Config Maps'){
           environment {
-	         APP_NAME = "pen-request"
+	         APP_NAME = "student-profile"
           }
           steps{
             script{
