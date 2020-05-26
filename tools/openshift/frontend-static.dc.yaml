@@ -34,7 +34,7 @@
             deploymentconfig: "${APP_NAME}-frontend-${JOB_NAME}"
         spec:
           containers:
-          - image: docker-registry.default.svc:5000/${NAMESPACE}/${REPO_NAME}-frontend-static:latest
+          - image: docker-registry.default.svc:5000/${NAMESPACE}/${REPO_NAME}-frontend-static:${TAG}
             imagePullPolicy: IfNotPresent
             volumeMounts:
             - name: tls-certs
@@ -66,11 +66,11 @@
               timeoutSeconds: 1
             resources:
               requests:
-                cpu: "5m"
-                memory: "32Mi"
+                cpu: "10m"
+                memory: "50Mi"
               limits:
                 cpu: "25m"
-                memory: "64Mi"
+                memory: "100Mi"
           volumes:
           - name: tls-certs
             secret:
@@ -87,7 +87,7 @@
           - "${APP_NAME}-frontend-${JOB_NAME}"
           from:
             kind: ImageStreamTag
-            name: "${REPO_NAME}-frontend-static:latest"
+            name: "${REPO_NAME}-frontend-static:${TAG}"
             namespace: "${NAMESPACE}"
         type: ImageChange
   - apiVersion: v1
@@ -161,4 +161,7 @@
     required: true
   - name: HOST_ROUTE
     description: The host the route will use to expose service outside cluster
+    required: true
+  - name: TAG
+    description: The identifying tag for this specific deployment
     required: true
