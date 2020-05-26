@@ -1,6 +1,6 @@
 'use strict';
 
-const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses } = require('./utils');
+const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, generateJWTToken } = require('./utils');
 const { getApiCredentials } = require('./auth');
 const config = require('../config/index');
 const log = require('npmlog');
@@ -187,13 +187,19 @@ async function getServerSideCodes(accessToken) {
 }
 
 async function sendVerificationEmail(accessToken, emailAddress, requestId, identityTypeLabel) {
+  const verificationUrl = config.get('server:frontend') + '/api/student/verification?verificationToken';
   const reqData = {
     emailAddress,
     requestId,
-    identityTypeLabel
+    identityTypeLabel,
+    verificationUrl: verificationUrl
   };
   const url = config.get('email:apiEndpoint') + '/verify';
   try {
+    const payload = {
+      SCOPE: 'VERIFY_EMAIL'
+    };
+    reqData.jwtToken = await generateJWTToken(requestId, emailAddress, 'VerifyEmailAPI', 'HS256', payload);
     return await postData(accessToken, reqData, url);
   } catch (e) {
     throw new ServiceError('sendVerificationEmail error', e);
