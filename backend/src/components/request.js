@@ -187,7 +187,7 @@ async function getServerSideCodes(accessToken) {
 }
 
 async function sendVerificationEmail(accessToken, emailAddress, requestId, identityTypeLabel) {
-  const verificationUrl = config.get('server:frontend') + '/api/pen/verification?verificationToken';
+  const verificationUrl = config.get('server:frontend') + '/api/student/verification?verificationToken';
   const reqData = {
     emailAddress,
     requestId,
