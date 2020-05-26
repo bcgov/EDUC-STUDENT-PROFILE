@@ -5,8 +5,8 @@ const config = require('../config/index');
 const log = require('npmlog');
 const HttpStatus = require('http-status-codes');
 const lodash = require('lodash');
-const { ApiError } = require('./error'); 
-
+const { ApiError } = require('./error');
+const jsonwebtoken = require('jsonwebtoken');
 let discovery = null;
 
 // Returns OIDC Discovery values
@@ -231,6 +231,21 @@ function computeSMRetUrl(req, token) {
   }
   return siteMinderRetUrl;
 }
+function generateJWTToken(jwtid, subject, issuer, algorithm, payload) {
+
+  const tokenTTL = config.get('email:tokenTTL'); // this should be in minutes
+  const jwtSecretKey = config.get('email:secretKey');
+  let sign_options_schema = {
+    expiresIn: tokenTTL * 60,
+    algorithm: algorithm,
+    issuer: issuer,
+    jwtid: jwtid,
+    subject: subject
+  };
+
+  return jsonwebtoken.sign(payload, jwtSecretKey, sign_options_schema);
+}
+
 const utils = {
   getOidcDiscovery,
   prettyStringify: (obj, indent = 2) => JSON.stringify(obj, null, indent),
@@ -246,7 +261,8 @@ const utils = {
   RequestStatuses,
   VerificationResults,
   EmailVerificationStatuses,
-  computeSMRetUrl
+  computeSMRetUrl,
+  generateJWTToken
 };
 
 module.exports = utils;
