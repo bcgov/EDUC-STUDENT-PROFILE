@@ -33,7 +33,7 @@ objects:
           deploymentconfig: "${APP_NAME}-backend-${JOB_NAME}"
       spec:
         containers:
-        - image: docker-registry.default.svc:5000/${NAMESPACE}/${REPO_NAME}-backend:latest
+        - image: docker-registry.default.svc:5000/${NAMESPACE}/${REPO_NAME}-backend:${TAG}
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - name: tls-certs
@@ -42,12 +42,12 @@ objects:
           livenessProbe:
             failureThreshold: 3
             httpGet:
-              path: "/api"
+              path: "/api/health"
               port: 8080
               scheme: HTTP
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 3
           name: "${APP_NAME}-backend-${JOB_NAME}"
           ports:
           - containerPort: 8080
@@ -57,16 +57,16 @@ objects:
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: "/api"
+              path: "/api/health"
               port: 8080
               scheme: HTTP
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 3
           resources:
             requests:
-              cpu: "10m"
-              memory: "100Mi"
+              cpu: "25m"
+              memory: "150Mi"
             limits:
               cpu: "50m"
               memory: "250Mi"
@@ -83,7 +83,7 @@ objects:
         - "${APP_NAME}-backend-${JOB_NAME}"
         from:
           kind: ImageStreamTag
-          name: "${REPO_NAME}-backend:latest"
+          name: "${REPO_NAME}-backend:${TAG}"
           namespace: "${NAMESPACE}"
       type: ImageChange
 - apiVersion: v1
@@ -162,4 +162,7 @@ parameters:
   required: true
 - name: HOST_ROUTE
   description: The host the route will use to expose service outside cluster 
+  required: true
+- name: TAG
+  description: The identifying tag for this specific deployment
   required: true
