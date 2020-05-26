@@ -3,7 +3,7 @@
     <v-row class="flex-grow-0 pb-5">
       <v-card height="100%" width="100%" elevation=0 color="#036" class="white--text">
         <v-card-title class="request-display-header px-1 px-sm-5">
-          <h1>{{status === requestStatuses.RETURNED ? 'Provide More Info for PEN Request' : 'PEN Request Status'}}</h1>
+          <h1>{{status === requestStatuses.RETURNED ? 'Provide More Info for Request' : 'Request Status'}}</h1>
         </v-card-title>
       </v-card>
     </v-row>

@@ -28,7 +28,7 @@ describe('auth.js', () => {
       status: 200
     });
 
-    var response = await store.dispatch('postRequest');
+    var response = await store.dispatch('postRequest', { requestData: {}, recordedData: {} });
     expect(response).toBeTruthy();
   });
 
@@ -37,7 +37,7 @@ describe('auth.js', () => {
       status: 400
     });
 
-    var response = await store.dispatch('postRequest');
+    var response = await store.dispatch('postRequest', { requestData: {}, recordedData: {} });
     expect(response).toBeFalsy();
   });
 });

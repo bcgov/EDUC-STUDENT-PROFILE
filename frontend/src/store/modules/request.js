@@ -1,6 +1,6 @@
 import ApiService from '@/common/apiService';
 import {getData} from '@/store/modules/helpers';
-import { find } from 'lodash';
+import { find, pick, mapKeys } from 'lodash';
 
 export default {
   namespaced: true,
@@ -52,15 +52,22 @@ export default {
       //   legalLastName: 'Duke',
       //   sexCode: 'M',
       //   sexLabel: 'Male',
-      //   dob: '1998-01-01'
+      //   dob: '1998-01-01',
+      //   genderCode: 'M',
+      //   email: 'test@test.com'
       // };
       state.student = student;
     },
   },
   actions: {
-    async postRequest(_context, info){
+    async postRequest(_context, { requestData, recordedData }){
+      let request = pick(requestData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email']);
+      const recorded = mapKeys(recordedData, (_, key) => {
+        return 'recorded' + key.slice(0,1).toUpperCase() + key.slice(1);
+      });
+      request = { ...request, ...recorded };
       try {
-        const response = await ApiService.postRequest(info);
+        const response = await ApiService.postRequest(request);
         if(response.status !== 200){
           return false;
         }
