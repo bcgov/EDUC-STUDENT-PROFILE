@@ -66,11 +66,11 @@
               timeoutSeconds: 1
             resources:
               requests:
-                cpu: "50m"
-                memory: "300Mi"
+                cpu: "5m"
+                memory: "32Mi"
               limits:
-                cpu: "100m"
-                memory: "500Mi"
+                cpu: "25m"
+                memory: "64Mi"
           volumes:
           - name: tls-certs
             secret:
