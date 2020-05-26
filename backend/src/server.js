@@ -97,5 +97,6 @@ function onListening() {
 module.exports = {
   normalizePort,
   onError,
-  onListening
+  onListening,
+  server
 };
