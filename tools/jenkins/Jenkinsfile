@@ -53,66 +53,66 @@ pipeline{
                 }
             }
         }
-        stage('Unit Tests') {
-            agent any
-            steps {
-                script {
-                parallel(
-                    Backend: {
-                        dir('backend') {
-                            try {
-                            timeout(10) {
-                                echo 'Installing NPM Dependencies...'
-                                sh 'npm ci'
+        // stage('Unit Tests') {
+        //     agent any
+        //     steps {
+        //         script {
+        //         parallel(
+        //             Backend: {
+        //                 dir('backend') {
+        //                     try {
+        //                     timeout(10) {
+        //                         echo 'Installing NPM Dependencies...'
+        //                         sh 'npm ci'
 
-                                echo 'Linting and Testing Backend...'
-                                sh'npm run lint:fix'
-                                sh 'npm run test:unit'
+        //                         echo 'Linting and Testing Backend...'
+        //                         sh'npm run lint:fix'
+        //                         sh 'npm run test:unit'
 
-                                echo 'Backend Lint Checks and Tests passed'
-                            }
-                            } catch (e) {
-                            echo 'Backend Lint Checks and Tests failed'
-                            throw e
-                            }
-                        }
-                    },
+        //                         echo 'Backend Lint Checks and Tests passed'
+        //                     }
+        //                     } catch (e) {
+        //                     echo 'Backend Lint Checks and Tests failed'
+        //                     throw e
+        //                     }
+        //                 }
+        //             },
 
-                    Frontend: {
-                        dir('frontend') {
-                            try {
-                            timeout(10) {
-                            echo 'Installing NPM Dependencies...'
-                            sh 'npm ci'
+        //             Frontend: {
+        //                 dir('frontend') {
+        //                     try {
+        //                     timeout(10) {
+        //                     echo 'Installing NPM Dependencies...'
+        //                     sh 'npm ci'
 
-                            echo 'Linting and Testing Backend...'
-                            sh' npm run lint:fix'
-                            sh 'npm run test:unit'
+        //                     echo 'Linting and Testing Backend...'
+        //                     sh' npm run lint:fix'
+        //                     sh 'npm run test:unit'
 
-                            echo 'Frontend Lint Checks and Tests passed'
+        //                     echo 'Frontend Lint Checks and Tests passed'
 
-                            }
-                            } catch (e) {
-                            echo 'Frontend Lint Checks and Tests failed'
-                            throw e
-                            }
-                        }
-                    }
-                )
-                }
-            }
-            post {
-                success {
-                    stash name: BE_COV_STASH, includes: 'backend/coverage/**'
-                    stash name: FE_COV_STASH, includes: 'frontend/coverage/**'
+        //                     }
+        //                     } catch (e) {
+        //                     echo 'Frontend Lint Checks and Tests failed'
+        //                     throw e
+        //                     }
+        //                 }
+        //             }
+        //         )
+        //         }
+        //     }
+        //     post {
+        //         success {
+        //             stash name: BE_COV_STASH, includes: 'backend/coverage/**'
+        //             stash name: FE_COV_STASH, includes: 'frontend/coverage/**'
 
-                    echo 'All Lint Checks and Tests passed'
-                }
-                failure {
-                    echo 'Some Lint Checks and Tests failed'
-                }
-            }
-        }
+        //             echo 'All Lint Checks and Tests passed'
+        //         }
+        //         failure {
+        //             echo 'Some Lint Checks and Tests failed'
+        //         }
+        //     }
+        // }
         /*stage('SonarQube Analysis'){
             agent any
 
