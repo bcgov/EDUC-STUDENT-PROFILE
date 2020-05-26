@@ -7,9 +7,9 @@ def FE_COV_STASH = 'frontend-coverage'
 
 pipeline{
     agent any
-    tools{
-        nodejs "nodejs"
-    }
+    // tools{
+    //     nodejs "nodejs"
+    // }
 
     environment{
         DEBUG_OUTPUT = 'false'
