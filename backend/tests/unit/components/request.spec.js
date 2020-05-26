@@ -552,7 +552,7 @@ describe('sendVerificationEmail', () => {
       emailAddress,
       requestId,
       identityTypeLabel,
-      verificationUrl: config.get('server:frontend') + '/api/pen/verification?verificationToken',
+      verificationUrl: config.get('server:frontend') + '/api/student/verification?verificationToken',
       jwtToken:token
     };
     expect(result).toBeTruthy();
