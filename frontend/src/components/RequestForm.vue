@@ -1,154 +1,67 @@
 <template>
-  <v-card class="mainCard" v-if="dataReady">
-    <v-row align-content="center" class="flex-grow-0 pb-5">
+  <div>
+    <!-- <v-row align-content="center" class="flex-grow-0 pb-5">
       <v-card style="margin-right: 1.4rem;margin-left: 1.4rem" height="100%" width="100%" elevation=0 color="#036"
               class="white--text">
-        <v-card-title class="py-3 pl-5"><h1>Student Profile Update Request Form</h1></v-card-title>
+        <v-card-title class="py-3 pl-5"><h1>Requested Changes to Student Information</h1></v-card-title>
       </v-card>
-    </v-row>
+    </v-row> -->
 
-    <v-card color="#FFECA9" class="pa-3 mb-8 mx-3">
+    <v-alert
+      dense
+      outlined
+      dismissible
+      v-model="alert"
+      class="pa-3 mb-3 mx-3 bootstrap-error"
+    >
+      {{ alertMessage }}
+    </v-alert>
+
+    <!-- <v-card color="#FFECA9" class="pa-3 mb-8 mx-3"> -->
+    <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
       <h3>Guidance:</h3>
       <ul class="pt-2">
         <li>This form can only be completed by the owner of the PEN</li>
         <li>This form can only be completed if you have already graduated from high school. If you are still attending a K-12 school, request changes at your school</li>
         <li>If your name and/or gender has been legally changed, proof of this change may be requested</li>
       </ul>
-    </v-card>
-    <v-card-subtitle><span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Student Information</span>
-    </v-card-subtitle>
+    </v-alert>
+    <!-- </v-card> -->
 
-    <v-form>
-      <v-container fluid class="py-0">
-        <v-row>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-text-field
-              id='recordedPen'
-              :value="student.pen"
-              color="#003366"
-              outlined
-              label="Personal Education Number (PEN)"
-              readonly
-              dense
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-text-field
-              id='recordedLegalLastName'
-              :value="student.legalLastName"
-              color="#003366"
-              outlined
-              label="Recorded Legal Last Name"
-              readonly
-              dense
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-text-field
-              id='recordedLegalFirstName'
-              :value="student.legalFirstName"
-              color="#003366"
-              outlined
-              label="Recorded Legal First Name(s) "
-              readonly
-              dense
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-text-field
-              id='recordedLegalMiddleNames'
-              :value="student.legalMiddleNames"
-              color="#003366"
-              outlined
-              label="Recorded Legal Middle Name(s)"
-              readonly
-              dense
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-text-field
-              id='recordedDob'
-              color="#003366"
-              outlined
-              :value="student.dob"
-              label="Recorded Birthdate"
-              readonly
-              dense
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-text-field
-              id='recordedGender'
-              color="#003366"
-              outlined
-              :value="genderLabel"
-              label="Recorded Gender"
-              readonly
-              dense
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-text-field
-              id='recordedEmail'
-              :value="student.email"
-              color="#003366"
-              outlined
-              label="E-mail Address"
-              readonly
-              dense
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-form>
+    <v-container fluid class="py-0">
+      <v-row>
+        <v-col cols="12" class="declaration py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
+          <v-checkbox
+            v-model="declared"
+            color="green"
+            class="mt-0"
+            :rules="privacyRule('')"
+          >
+            <template v-slot:label>
+              <div class="pl-3">
+                I declare that I am submitting a student data change request on my own behalf. Update personal data as indicated below
+              </div>
+            </template>
+          </v-checkbox>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
+      <span>Check fields that need to be updated.  Leave fields that do not require changes unchecked</span>
+    </v-alert>
 
     <v-form autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
       ref="form" id="requestForm"
       v-model="validForm"
     >
 
+      <v-card-subtitle class="mb-2">
+        <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Student Information</span>
+      </v-card-subtitle>
+
       <v-container fluid class="py-0">
         <v-row>
-          <v-col cols="12" class="declaration py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-checkbox
-              v-model="declared"
-              color="green"
-              class="mt-0"
-              :rules="privacyRule('')"
-            >
-              <template v-slot:label>
-                <div class="pl-3">
-                  I declare that I am submitting a student data change request on my own behalf. Update personal data as indicated below
-                </div>
-              </template>
-            </v-checkbox>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-container class="d-flex align-start pa-0" fluid>
-              <v-checkbox
-                class="pt-0 pr-2 mt-0"
-                v-model="editLegalLastName"
-                label="Edit"
-                dense
-                :disabled="enableDisableForm.disabled"
-              ></v-checkbox>
-              <v-text-field
-                id='legalLastName'
-                v-model="userPost.legalLastName"
-                color="#003366"
-                outlined
-                :rules="charRules"
-                :hint="legalLastNameHint"
-                label="Current Legal Last Name (optional)"
-                :disabled="enableDisableForm.disabled || !editLegalLastName"
-                autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-                maxlength="40"
-                dense
-              ></v-text-field>
-            </v-container>
-          </v-col>
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
@@ -160,9 +73,10 @@
               ></v-checkbox>
               <v-text-field
                 id='legalFirstName'
-                v-model="userPost.legalFirstName"
+                v-model="request.legalFirstName"
                 color="#003366"
                 hint="As shown on current Government Photo ID"
+                :persistent-hint="!enableDisableForm.disabled && editLegalFirstName"
                 outlined
                 label="Current Legal First Name(s) (optional)"
                 :disabled="enableDisableForm.disabled || !editLegalFirstName"
@@ -184,9 +98,10 @@
               ></v-checkbox>
               <v-text-field
                 id='legalMiddleNames'
-                v-model="userPost.legalMiddleNames"
+                v-model="request.legalMiddleNames"
                 color="#003366"
                 hint="As shown on current Government Photo ID"
+                :persistent-hint="!enableDisableForm.disabled && editLegalMiddleNames"
                 outlined
                 label="Current Legal Middle Name(s) (optional)"
                 :disabled="enableDisableForm.disabled || !editLegalMiddleNames"
@@ -194,6 +109,31 @@
                 maxlength="255"
                 dense
                 :rules="charRules"
+              ></v-text-field>
+            </v-container>
+          </v-col>
+          <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
+            <v-container class="d-flex align-start pa-0" fluid>
+              <v-checkbox
+                class="pt-0 pr-2 mt-0"
+                v-model="editLegalLastName"
+                label="Edit"
+                dense
+                :disabled="enableDisableForm.disabled"
+              ></v-checkbox>
+              <v-text-field
+                id='legalLastName'
+                v-model="request.legalLastName"
+                color="#003366"
+                outlined
+                :rules="charRules"
+                :hint="legalLastNameHint"
+                :persistent-hint="!enableDisableForm.disabled && editLegalLastName"
+                label="Current Legal Last Name (optional)"
+                :disabled="enableDisableForm.disabled || !editLegalLastName"
+                autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
+                maxlength="40"
+                dense
               ></v-text-field>
             </v-container>
           </v-col>
@@ -218,7 +158,7 @@
                   <v-text-field
                     color="#003366"
                     outlined
-                    v-model="userPost.dob"
+                    :value="request.dob ? moment(request.dob).format('MMMM D, YYYY'):''"
                     :rules="requiredRules(dobHint)"
                     label="Birthdate"
                     readonly
@@ -235,7 +175,7 @@
                   id='dob'
                   color="#003366"
                   ref="picker"
-                  v-model="userPost.dob"
+                  v-model="request.dob"
                   show-current
                   :max="new Date(this.localDate.now().minusYears(5).toString()).toISOString().substr(0, 10)"
                   min="1903-01-01"
@@ -256,17 +196,27 @@
               <v-select
                 id='gender'
                 color="#003366"
-                v-model="genderLabel"
+                v-model="genderLabelChanged"
                 :rules="requiredRules(genderHint)"
                 outlined
                 :items="genderLabels"
                 :hint="genderHint"
+                :persistent-hint="!enableDisableForm.disabled && editGenderLabel"
                 label="Current Gender"
                 :disabled="enableDisableForm.disabled || !editGenderLabel"
                 dense
               ></v-select>
             </v-container>
           </v-col>
+        </v-row>
+      </v-container>
+
+      <v-card-subtitle class="mb-2">
+        <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Contact Information</span>
+      </v-card-subtitle>
+
+      <v-container fluid class="py-0">
+        <v-row>
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
@@ -278,7 +228,7 @@
               ></v-checkbox>
               <v-text-field
                 id='email'
-                v-model="userPost.email"
+                v-model="request.email"
                 :rules="emailRules"
                 color="#003366"
                 :hint="emailHint"
@@ -333,47 +283,62 @@
               <v-btn
                 color="#003366"
                 class="white--text align-self-center"
-                id="submit_form"
-                @click="submitRequestForm"
-                :disabled="!validForm"
-                :loading="submitting"
+                id="previous-step"
+                @click="previousStep"
               >
-                Submit
+                Back
+              </v-btn>
+              <v-btn
+                color="#003366"
+                class="white--text align-self-center"
+                id="next-step"
+                @click="validateRequestForm"
+                :disabled="!validForm"
+              >
+                Next
               </v-btn>
             </v-card-actions>
           </v-col>
         </v-row>
       </v-container>
     </v-form>
-    <v-dialog
-      v-model="dialog"
-      width="500px"
-    >
-      <v-card>
-        <v-card-text class="fullPadding">
-          {{ dialogMessage }}
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="#003366"
-            class="white--text"
-            @click="closeDialog"
-          >
-            Close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+  </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations, mapActions} from 'vuex';
 import {LocalDate} from '@js-joda/core';
-import { isEqual, pick } from 'lodash';
+import { isEqual } from 'lodash';
+import moment from 'moment';
 
 export default {
+  name: 'requestForm',
+  props: {
+    recordedData: {
+      type: Object,
+      required: true
+    },
+    request: {
+      type: Object,
+      required: true
+    },
+    genderLabel: {
+      type: String,
+      required: true
+    },
+    changeRequest: {
+      type: Function,
+      required: true
+    },
+    nextStep: {
+      type: Function,
+      required: true
+    },
+    previousStep: {
+      type: Function,
+      required: true
+    },
+  },
   data() {
     return {
       localDate:LocalDate,
@@ -383,23 +348,16 @@ export default {
       emailHint: 'Valid Email Required',
       dobHint: 'Valid Birthdate Required',
       menu: false,
-      appTitle: process.env.VUE_APP_TITLE,
       validForm: false,
-      dialog: false,
       submitting: false,
-      dialogMessage: null,
-      genderLabel: null,
+
+      alert: false,
+      alertMessage: null,
+
+      genderLabelChanged: null,
       declared: false,
       acceptance: false,
-      recordedData: null,
-      userPost: {
-        legalLastName: null,
-        legalFirstName: null,
-        legalMiddleNames: null,
-        dob: null,
-        genderCode: null,
-        email: null,
-      },
+      
       editLegalLastName: false,
       editLegalFirstName: false,
       editLegalMiddleNames: false,
@@ -412,11 +370,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['userInfo']),
     ...mapGetters('request', ['genders', 'student']),
-    dataReady() {
-      return !!this.userInfo;
-    },
     emailRules() {
       return [
         v => !!v || this.emailHint,
@@ -434,35 +388,30 @@ export default {
       val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'));
     },
     editLegalLastName(val) {
-      this.userPost.legalLastName = val ? '' : this.student.legalLastName;
+      this.request.legalLastName = val ? '' : this.student.legalLastName;
     },
     editLegalFirstName(val) {
-      this.userPost.legalFirstName = val ? '' : this.student.legalFirstName;
+      this.request.legalFirstName = val ? '' : this.student.legalFirstName;
     },
     editLegalMiddleNames(val) {
-      this.userPost.legalMiddleNames = val ? '' : this.student.legalMiddleNames;
+      this.request.legalMiddleNames = val ? '' : this.student.legalMiddleNames;
     },
     editBirthdate(val) {
-      this.userPost.dob = val ? '' : this.student.dob;
+      this.request.dob = val ? '' : this.student.dob;
     },
     editGenderLabel(val) {
-      this.genderLabel = val ? '' : this.student.genderLabel;
+      this.genderLabelChanged = val ? '' : this.genderLabel;
     },
     editEmail(val) {
-      this.userPost.email = val ? '' : this.student.email;
+      this.request.email = val ? '' : this.student.email;
     },    
   },
-  mounted() {
+  created() {
     this.genderLabels = this.genders.map(a => a.label);
-    if (this.student) {
-      this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email']);
-      Object.assign(this.userPost, this.recordedData);
-      const gender = this.genders.find(it => (it.genderCode === this.student.genderCode));
-      this.student.genderLabel = gender.label;
-      this.genderLabel = gender.label;
-    }
+    this.genderLabelChanged = this.genderLabel;
   },
   methods: {
+    moment,
     ...mapMutations('request', ['setRequest']),
     ...mapActions('request', ['postRequest']),
     requiredRules(hint = 'Required') {
@@ -486,46 +435,22 @@ export default {
     validate() {
       this.$refs.form.validate();
     },
-    setSuccessDialog() {
-      this.dialogMessage = 'Form submit success!';
-      this.dialog = true;
-    },
-    setErrorDialog() {
-      this.dialogMessage = 'Sorry, an unexpected error seems to have occured. You can click on the submit button again later.';
-      this.dialog = true;
-    },
     setNoChangeErrorDialog() {
-      this.dialogMessage = 'Please fill in fields that you want to update in the form.';
-      this.dialog = true;
+      this.alertMessage = 'Please fill in fields that you want to update in the form.';
+      this.alert = true;
+      window.scrollTo(0,0);
     },
-    async submitRequestForm() {
+    validateRequestForm() {
       this.validate();
       if (this.validForm) {
-        try {
-          const code = this.genders.filter(it => (it.label === this.genderLabel));
-          this.userPost.genderCode = code[0].genderCode;
+        const code = this.genders.filter(it => (it.label === this.genderLabelChanged));
+        this.request.genderCode = code[0].genderCode;
 
-          if(isEqual(this.userPost, this.recordedData)) {
-            this.setNoChangeErrorDialog();
-          } else {
-            this.submitting = true;
-            const resData = await this.postRequest(this.userPost);
-            if (resData) {
-              this.$refs.form.reset();
-              this.setSuccessDialog();
-              this.setRequest(resData);
-              if (this.$route.name !== 'home') {
-                this.$router.replace({name: 'home'});
-              }
-            } else {
-              this.setErrorDialog();
-            }
-          }
-        } catch (e) {
-          this.setErrorDialog();
-          throw e;
-        } finally {
-          this.submitting = false;
+        if(isEqual(this.request, this.recordedData)) {
+          this.setNoChangeErrorDialog();
+        } else {
+          this.changeRequest(this.request);
+          this.nextStep();
         }
       }
     },
@@ -555,12 +480,6 @@ export default {
     height: 0;
     width: 0;
     margin: 0;
-  }
-  .mainCard {
-    margin: 20px 0;
-    padding: 10px;
-    width: 100%;
-    /* max-width: 900px; */
   }
 
   .v-dialog {
@@ -594,32 +513,5 @@ export default {
 
   .bottom_group {
     padding-bottom: 15px;
-  }
-
-  @media screen and (max-width: 300px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 8rem;
-    }
-  }
-
-  @media screen and (min-width: 301px) and (max-width: 600px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 7rem;
-    }
-  }
-
-  @media screen and (min-width: 601px) and (max-width: 900px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 7rem;
-    }
   }
 </style>

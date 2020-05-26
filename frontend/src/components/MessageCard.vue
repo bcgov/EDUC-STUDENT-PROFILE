@@ -1,10 +1,10 @@
 <template>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-if="status === requestStatuses.INITREV || status === requestStatuses.SUBSREV">
-    <p class="mb-2"><strong>Your email has been verified and your PEN request has now been submitted for processing.</strong></p>
+    <p class="mb-2"><strong>Your request to update your student information with the changes below has been submitted.</strong></p>
     <ul>
-      <li>Requests are processed M-F 8am – 4:30pm excluding stat holidays</li>
+      <li>Requests are processed M-F 8am - 4:30pm excluding stat holidays</li>
       <li>In most cases you will get a response within one business day</li>
-      <li>You will receive an email when your request has been processed. You can also log into GetMyPEN after one business day to check on status of your request</li>
+      <li>You will receive an email when your request has been processed. You can also log into UpdateMyPENInfo after one business day to check on the status of your request</li>
     </ul>
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.DRAFT && timedout">
@@ -16,20 +16,19 @@
     </ol>
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.DRAFT && ! timedout">
-    <p class="mb-2"><strong>You are almost finished. To complete your request, you must verify the email address you provided by completing the following steps:</strong></p>
-    <p>
-      <ol>
-        <li>Go to your email inbox for <strong>{{ request.email }}</strong> and look for an email from {{ ministry }}. You may need to check your spam folder</li>
-        <li><strong>Within 24 hours</strong> you must click on the link in the email to complete your request</li>
-      </ol>
-    </p>
-    <p>If the email has expired or is not in your Inbox (or spam folder) click on the 'Resend Verification Email' button below to receive a new email and then follow the 2 steps listed above.</p>
+    <p class="mb-2"><strong>You are almost finished. To complete your request for the changes below, you must verify the email address you provided by completing the following steps:</strong></p>
+    <ol>
+      <li>Go to your email for {{request.email}} and look for an email from the Ministry of Education.  You may need to check your spam folder</li>
+      <li>Within 24 hours you must click on the link in the email to complete your request</li>
+    </ol>
+    <br/>
+    <p>If the email has expired or is not in your Inbox (or spam folder) click on the "Resend Verification Email" button below to receive a new email and the follow the 2 steps listed above.</p>
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.RETURNED">
     <p class="mb-2"><strong>Additional information is required.</strong> See the request below.</p>
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.REJECTED">
-    <p class="mb-2"><strong>Your request to get your PEN could not be completed, for the following reason:</strong></p>
+    <p class="mb-2"><strong>Your request to update your student information could not be completed, for the following reason:</strong></p>
     <p>
       <ul>
         <li>{{ request.failureReason }}</li>
@@ -113,9 +112,6 @@ export default {
     ...mapGetters('request', ['request', 'student', 'sexInfo']),
     status() {
       return this.request.requestStatusCode;
-    },
-    request() {
-      return this.request;
     },
     ministry() {
       return 'the Ministry of Education';

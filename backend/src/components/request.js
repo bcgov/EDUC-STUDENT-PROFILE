@@ -283,10 +283,12 @@ async function submitRequest(req, res) {
     const resData = await postRequest(accessToken, req.body, userInfo._json);
 
     req.session.request = resData;
-    sendVerificationEmail(accessToken, req.body.email, resData.requestID, req.session.digitalIdentityData.identityTypeLabel).catch(e => 
-      log.error('sendVerificationEmail Error', e.stack)
-    );
-
+    if(req.body.email && req.body.email !== req.body.recordedEmail) {
+      sendVerificationEmail(accessToken, req.body.email, resData.requestID, req.session.digitalIdentityData.identityTypeLabel).catch(e => 
+        log.error('sendVerificationEmail Error', e.stack)
+      );
+    }
+    
     return res.status(HttpStatus.OK).json(resData);
   } catch(e) {
     log.error('submitRequest Error', e.stack);
