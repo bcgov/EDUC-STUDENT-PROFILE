@@ -142,8 +142,8 @@ objects:
       kind: DeploymentConfig
       name: "${APP_NAME}-backend-${JOB_NAME}"
       subresource: scale
-    minReplicas: 3
-    maxReplicas: 5
+    minReplicas: 2
+    maxReplicas: 3
     metrics:
       - type: Resource
         resource:
