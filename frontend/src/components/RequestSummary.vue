@@ -20,7 +20,7 @@
     <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
       <h3>Guidance:</h3>
       <ul class="pt-2">
-        <li>Please review your information below before completing the request. If requested updates are incorrect or need to be adjusted further, use the <strong>Back</strong> button to return to UpdateMyPENInfo form</li>
+        <li>Please review your information below before completing the request. If requested updates are incorrect or need to be adjusted further, use the <strong>Back</strong> button to return to the UpdateMyPENInfo form</li>
         <li>If your name and/or gender has been legally changed, proof of this change may be requested</li>
       </ul>
     </v-alert>
