@@ -48,7 +48,7 @@
     </v-container>
 
     <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
-      <span>Check fields that need to be updated.  Leave fields that do not require changes unchecked</span>
+      <span>Check fields that need to be updated. Leave fields unchecked that do not require changes</span>
     </v-alert>
 
     <v-form autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -266,13 +266,12 @@
             <v-card height="100%" width="100%" elevation=2
                     class="black--text pa-4">
               <p>
-                <strong>CONFIDENTIAL INFORMATION.</strong> The information collected on this form will be used to 
-                verify your identity for the purposes of communicating your personal education number to you, 
-                and may also be used to update your PEN file. All information provided on this form will be 
-                administered in accordance with the Freedom of Information and Protection of Privacy Act. 
-                For more information regarding the use of your personal information provided on this form, 
-                please contact the Student Information Services Branch, Data Management Unit, Ministry of 
-                Education.
+                <strong>CONFIDENTIAL INFORMATION.</strong> The information collected on this form will be 
+                used to verify your identity and may also be used to update your PEN file. All information 
+                provided on this form will be administered in accordance with the Freedom of Information 
+                and Protection of Privacy Act. For more information regarding the use of your personal 
+                information provided on this form, please contact the Student Information Services Branch, 
+                Data Management Unit, Ministry of Education.
               </p>
             </v-card>
           </v-col>
