@@ -4,6 +4,7 @@
       <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Student Information</span>
     </v-card-subtitle>
     <v-container fluid class="pt-0 px-1">
+      <slot name="hint"></slot>
       <v-row no-gutters>
         <v-col xl="auto" lg="auto" md="auto" sm="auto">
           <p class="mb-0">Name:</p>
@@ -44,6 +45,7 @@
         </v-col>
       </v-row>
     </v-container>
+    <slot name="actions"></slot>
   </v-card>
 </template>
 
@@ -53,13 +55,19 @@ import moment from 'moment';
 
 export default {
   name: 'requestCard',
+  props: {
+    request: {
+      type: Object,
+      required: true
+    },
+  },
   computed: {
-    ...mapGetters('request', ['genderInfo', 'request']),
+    ...mapGetters('request', ['genderInfo']),
     genderLabel() { 
       return this.genderInfo(this.request.genderCode).label;
     },
     fullName() {
-      return [this.request.legalFirstName, this.request.legalMiddleNames, this.request.legalLastName].filter(Boolean).join(' ');
+      return [this.request.legalFirstName, this.request.legalMiddleNames, this.request.legalLastName].filter(Boolean).join(' ').toUpperCase();
     }
   },
   methods: {

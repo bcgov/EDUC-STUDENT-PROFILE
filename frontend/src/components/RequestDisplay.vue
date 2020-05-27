@@ -30,7 +30,7 @@
       <Chat v-if="status !== requestStatuses.DRAFT || status !== requestStatuses.INITREV"></Chat>
     </v-row>
     <v-row>
-      <RequestCard></RequestCard>
+      <RequestCard :request="request"></RequestCard>
     </v-row>
   </v-card>
 </template>

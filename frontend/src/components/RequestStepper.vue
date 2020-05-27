@@ -53,7 +53,7 @@
         </v-stepper-content>
         <v-stepper-content step="4" class="px-0">
           <RequestSubmission
-            :request="userPost"
+            :request="request"
           ></RequestSubmission>
         </v-stepper-content>
       </v-stepper-items>
@@ -121,7 +121,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('request', ['genders', 'student', 'genderInfo']),
+    ...mapGetters('request', ['genders', 'student', 'genderInfo', 'request']),
     dataReady() {
       return !!this.userInfo;
     },
