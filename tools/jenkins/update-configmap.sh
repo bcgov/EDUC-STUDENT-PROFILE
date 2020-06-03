@@ -1,24 +1,27 @@
 envValue=$1
 APP_NAME=$2
-OPENSHIFT_NAMESPACE=$3
+PEN_NAMESPACE=$3
+COMMON_NAMESPACE=$4
 
 TZVALUE="America/Vancouver"
 SOAM_KC_REALM_ID="master"
 KCADM_FILE_BIN_FOLDER="/tmp/keycloak-9.0.3/bin"
-SOAM_KC=$OPENSHIFT_NAMESPACE-$envValue.pathfinder.gov.bc.ca
+SOAM_KC=$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca
 siteMinderLogoutUrl=""
 if [ "$envValue" != "prod" ]
 then
-  SERVER_FRONTEND="https://student-profile-${OPENSHIFT_NAMESPACE}-${envValue}.pathfinder.gov.bc.ca"
+  SERVER_FRONTEND="https://student-profile-${PEN_NAMESPACE}-${envValue}.pathfinder.gov.bc.ca"
   siteMinderLogoutUrl="https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
 else
   SERVER_FRONTEND="https://getmypen.gov.bc.ca"
   siteMinderLogoutUrl="https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
 fi
 
-oc project $OPENSHIFT_NAMESPACE-$envValue
+oc project $COMMON_NAMESPACE-$envValue
 SOAM_KC_LOAD_USER_ADMIN=$(oc -o json get secret sso-admin-${envValue} | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
 SOAM_KC_LOAD_USER_PASS=$(oc -o json get secret sso-admin-${envValue} | sed -n 's/.*"password": "\(.*\)",/\1/p' | base64 --decode)
+oc project $PEN_NAMESPACE-$envValue
+
 
 $KCADM_FILE_BIN_FOLDER/kcadm.sh config credentials --server https://$SOAM_KC/auth --realm $SOAM_KC_REALM_ID --user $SOAM_KC_LOAD_USER_ADMIN --password $SOAM_KC_LOAD_USER_PASS
 
@@ -58,7 +61,7 @@ echo Removing key files
 rm tempPenBackendkey
 rm tempPenBackendkey.pub
 echo Creating config map $APP_NAME-backend-config-map
-oc create -n $OPENSHIFT_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map --from-literal=TZ=$TZVALUE --from-literal=UI_PRIVATE_KEY="$UI_PRIVATE_KEY_VAL" --from-literal=UI_PUBLIC_KEY="$UI_PUBLIC_KEY_VAL" --from-literal=SOAM_CLIENT_ID=$APP_NAME-soam --from-literal=SOAM_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=SERVER_FRONTEND="$SERVER_FRONTEND" --from-literal=ISSUER=PEN_Retrieval_Application --from-literal=STUDENT_PROFILE_API_ENDPOINT=https://student-profile-api-$OPENSHIFT_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=SOAM_PUBLIC_KEY="$soamFullPublicKey" --from-literal=SOAM_DISCOVERY=https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/.well-known/openid-configuration --from-literal=SOAM_URL=https://$SOAM_KC --from-literal=STUDENT_API_ENDPOINT=https://student-api-$OPENSHIFT_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=DIGITALID_API_ENDPOINT=https://digitalid-api-$OPENSHIFT_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=STUDENT_PROFILE_CLIENT_ID=student-profile-soam --from-literal=STUDENT_PROFILE_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=STUDENT_PROFILE_EMAIL_API_ENDPOINT=https://student-profile-email-api-$OPENSHIFT_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=STUDENT_PROFILE_EMAIL_SECRET_KEY="$JWT_SECRET_KEY" --from-literal=SITEMINDER_LOGOUT_ENDPOINT="$siteMinderLogoutUrl" --from-literal=STUDENT_DEMOG_API_ENDPOINT=https://pen-demographics-api-$OPENSHIFT_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=LOG_LEVEL=info --from-literal=REDIS_HOST=redis --from-literal=REDIS_PORT=6379 --from-literal=TOKEN_TTL_MINUTES=1440 --dry-run -o yaml | oc apply -f -
+oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map --from-literal=TZ=$TZVALUE --from-literal=UI_PRIVATE_KEY="$UI_PRIVATE_KEY_VAL" --from-literal=UI_PUBLIC_KEY="$UI_PUBLIC_KEY_VAL" --from-literal=SOAM_CLIENT_ID=$APP_NAME-soam --from-literal=SOAM_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=SERVER_FRONTEND="$SERVER_FRONTEND" --from-literal=ISSUER=PEN_Retrieval_Application --from-literal=STUDENT_PROFILE_API_ENDPOINT=https://student-profile-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=SOAM_PUBLIC_KEY="$soamFullPublicKey" --from-literal=SOAM_DISCOVERY=https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/.well-known/openid-configuration --from-literal=SOAM_URL=https://$SOAM_KC --from-literal=STUDENT_API_ENDPOINT=https://student-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=DIGITALID_API_ENDPOINT=https://digitalid-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=STUDENT_PROFILE_CLIENT_ID=student-profile-soam --from-literal=STUDENT_PROFILE_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=STUDENT_PROFILE_EMAIL_API_ENDPOINT=https://student-profile-email-api-$PEN_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=STUDENT_PROFILE_EMAIL_SECRET_KEY="$JWT_SECRET_KEY" --from-literal=SITEMINDER_LOGOUT_ENDPOINT="$siteMinderLogoutUrl" --from-literal=STUDENT_DEMOG_API_ENDPOINT=https://pen-demographics-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=LOG_LEVEL=info --from-literal=REDIS_HOST=redis --from-literal=REDIS_PORT=6379 --from-literal=TOKEN_TTL_MINUTES=1440 --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for $APP_NAME-backend-$SOAM_KC_REALM_ID application
 oc set env --from=configmap/$APP_NAME-backend-config-map dc/$APP_NAME-backend-$SOAM_KC_REALM_ID
@@ -107,7 +110,7 @@ regConfig="var config = (function() {
 })();"
 
 echo Creating config map $APP_NAME-frontend-config-map
-oc create -n $OPENSHIFT_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map --from-literal=TZ=$TZVALUE --from-literal=HOST_ROUTE=$APP_NAME-$OPENSHIFT_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=config.js="$regConfig" --from-literal=snowplow.js="$snowplow"  --dry-run -o yaml | oc apply -f -
+oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map --from-literal=TZ=$TZVALUE --from-literal=HOST_ROUTE=$APP_NAME-$PEN_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=config.js="$regConfig" --from-literal=snowplow.js="$snowplow"  --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for $APP_NAME-frontend-$SOAM_KC_REALM_ID application
 oc set env --from=configmap/$APP_NAME-frontend-config-map dc/$APP_NAME-frontend-$SOAM_KC_REALM_ID

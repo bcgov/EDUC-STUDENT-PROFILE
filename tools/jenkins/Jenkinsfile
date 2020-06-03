@@ -4,6 +4,7 @@ pipeline{
         DEBUG_OUTPUT = 'false'
 
         NAMESPACE='c2mvws'
+        COMMON_NAMESPACE='mvubjx'
         TOOLS = "${NAMESPACE}-tools"
         DEV = "${NAMESPACE}-dev"
         TEST = "${NAMESPACE}-test"
@@ -145,7 +146,7 @@ pipeline{
             script{
               dir('tools/jenkins'){
                 def configVars
-                sh "bash ./update-configmap.sh \"dev\" ${APP_NAME} ${NAMESPACE}"
+                sh "bash ./update-configmap.sh \"dev\" ${APP_NAME} ${NAMESPACE} ${COMMON_NAMESPACE}"
               }
             }
           }
