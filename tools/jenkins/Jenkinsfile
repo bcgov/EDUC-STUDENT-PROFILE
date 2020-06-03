@@ -122,7 +122,7 @@ pipeline{
 			   DC_URL_BACKEND = "https://raw.githubusercontent.com/bcgov/EDUC-STUDENT-PROFILE/master/tools/openshift/backend.dc.yaml"
             }
             steps{
-                deployStage('Dev', DEV, 'educ-student-profile', 'student-profile', 'master', 'dev', TOOLS, DEV, APP_DOMAIN, "${DC_URL_FRONTEND}", "${DC_URL_BACKEND}")
+                deployStage('Dev', DEV, 'educ-student-profile', 'student-profile', 'master', 'dev', TOOLS, DEV, APP_DOMAIN, "${DC_URL_FRONTEND}", "${DC_URL_BACKEND}",'1','1')
             }
             post{
                 success{
@@ -154,7 +154,7 @@ pipeline{
     }
 }
 
-def deployStage(String stageEnv, String projectEnv, String repoName, String appName, String jobName, String tag, String toolsEnv, String targetEnvironment, String appDomain, String rawApiDcURLFrontend, String rawApiDcURLBackend) {
+def deployStage(String stageEnv, String projectEnv, String repoName, String appName, String jobName, String tag, String toolsEnv, String targetEnvironment, String appDomain, String rawApiDcURLFrontend, String rawApiDcURLBackend, String minReplicas, String maxReplicas) {
   openshift.withCluster() {
 	openshift.withProject(projectEnv) {
 	  echo "Tagging Image ${repoName}-backend:${jobName} with version ${tag}"
@@ -172,7 +172,9 @@ def deployStage(String stageEnv, String projectEnv, String repoName, String appN
 		"NAMESPACE=${projectEnv}",
 		"APP_NAME=${appName}",
 		"HOST_ROUTE=${appName}-${targetEnvironment}.${appDomain}",
-		"TAG=${tag}"
+		"TAG=${tag}",
+		"MIN_REPLICAS=${minReplicas}",
+		"MAX_REPLICAS=${maxReplicas}"
 	  )
 		
 	  def dcBackend = openshift.apply(dcBackendTemplate).narrow('dc')
@@ -185,7 +187,9 @@ def deployStage(String stageEnv, String projectEnv, String repoName, String appN
 		"NAMESPACE=${projectEnv}",
 		"APP_NAME=${appName}",
 		"HOST_ROUTE=${appName}-${targetEnvironment}.${appDomain}",
-		"TAG=${tag}"
+		"TAG=${tag}",
+		"MIN_REPLICAS=${minReplicas}",
+		"MAX_REPLICAS=${maxReplicas}"
 	  )
 
 	  echo "Applying Deployment ${appName}-frontend-static..."
