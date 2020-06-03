@@ -128,7 +128,7 @@ pipeline{
 			   DC_URL_BACKEND = "https://raw.githubusercontent.com/bcgov/EDUC-STUDENT-PROFILE/master/tools/openshift/backend.dc.yaml"
             }
             steps{
-                deployStage('Dev', DEV, 'educ-student-profile', 'student-profile', 'master', 'dev', TOOLS, DEV, APP_DOMAIN, "${DC_URL_FRONTEND}", "${DC_URL_BACKEND}",'1','1')
+                deployStage('Dev', DEV, 'educ-student-profile', 'student-profile', 'master', 'dev', TOOLS, DEV, APP_DOMAIN, "${DC_URL_FRONTEND}", "${DC_URL_BACKEND}")
             }
             post{
                 success{
