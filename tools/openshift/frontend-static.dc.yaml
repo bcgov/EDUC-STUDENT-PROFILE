@@ -66,11 +66,11 @@
               timeoutSeconds: 1
             resources:
               requests:
-                cpu: "10m"
-                memory: "50Mi"
+                cpu: "${MIN_CPU}"
+                memory: "${MIN_MEM}"
               limits:
-                cpu: "25m"
-                memory: "100Mi"
+                cpu: "${MAX_CPU}"
+                memory: "${MAX_MEM}"
           volumes:
           - name: tls-certs
             secret:
@@ -169,5 +169,17 @@
     description: The minimum amount of replicas
     required: true
   - name: MAX_REPLICAS
+    description: The minimum amount of replicas
+    required: true
+  - name: MIN_CPU
+    description: The minimum amount of replicas
+    required: true
+  - name: MAX_CPU
+    description: The minimum amount of replicas
+    required: true
+  - name: MIN_MEM
+    description: The minimum amount of replicas
+    required: true
+  - name: MAX_MEM
     description: The minimum amount of replicas
     required: true
