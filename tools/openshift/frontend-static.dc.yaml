@@ -17,7 +17,7 @@
         app: "${APP_NAME}-${JOB_NAME}"
       name: "${APP_NAME}-frontend-${JOB_NAME}"
     spec:
-      replicas: ${MIN_REPLICAS}
+      replicas: ${{MIN_REPLICAS}}
       selector:
         app: "${APP_NAME}-${JOB_NAME}"
         deploymentconfig: "${APP_NAME}-frontend-${JOB_NAME}"
@@ -139,8 +139,8 @@
         kind: DeploymentConfig
         name: "${APP_NAME}-frontend-${JOB_NAME}"
         subresource: scale
-      minReplicas: ${MIN_REPLICAS}
-      maxReplicas: ${MAX_REPLICAS}
+      minReplicas: ${{MIN_REPLICAS}}
+      maxReplicas: ${{MAX_REPLICAS}}
       metrics:
         - type: Resource
           resource:
