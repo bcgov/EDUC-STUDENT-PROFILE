@@ -185,4 +185,4 @@ parameters:
   required: true
 - name: MAX_MEM
   description: The maximum amount of memory
-  required: truee
+  required: true
