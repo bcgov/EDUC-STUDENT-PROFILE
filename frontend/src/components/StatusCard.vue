@@ -35,6 +35,14 @@
         </v-row>
       </v-card>
     </div>
+    <div class="pa-0 align-self-start" v-if="status === requestStatuses.ABANDONED">
+      <v-card height="100%" width="100%" elevation=0>
+        <v-row no-gutters justify="end" class="pb-5">
+          <v-btn color="#38598a" dark class="ml-2 text-none" @click.stop="$router.push('request')">Create a new Request
+          </v-btn>
+        </v-row>
+      </v-card>
+    </div>
     <div class="pa-0 align-self-start" v-else-if="status === requestStatuses.DRAFT">
       <v-card height="100%" width="100%" elevation=0>
         <v-row no-gutters justify="end" class="pb-5">

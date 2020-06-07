@@ -23,6 +23,7 @@ export const ApiRoutes = Object.freeze({
   FILE_REQUIREMENTS: apiRoot + '/file-requirements',
   // FILE_UPLOAD: apiRoot + '/document',
   USER: apiRoot + '/user',
+  CONFIG: baseRoot + '/config'
 });
 
 export const RequestStatuses = Object.freeze({
@@ -33,6 +34,7 @@ export const RequestStatuses = Object.freeze({
   AUTO: 'AUTO',
   MANUAL: 'MANUAL',
   REJECTED: 'REJECTED',
+  ABANDONED: 'ABANDONED'
 });
 
 export const VerificationResults = Object.freeze({

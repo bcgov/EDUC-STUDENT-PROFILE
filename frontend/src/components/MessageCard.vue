@@ -93,10 +93,13 @@
     </p>
     <p class="mb-2">You can log back into GetMyPEN at any time to see your PEN.</p>
   </v-alert>
+  <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.ABANDONED">
+    <p class="mb-2"><strong>You did not verify your email and after {{numDaysAllowedInDraftStatus}} days your Update My Profile request was deleted. Please start again.</strong></p>
+  </v-alert>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters,mapActions } from 'vuex';
 import moment from 'moment';
 import { RequestStatuses } from '@/utils/constants';
 
@@ -110,6 +113,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['userInfo']),
     ...mapGetters('request', ['request', 'student', 'sexInfo']),
+    ...mapGetters('config',['numDaysAllowedInDraftStatus']),
     status() {
       return this.request.requestStatusCode;
     },
@@ -126,8 +130,12 @@ export default {
       return this.sexInfo(this.student.sexCode).label;
     }
   },
+  async created(){
+    await this.getNumDaysAllowedInDraftStatus();
+  },
   methods: {
     moment,
+    ...mapActions('config',['getNumDaysAllowedInDraftStatus']),
   }
 };
 </script>

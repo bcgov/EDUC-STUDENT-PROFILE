@@ -1,7 +1,7 @@
 const redis = require('redis-mock');
 const express = require('express');
 
-jest.doMock('redis', () => {
+jest.doMock('ioredis', () => {
   return redis;
 });
 

@@ -12,10 +12,11 @@ const cors = require('cors');
 const utils = require('./components/utils');
 const auth = require('./components/auth');
 const bodyParser = require('body-parser');
-const redis = require('redis');
+const Redis = require('ioredis');
 const connectRedis = require('connect-redis');
 dotenv.config();
 
+const scheduler = require('./schedulers/student-profile-scheduler');
 const JWTStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const OidcStrategy = require('passport-openidconnect-kc-idp').Strategy;
@@ -23,6 +24,7 @@ const OidcStrategy = require('passport-openidconnect-kc-idp').Strategy;
 const apiRouter = express.Router();
 const authRouter = require('./routes/auth');
 const studentRouter = require('./routes/student');
+const configRouter = require('./routes/config');
 const promMid = require('express-prometheus-middleware');
 const actuator = require('express-actuator');
 
@@ -53,7 +55,7 @@ app.use(bodyParser.urlencoded({
 
 
 app.use(morgan(config.get('server:morganFormat')));
-const redisClient = redis.createClient({
+const redisClient = new Redis({
   host: config.get('redis:host'),
   port: config.get('redis:port'),
   password: config.get('redis:password')
@@ -192,6 +194,7 @@ app.use(/(\/api)?/, apiRouter);
 
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/student', studentRouter);
+apiRouter.use('/config',configRouter);
 
 //Handle 500 error
 app.use((err, _req, res, next) => {
@@ -211,5 +214,5 @@ process.on('unhandledRejection', err => {
   log.error('Unhandled Rejection at:', err.stack || err);
   // res.redirect(config.get('server:frontend') + '/error?message=unhandled_rejection');
 });
-
+scheduler.draftToAbandonRequestJob.start();
 module.exports = app;
