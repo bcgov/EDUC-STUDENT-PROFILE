@@ -77,11 +77,11 @@ async function findAndUpdateDraftProfileRequestsToAbandoned(lock) {
     log.silly(JSON.stringify(result));
     if (result['content'] && result['content'].length > 0) {
       const updatePenReqResult = [];
-      for (const penRequest in result['content']) {
-        const penReqObj = result['content'][penRequest];
-        penReqObj.statusUpdateDate = localDateTime.now().toString();
-        penReqObj.penRequestStatusCode = 'ABANDONED';
-        const putDataResult = putData(accessToken, penReqObj, config.get('studentProfile:apiEndpoint'));
+      for (const profileReqIndex in result['content']) {
+        const profileReq = result['content'][profileReqIndex];
+        profileReq.statusUpdateDate = localDateTime.now().toString();
+        profileReq.studentRequestStatusCode = 'ABANDONED';
+        const putDataResult = putData(accessToken, profileReq, config.get('studentProfile:apiEndpoint'));
         updatePenReqResult.push(putDataResult);
 
       }
