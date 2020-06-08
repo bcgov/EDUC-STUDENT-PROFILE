@@ -28,7 +28,7 @@
             </v-row>
         </v-card>
     </div>
-    <div class="pa-0 align-self-start" v-if="status === requestStatuses.REJECTED || status === requestStatuses.AUTO || status === requestStatuses.MANUAL">
+    <div class="pa-0 align-self-start" v-if="status === requestStatuses.REJECTED || status === requestStatuses.COMPLETED">
       <v-card height="100%" width="100%" elevation=0>
         <v-row no-gutters justify="end" class="pb-5">
           <v-btn color="#38598a" dark class="ml-2 text-none" @click.stop="$router.push('request')">Create a new Request</v-btn>
@@ -70,10 +70,10 @@ export default {
   computed: {
     ...mapGetters('request', ['request', 'statuses']),
     status() {
-      return this.request.requestStatusCode;
+      return this.request.studentRequestStatusCode;
     },
     statusLabel() {
-      const statusCode = find(this.statuses, ['requestStatusCode', this.status]);
+      const statusCode = find(this.statuses, ['studentRequestStatusCode', this.status]);
       return statusCode && statusCode.label;
     },
     requestStatuses() {
@@ -87,7 +87,7 @@ export default {
     moment,
     resendVerificationEmail() {
       this.sending = true;
-      ApiService.resendVerificationEmail(this.request.requestID).then(() => {
+      ApiService.resendVerificationEmail(this.request.studentRequestID).then(() => {
         this.$emit('success-alert', 'Your verification email has been sent successfully.');
       }).catch(() => {
         this.$emit('error-alert', 'Sorry, an unexpected error seems to have occurred. You can click on the resend button again later.');

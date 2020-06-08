@@ -63,7 +63,7 @@ export default {
   computed: {
     ...mapGetters('request', ['request']),
     status() {
-      return this.request.requestStatusCode;
+      return this.request.studentRequestStatusCode;
     },
     requestStatuses() {
       return RequestStatuses;

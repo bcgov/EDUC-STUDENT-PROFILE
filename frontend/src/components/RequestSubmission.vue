@@ -93,7 +93,7 @@ export default {
     },
     resendVerificationEmail() {
       this.sending = true;
-      ApiService.resendVerificationEmail(this.request.requestID).then(() => {
+      ApiService.resendVerificationEmail(this.request.studentRequestID).then(() => {
         this.setSuccessAlert('Your verification email has been sent successfully.');
       }).catch(() => {
         this.setErrorAlert('Sorry, an unexpected error seems to have occurred. You can click on the resend button again later.');

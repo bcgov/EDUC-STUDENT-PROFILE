@@ -24,7 +24,7 @@ describe('postComment', () => {
   };
   const session = {
     request: {
-      requestStatusCode: utils.RequestStatuses.RETURNED,
+      studentRequestStatusCode: utils.RequestStatuses.RETURNED,
     }
   };
 
@@ -58,7 +58,7 @@ describe('postComment', () => {
     };
 
     const postReq =  {
-      dataChangeRequestID: params.id,
+      studentRequestID: params.id,
       staffMemberIDIRGUID: null,
       staffMemberName: null,
       commentContent: comment.content,
@@ -91,7 +91,7 @@ describe('postComment', () => {
 
   it('should return CONFLICT if request is not RETURNED', async () => {
     const session = {
-      requestStatusCode: utils.RequestStatuses.INITREV,
+      studentRequestStatusCode: utils.RequestStatuses.INITREV,
     };
     req = mockRequest(comment, session, params);
 

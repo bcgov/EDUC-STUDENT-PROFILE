@@ -90,7 +90,7 @@ export default {
 
   async updateRequestStatus(requestId, status){
     try{
-      const response = await apiAxios.patch(`${ApiRoutes.REQUEST}/${requestId}`, {requestStatusCode: status});
+      const response = await apiAxios.patch(`${ApiRoutes.REQUEST}/${requestId}`, {studentRequestStatusCode: status});
       return response;
     } catch(e) {
       console.log(`Failed to post to Nodejs API - ${e}`);

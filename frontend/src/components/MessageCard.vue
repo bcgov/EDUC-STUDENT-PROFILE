@@ -36,7 +36,7 @@
     </p>
     <p>If needed, you can submit another request using the button below.</p>
   </v-alert>
-  <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-else-if="status === requestStatuses.AUTO || status === requestStatuses.MANUAL">
+  <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-else-if="status === requestStatuses.COMPLETED">
     <p class="mb-1"><strong>Your PEN request is complete. Your PEN is:</strong></p>
     <p class="mb-2 pen"><strong>{{student.pen}}</strong></p>
     <p class="mb-2">Below is the key information the Ministry of Education has on file for you. If any of this information is not current, please contact <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.</p>
@@ -115,7 +115,7 @@ export default {
     ...mapGetters('request', ['request', 'student', 'sexInfo']),
     ...mapGetters('config',['numDaysAllowedInDraftStatus']),
     status() {
-      return this.request.requestStatusCode;
+      return this.request.studentRequestStatusCode;
     },
     ministry() {
       return 'the Ministry of Education';

@@ -199,8 +199,6 @@ const RequestStatuses = Object.freeze({
   INITREV: 'INITREV',
   RETURNED: 'RETURNED',
   SUBSREV: 'SUBSREV',
-  AUTO: 'AUTO',
-  MANUAL: 'MANUAL',
   REJECTED: 'REJECTED',
 });
 

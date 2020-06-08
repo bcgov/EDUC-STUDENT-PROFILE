@@ -29,7 +29,7 @@ describe('beforeUpdateRequestAsInitrev', () => {
 
   it('should return request with VERIFIED and initialSubmitDate', async () => {
     let request = {
-      requestStatusCode: utils.RequestStatuses.DRAFT,
+      studentRequestStatusCode: utils.RequestStatuses.DRAFT,
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED
     };
 
@@ -44,7 +44,7 @@ describe('beforeUpdateRequestAsInitrev', () => {
 
   it('should throw ConflictStateError if request is not DRAFT', async () => {
     let request = {
-      requestStatusCode: utils.RequestStatuses.INITREV,
+      studentRequestStatusCode: utils.RequestStatuses.INITREV,
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED
     };
 
@@ -53,7 +53,7 @@ describe('beforeUpdateRequestAsInitrev', () => {
 
   it('should throw ConflictStateError if request is already VERIFIED', async () => {
     let request = {
-      requestStatusCode: utils.RequestStatuses.DRAFT,
+      studentRequestStatusCode: utils.RequestStatuses.DRAFT,
       emailVerified: utils.EmailVerificationStatuses.VERIFIED
     };
 
@@ -66,9 +66,9 @@ describe('setRequestAsInitrev', () => {
   const localDateTime = '2020-01-01T12:00:00';
   const requestID = 'requestID';
   let request = {
-    requestID,
+    studentRequestID: requestID,
     digitalID: 'digitalID',
-    requestStatusCode: utils.RequestStatuses.DRAFT,
+    studentRequestStatusCode: utils.RequestStatuses.DRAFT,
     emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED
   };
 
@@ -94,9 +94,9 @@ describe('setRequestAsInitrev', () => {
     const result = await changeRequest.__get__('setRequestAsInitrev')(requestID);
 
     expect(result).toBeTruthy();
-    expect(result.requestID).toEqual(requestID);
+    expect(result.studentRequestID).toEqual(requestID);
     expect(result.digitalID).toBeNull();
-    expect(result.requestStatusCode).toEqual(utils.RequestStatuses.INITREV);
+    expect(result.studentRequestStatusCode).toEqual(utils.RequestStatuses.INITREV);
     expect(result.emailVerified).toEqual(utils.EmailVerificationStatuses.VERIFIED);
     expect(result.statusUpdateDate).toEqual(localDateTime);
 
@@ -107,9 +107,9 @@ describe('setRequestAsInitrev', () => {
 
   it('should throw ConflictStateError if request is not DRAFT', async () => {
     let request = {
-      requestID,
+      studentRequestID: requestID,
       digitalID: 'digitalID',
-      requestStatusCode: utils.RequestStatuses.INITREV,
+      studentRequestStatusCode: utils.RequestStatuses.INITREV,
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED
     };
     utils.getData.mockResolvedValue(request);
@@ -155,7 +155,7 @@ describe('verifyEmailToken', () => {
 
 describe('verifyEmail', () => {
   const request = {
-    requestID: 'requestID'
+    studentRequestID: 'requestID'
   };
   const query = {
     verificationToken: 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxMjM0NTY3ODkwIiwiU0NPUEUiOiJWRVJJRllfRU1BSUwiLCJpYXQiOjE1MTYyMzkwMjJ9.3Qlu82ltNX0DJKwWedrT5MX2Nk9hn8cKbd6PpktTVAl_RTH42lkaolhdOFwlrC5g1kJh9rt-QmF8ABDqlpWpHA',

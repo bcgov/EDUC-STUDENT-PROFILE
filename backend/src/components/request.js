@@ -22,7 +22,7 @@ function getRequest(req, res, next) {
   }
 
   const requestID = req.params.id;
-  if(!req || !req.session || !req.session.request || req.session.request.requestID !== requestID) {
+  if(!req || !req.session || !req.session.request || req.session.request.studentRequestID !== requestID) {
     return res.status(HttpStatus.BAD_REQUEST).json({
       message: 'Wrong requestID'
     });
@@ -280,7 +280,7 @@ async function submitRequest(req, res) {
 
     const accessToken = userInfo.jwt;
 
-    if(req && req.session && req.session.request && req.session.request.requestStatusCode !== RequestStatuses.REJECTED) {
+    if(req && req.session && req.session.request && req.session.request.studentRequestStatusCode !== RequestStatuses.REJECTED) {
       return res.status(HttpStatus.CONFLICT).json({
         message: 'Submit Request not allowed'
       });
@@ -290,7 +290,7 @@ async function submitRequest(req, res) {
 
     req.session.request = resData;
     if(req.body.email && req.body.email !== req.body.recordedEmail) {
-      sendVerificationEmail(accessToken, req.body.email, resData.requestID, req.session.digitalIdentityData.identityTypeLabel).catch(e => 
+      sendVerificationEmail(accessToken, req.body.email, resData.studentRequestID, req.session.digitalIdentityData.identityTypeLabel).catch(e => 
         log.error('sendVerificationEmail Error', e.stack)
       );
     }
@@ -314,7 +314,7 @@ async function postComment(req, res) {
       });
     }
 
-    if(!req || !req.session || !req.session.request || req.session.request.requestStatusCode !== RequestStatuses.RETURNED) {
+    if(!req || !req.session || !req.session.request || req.session.request.studentRequestStatusCode !== RequestStatuses.RETURNED) {
       return res.status(HttpStatus.CONFLICT).json({
         message: 'Post comment not allowed'
       });
@@ -322,7 +322,7 @@ async function postComment(req, res) {
 
     const url = `${config.get('studentProfile:apiEndpoint')}/${req.params.id}/comments`;
     const comment = {
-      dataChangeRequestID: req.params.id,
+      studentRequestID: req.params.id,
       staffMemberIDIRGUID: null,
       staffMemberName: null,
       commentContent: req.body.content,
@@ -402,8 +402,8 @@ async function getComments(req, res) {
 }
 
 function beforeUpdateRequestAsInitrev(request) {
-  if(request.requestStatusCode !== RequestStatuses.DRAFT) {
-    throw new ConflictStateError('Current Request Status: ' + request.requestStatusCode);
+  if(request.studentRequestStatusCode !== RequestStatuses.DRAFT) {
+    throw new ConflictStateError('Current Request Status: ' + request.studentRequestStatusCode);
   }
 
   if(request.emailVerified !== EmailVerificationStatuses.NOT_VERIFIED) {
@@ -481,7 +481,7 @@ async function updateRequestStatus(accessToken, requestID, requestStatus, before
     let data = await getData(accessToken, `${config.get('studentProfile:apiEndpoint')}/${requestID}`);
 
     let request = beforeUpdate(data);
-    request.requestStatusCode = requestStatus;
+    request.studentRequestStatusCode = requestStatus;
     request.statusUpdateDate = localDateTime.now().toString();
 
     data = await putData(accessToken, request, config.get('studentProfile:apiEndpoint'));
@@ -498,8 +498,8 @@ async function updateRequestStatus(accessToken, requestID, requestStatus, before
 }
 
 function beforeUpdateRequestAsSubsrev(request) {
-  if(request.requestStatusCode !== RequestStatuses.RETURNED) {
-    throw new ConflictStateError('Current Request Status: ' + request.requestStatusCode);
+  if(request.studentRequestStatusCode !== RequestStatuses.RETURNED) {
+    throw new ConflictStateError('Current Request Status: ' + request.studentRequestStatusCode);
   }
 
   return request;
@@ -515,7 +515,7 @@ async function setRequestAsSubsrev(req, res) {
     }
 
     const requestID = req.params.id;
-    const requestStatus = req.body.requestStatusCode;
+    const requestStatus = req.body.studentRequestStatusCode;
 
     if(! requestStatus) {
       return res.status(HttpStatus.BAD_REQUEST).json({
@@ -551,13 +551,13 @@ async function resendVerificationEmail(req, res) {
       });
     }
 
-    if(req.session.request.requestStatusCode !== RequestStatuses.DRAFT) {
+    if(req.session.request.studentRequestStatusCode !== RequestStatuses.DRAFT) {
       return res.status(HttpStatus.CONFLICT).json({
         message: 'Resend email not allowed'
       });
     }
 
-    const data = await sendVerificationEmail(accessToken, req.session.request.email, req.session.request.requestID, 
+    const data = await sendVerificationEmail(accessToken, req.session.request.email, req.session.request.studentRequestID, 
       req.session.digitalIdentityData.identityTypeLabel);
 
     return res.status(HttpStatus.OK).json(data);
@@ -579,7 +579,7 @@ async function uploadFile(req, res) {
       });
     }
 
-    if(!req.session.request || req.session.request.requestStatusCode !== RequestStatuses.RETURNED) {
+    if(!req.session.request || req.session.request.studentRequestStatusCode !== RequestStatuses.RETURNED) {
       return res.status(HttpStatus.CONFLICT).json({
         message: 'Upload file not allowed'
       });
@@ -617,7 +617,7 @@ async function deleteDocument(req, res) {
     let resData = await getDocument(accessToken, req.params.id, req.params.documentId, 'N');
 
     if(!req.session.request || resData.createDate <= req.session.request.statusUpdateDate || 
-      req.session.request.requestStatusCode !== RequestStatuses.RETURNED) {
+      req.session.request.studentRequestStatusCode !== RequestStatuses.RETURNED) {
       return res.status(HttpStatus.CONFLICT).json({
         message: 'Delete file not allowed'
       });
