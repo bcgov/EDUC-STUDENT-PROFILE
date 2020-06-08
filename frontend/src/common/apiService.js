@@ -217,4 +217,19 @@ export default {
       throw e;
     }
   },
+  async getConfig(configName) {
+    console.log('called getNumDaysAllowedInDraftStatus.');
+    try {
+      const queryParams = {
+        params: {
+          configName: configName
+        }
+      };
+      const response = await apiAxios.get(ApiRoutes.CONFIG, queryParams);
+      return response.data.configValue;
+    } catch (e) {
+      console.log(`Failed to do get from Nodejs getNumDaysAllowedInDraftStatus API - ${e}`);
+      throw e;
+    }
+  },
 };

@@ -68,6 +68,11 @@ nconf.defaults({
     host:process.env.REDIS_HOST,
     port:process.env.REDIS_PORT,
     password:process.env.REDIS_PASSWORD
+  },
+  scheduler :{
+    schedulerCronProfileRequestDraft:process.env.SCHEDULER_CRON_PROFILE_REQUEST_DRAFT,
+    numDaysAllowedInDraftStatus:process.env.NUM_DAYS_ALLOWED_IN_DRAFT_STATUS,
+    expectedDraftRequests: process.env.EXPECTED_DRAFT_REQUESTS,
   }
 });
 module.exports = nconf;

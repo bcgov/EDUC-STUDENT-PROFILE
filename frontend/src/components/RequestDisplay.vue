@@ -27,10 +27,10 @@
       <StatusCard @success-alert="setSuccessAlert" @error-alert="setErrorAlert"></StatusCard>
     </v-row>
     <v-row>
-      <Chat v-if="status !== requestStatuses.DRAFT || status !== requestStatuses.INITREV"></Chat>
+      <Chat v-if="status !== requestStatuses.DRAFT && status !== requestStatuses.INITREV && status !== requestStatuses.ABANDONED"></Chat>
     </v-row>
     <v-row>
-      <RequestCard :request="request"></RequestCard>
+      <RequestCard v-if="status !== requestStatuses.ABANDONED" :request="request"></RequestCard>
     </v-row>
   </v-card>
 </template>
