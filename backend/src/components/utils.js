@@ -199,7 +199,9 @@ const RequestStatuses = Object.freeze({
   INITREV: 'INITREV',
   RETURNED: 'RETURNED',
   SUBSREV: 'SUBSREV',
+  COMPLETED: 'COMPLETED',
   REJECTED: 'REJECTED',
+  ABANDONED: 'ABANDONED'
 });
 
 const EmailVerificationStatuses = Object.freeze({

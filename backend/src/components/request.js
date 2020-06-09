@@ -280,7 +280,8 @@ async function submitRequest(req, res) {
 
     const accessToken = userInfo.jwt;
 
-    if(req && req.session && req.session.request && req.session.request.studentRequestStatusCode !== RequestStatuses.REJECTED) {
+    if(req && req.session && req.session.request && req.session.request.studentRequestStatusCode !== RequestStatuses.REJECTED && 
+      req.session.request.studentRequestStatusCode !== RequestStatuses.ABANDONED) {
       return res.status(HttpStatus.CONFLICT).json({
         message: 'Submit Request not allowed'
       });

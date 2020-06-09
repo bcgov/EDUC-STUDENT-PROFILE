@@ -214,5 +214,5 @@ process.on('unhandledRejection', err => {
   log.error('Unhandled Rejection at:', err.stack || err);
   // res.redirect(config.get('server:frontend') + '/error?message=unhandled_rejection');
 });
-scheduler.draftToAbandonRequestJob.start();
+//scheduler.draftToAbandonRequestJob.start();
 module.exports = app;
