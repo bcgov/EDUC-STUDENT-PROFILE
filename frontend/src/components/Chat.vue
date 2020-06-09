@@ -100,7 +100,7 @@ export default {
       return this.commentHistory && this.commentHistory.length > 0;
     },
     status() {
-      return this.request.requestStatusCode;
+      return this.request.studentRequestStatusCode;
     },
     requestStatuses() {
       return RequestStatuses;
@@ -108,8 +108,8 @@ export default {
   },
   created() {
     Promise.all([
-      ApiService.getDocumentList(this.request.requestID),
-      ApiService.getCommentList(this.request.requestID),
+      ApiService.getDocumentList(this.request.studentRequestID),
+      ApiService.getCommentList(this.request.studentRequestID),
       this.getDocumentTypeCodes()
     ]).then(([documentRes, commentRes]) => {
       this.participants = commentRes.data.participants;

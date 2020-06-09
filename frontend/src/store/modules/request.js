@@ -15,7 +15,7 @@ export default {
     genderInfo: state => genderCode => find(state.genders, ['genderCode', genderCode]),
     statuses: state => state.statuses,
     request: state => state.request,
-    requestID: state => state.request.requestID,
+    requestID: state => state.request.studentRequestID,
     student: state => state.student,
   },
   mutations: {
@@ -26,36 +26,9 @@ export default {
       state.statuses = statuses;
     },
     setRequest: (state, request) => {
-      // request.requestStatusCode = 'REJECTED';
-      // request.failureReason = 'Can not find your record';
-
-      // request.requestStatusCode = 'DRAFT';
-      // request.statusUpdateDate = '2020-02-05T22:23:18.000+0000';
-
-      // request.requestStatusCode = 'INITREV';
-
-      // request.requestStatusCode = 'SUBSREV';
-
-      // request.requestStatusCode = 'RETURNED';
-
-      // request.requestStatusCode = 'AUTO';
-
-      // request = null;
-
       state.request = request;
     },
     setStudent: (state, student) => {
-      // student = {
-      //   pen: '123456',
-      //   legalFirstName: 'James',
-      //   legalMiddleNames: 'Wayne',
-      //   legalLastName: 'Duke',
-      //   sexCode: 'M',
-      //   sexLabel: 'Male',
-      //   dob: '1998-01-01',
-      //   genderCode: 'M',
-      //   email: 'test@test.com'
-      // };
       state.student = student;
     },
   },

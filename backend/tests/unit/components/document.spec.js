@@ -23,7 +23,7 @@ describe('uploadFile', () => {
   };
   const session = {
     request: {
-      requestStatusCode: utils.RequestStatuses.RETURNED,
+      studentRequestStatusCode: utils.RequestStatuses.RETURNED,
     }
   };
 
@@ -73,7 +73,7 @@ describe('uploadFile', () => {
 
   it('should return CONFLICT if request is not RETURNED', async () => {
     const session = {
-      requestStatusCode: utils.RequestStatuses.INITREV,
+      studentRequestStatusCode: utils.RequestStatuses.INITREV,
     };
     req = mockRequest(document, session, params);
 
@@ -131,7 +131,7 @@ describe('deleteDocument', () => {
   };
   const session = {
     request: {
-      requestStatusCode: utils.RequestStatuses.RETURNED,
+      studentRequestStatusCode: utils.RequestStatuses.RETURNED,
       statusUpdateDate: '2020-03-01T12:13:16'
     }
   };
@@ -184,7 +184,7 @@ describe('deleteDocument', () => {
 
   it('should return CONFLICT if request is not RETURNED', async () => {
     const session = {
-      requestStatusCode: utils.RequestStatuses.INITREV,
+      studentRequestStatusCode: utils.RequestStatuses.INITREV,
       statusUpdateDate: '2020-03-01T12:13:16'
     };
     req = mockRequest(null, session, params);
@@ -196,7 +196,7 @@ describe('deleteDocument', () => {
 
   it('should return CONFLICT if document was uploaded before request was returned ', async () => {
     const session = {
-      requestStatusCode: utils.RequestStatuses.RETURNED,
+      studentRequestStatusCode: utils.RequestStatuses.RETURNED,
       statusUpdateDate: '2020-03-03T12:13:16'
     };
     req = mockRequest(null, session, params);
