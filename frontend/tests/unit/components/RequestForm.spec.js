@@ -44,18 +44,19 @@ describe('RequestForm.vue', () => {
       email: 'james@test.com'
     }
 
-    const request = {
-      legalFirstName: 'James',
-      legalMiddleNames: 'Wayne',
-      legalLastName: 'Duke',
-      genderCode: 'M',
-      dob: '1989-09-04',
-      email: 'wayne@test.com'
-    }
+    // const request = {
+    //   legalFirstName: 'James',
+    //   legalMiddleNames: 'Wayne',
+    //   legalLastName: 'Duke',
+    //   genderCode: 'M',
+    //   dob: '1989-09-04',
+    //   email: 'wayne@test.com'
+    // }
     
     const requestGetters = {
       genders: jest.fn().mockReturnValue(genderCodes),
       student: jest.fn().mockReturnValue(student),
+      recordedData: jest.fn().mockReturnValue(recordedData),
     };
 
     const authGetters = {
@@ -79,14 +80,6 @@ describe('RequestForm.vue', () => {
     wrapper = shallowMount(RequestForm, {
       Vue: Vue,
       store,
-      propsData: {
-        recordedData,
-        request,
-        genderLabel: 'Male',
-        changeRequest: jest.fn(),
-        nextStep: jest.fn(),
-        previousStep: jest.fn(),
-      }
     });
   });
 

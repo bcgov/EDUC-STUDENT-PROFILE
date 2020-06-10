@@ -56,7 +56,6 @@
 <script>
 import { mapGetters } from 'vuex';
 import { find } from 'lodash';
-import moment from 'moment';
 import { RequestStatuses } from '@/utils/constants';
 import ApiService from '@/common/apiService';
 
@@ -84,7 +83,6 @@ export default {
     }
   },
   methods: {
-    moment,
     resendVerificationEmail() {
       this.sending = true;
       ApiService.resendVerificationEmail(this.request.studentRequestID).then(() => {

@@ -9,11 +9,11 @@
           </v-card-title>
           <v-card-text id="verification_descriptor">
             <v-card height="100%" width="100%" outlined color="#C3F1E8" class="pa-3" v-if="this.status === this.verificationResults.OK">
-              <p class="mb-2"><strong>Your email has been verified and your PEN request has now been submitted for processing.</strong></p>
+              <p class="mb-2"><strong>Your email has been verified and your UpdateMyPENInfo request has now been submitted for processing.</strong></p>
               <ul>
                 <li>Requests are processed M-F 8am – 4:30pm excluding stat holidays</li>
                 <li>In most cases you will get a response within one business day</li>
-                <li>You will receive an email when your request has been processed. You can also log into GetMyPEN after one business day to check on status of your request</li>
+                <li>You will receive an email when your request has been processed. You can also log into UpdateMyPENInfo after one business day to check on status of your request</li>
               </ul>
             </v-card>
             <v-card height="100%" width="100%" outlined color="#FFECA9" class="pa-3" v-else-if="this.status === this.verificationResults.EXPIRED">
@@ -32,7 +32,7 @@
                   </ul>
                 </p>
                 <p>Likely the link used is not complete. You can copy/paste the verification link from the email you receive into your web browser's address field. You must use the entire link.</p>
-                <p>If this does not work, login to the GetMyPEN application again and use the Resend Email Verification action to get a new verification link.</p>
+                <p>If this does not work, login to the UpdateMyPENInfo application again and use the Resend Email Verification action to get a new verification link.</p>
             </v-card>
             <v-card height="100%" width="100%" outlined color="#FFECA9" class="pa-3" v-else>
                 <p class="mb-2"><strong>Sorry, Your email verification could not be completed, for the following reason:</strong></p>

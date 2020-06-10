@@ -1,12 +1,5 @@
 <template>
-  <div>
-    <!-- <v-row align-content="center" class="flex-grow-0 pb-5">
-      <v-card style="margin-right: 1.4rem;margin-left: 1.4rem" height="100%" width="100%" elevation=0 color="#036"
-              class="white--text">
-        <v-card-title class="py-3 pl-5"><h1>UpdateMyPENInfo Summary Page</h1></v-card-title>
-      </v-card>
-    </v-row> -->
-
+  <div v-if="request">
     <v-alert
       dense
       outlined
@@ -27,13 +20,11 @@
       <p>If the email has expired or is not in your Inbox (or spam folder) click on the "Resend Verification Email" button below to receive a new email and the follow the 2 steps listed above.</p>
     </v-alert>
 
-    <!-- <div class="pa-0 align-self-start"> -->
-      <v-card height="100%" width="100%" elevation=0>
-        <v-row no-gutters justify="end" class="pb-5 mx-3">
-          <v-btn color="#38598a" dark class="ml-2 text-none" @click.stop="resendVerificationEmail" :loading="sending">Resend Verification Email</v-btn>
-        </v-row>
-      </v-card>
-    <!-- </div> -->
+    <v-card height="100%" width="100%" elevation=0>
+      <v-row no-gutters justify="end" class="pb-5 mx-3">
+        <v-btn color="#38598a" dark class="ml-2 text-none" @click.stop="resendVerificationEmail" :loading="sending">Resend Verification Email</v-btn>
+      </v-row>
+    </v-card>
 
     <RequestCard :request="request" class="px-3">
       <template v-slot:hint>
@@ -57,6 +48,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import ApiService from '@/common/apiService';
 import RequestCard from './RequestCard';
 
@@ -64,12 +56,6 @@ export default {
   name: 'requestSubmission',
   components: {
     RequestCard,
-  },
-  props: {
-    request: {
-      type: Object,
-      required: true
-    },
   },
   data() {
     return {
@@ -79,6 +65,9 @@ export default {
 
       sending: false,
     };
+  },
+  computed: {
+    ...mapGetters('request', ['request']),
   },
   methods: {
     setSuccessAlert(alertMessage) {

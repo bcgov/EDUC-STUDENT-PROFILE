@@ -1,6 +1,7 @@
 <template>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-if="status === requestStatuses.INITREV || status === requestStatuses.SUBSREV">
-    <p class="mb-2"><strong>Your request to update your student information with the changes below has been submitted.</strong></p>
+    <p class="mb-2" v-if="request.email === request.recordedEmail"><strong>Your request to update your student information with the changes below has been submitted.</strong></p>
+    <p class="mb-2" v-else><strong>Your email has been verified and your UpdateMyPENInfo request has now been submitted for processing.</strong></p>
     <ul>
       <li>Requests are processed M-F 8am - 4:30pm excluding stat holidays</li>
       <li>In most cases you will get a response within one business day</li>
@@ -28,7 +29,7 @@
     <p class="mb-2"><strong>Additional information is required.</strong> See the request below.</p>
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.REJECTED">
-    <p class="mb-2"><strong>Your request to update your student information could not be completed, for the following reason:</strong></p>
+    <p class="mb-2"><strong>Your request to update your PEN information could not be completed for the following reason:</strong></p>
     <p>
       <ul>
         <li>{{ request.failureReason }}</li>
@@ -37,40 +38,67 @@
     <p>If needed, you can submit another request using the button below.</p>
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-else-if="status === requestStatuses.COMPLETED">
-    <p class="mb-1"><strong>Your PEN request is complete. Your PEN is:</strong></p>
-    <p class="mb-2 pen"><strong>{{student.pen}}</strong></p>
-    <p class="mb-2">Below is the key information the Ministry of Education has on file for you. If any of this information is not current, please contact <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.</p>
+    <p class="mb-2"><strong>Your request to update your PEN information is complete</strong></p>
+    <p class="mb-2">Below are the requested changes you submitted to the Ministry of Education</p>
     <v-container class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
       <v-row no-gutters class="py-0 px-2">
         <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2">Legal Last Name:</p>
+          <p class="mb-2">PEN:</p>
         </v-col>
         <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ student.legalLastName }}</strong></p>
+          <p class="mb-2"><strong>{{ request.recordedPen }}</strong></p>
         </v-col>
       </v-row>
       <v-row no-gutters class="py-0 px-2">
         <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2">Legal First Name(s):</p>
+          <p class="mb-2">Name:</p>
         </v-col>
         <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ student.legalFirstName }}</strong></p>
-        </v-col>
-      </v-row>   
-      <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2" color="green">Legal Middle Name(s):</p>
-        </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ student.legalMiddleNames }}</strong></p>
+          <p class="mb-2"><strong>{{ requestedFullName }}</strong></p>
         </v-col>
       </v-row>
       <v-row no-gutters class="py-0 px-2">
         <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2">Date of Birth:</p>
+          <p class="mb-2">Birthdate:</p>
         </v-col>
         <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ student.dob }}</strong></p>
+          <p class="mb-2"><strong>{{ request.dob ? moment(request.dob).format('MMMM D, YYYY'):'' }}</strong></p>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="py-0 px-2">
+        <v-col xl="4" lg="4" md="4" sm="4">
+          <p class="mb-2">Gender:</p>
+        </v-col>
+        <v-col xl="4" lg="5" md="5" sm="5">
+          <p class="mb-2"><strong>{{ genderLabel }}</strong></p>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <p class="mb-2">For your reference, your student record at the Ministry of Education has been updated as shown below</p>
+    <v-container class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
+      <v-row no-gutters class="py-0 px-2">
+        <v-col xl="4" lg="4" md="4" sm="4">
+          <p class="mb-2">PEN:</p>
+        </v-col>
+        <v-col xl="4" lg="5" md="5" sm="5">
+          <p class="mb-2"><strong>{{ student.pen }}</strong></p>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="py-0 px-2">
+        <v-col xl="4" lg="4" md="4" sm="4">
+          <p class="mb-2">Name:</p>
+        </v-col>
+        <v-col xl="4" lg="5" md="5" sm="5">
+          <p class="mb-2"><strong>{{ updatedFullName }}</strong></p>
+        </v-col>
+      </v-row>
+      <v-row no-gutters class="py-0 px-2">
+        <v-col xl="4" lg="4" md="4" sm="4">
+          <p class="mb-2">Birthdate:</p>
+        </v-col>
+        <v-col xl="4" lg="5" md="5" sm="5">
+          <p class="mb-2"><strong>{{ student.dob ? moment(student.dob).format('MMMM D, YYYY'):'' }}</strong></p>
         </v-col>
       </v-row>
       <v-row no-gutters class="py-0 px-2">
@@ -82,6 +110,8 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <p class="mb-2"><strong>If any of this information is not current, please contact <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.</strong></p>
     <p class="mb-2">You now may wish to use your PEN to:
       <ul>
         <li>
@@ -91,7 +121,7 @@
         </li>
       </ul>
     </p>
-    <p class="mb-2">You can log back into GetMyPEN at any time to see your PEN.</p>
+    <p class="mb-2">You can log back into UpdateMyPENInfo at any time to see your PEN and current student information.</p>
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.ABANDONED">
     <p class="mb-2"><strong>You did not verify your email and after {{numDaysAllowedInDraftStatus}} days your Update My Profile request was deleted. Please start again.</strong></p>
@@ -100,7 +130,6 @@
 
 <script>
 import { mapGetters,mapActions } from 'vuex';
-import moment from 'moment';
 import { RequestStatuses } from '@/utils/constants';
 
 export default {
@@ -112,7 +141,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('request', ['request', 'student', 'sexInfo']),
+    ...mapGetters('request', ['request', 'student', 'genderInfo']),
     ...mapGetters('config',['numDaysAllowedInDraftStatus']),
     status() {
       return this.request.studentRequestStatusCode;
@@ -126,16 +155,24 @@ export default {
     timedout() {
       return Math.floor(new Date() - new Date(this.request.statusUpdateDate)) / (1000*60*60) > 24;
     },
-    sexLabel() { 
-      return this.sexInfo(this.student.sexCode).label;
-    }
+    requestedFullName() {
+      return this.fullName(this.request.legalFirstName, this.request.legalMiddleNames, this.request.legalLastName);
+    },
+    updatedFullName() {
+      return this.fullName(this.student.legalFirstName, this.student.legalMiddleNames, this.student.legalLastName);
+    },
+    genderLabel() { 
+      return this.request.genderCode && this.genderInfo(this.request.genderCode).label;
+    },
   },
   async created(){
     await this.getNumDaysAllowedInDraftStatus();
   },
   methods: {
-    moment,
     ...mapActions('config',['getNumDaysAllowedInDraftStatus']),
+    fullName(...names) {
+      return names.filter(Boolean).join(' ').toUpperCase();
+    },
   }
 };
 </script>

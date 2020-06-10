@@ -28,33 +28,24 @@
       <v-stepper-items>
         <v-stepper-content step="1" class="px-0">
           <CurrentInfo
-            :gender-label="genderLabel"
-            :next-step="nextStep"
+            @next="nextStep"
           >
           </CurrentInfo>
         </v-stepper-content>
         <v-stepper-content step="2" class="px-0">
           <RequestForm
-            :recorded-data="recordedData"
-            :request="userPost"
-            :gender-label="genderLabel"
-            :change-request="setUserPost"
-            :next-step="nextStep"
-            :previous-step="previousStep"
+            @next="nextStep"
+            @back="previousStep"
           ></RequestForm>
         </v-stepper-content>
         <v-stepper-content step="3" class="px-0">
           <RequestSummary
-            :recorded-data="recordedData"
-            :request="userPost"
-            :next-step="nextStep"
-            :previous-step="previousStep"
+            @next="nextStep"
+            @back="previousStep"
           ></RequestSummary>
         </v-stepper-content>
         <v-stepper-content step="4" class="px-0">
-          <RequestSubmission
-            :request="request"
-          ></RequestSubmission>
+          <RequestSubmission></RequestSubmission>
         </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
@@ -83,8 +74,7 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations, mapActions} from 'vuex';
-import { pick } from 'lodash';
+import { mapGetters } from 'vuex';
 import CurrentInfo from './CurrentInfo';
 import RequestForm from './RequestForm';
 import RequestSummary from './RequestSummary';
@@ -105,58 +95,31 @@ export default {
       titles: ['Current Student Information', 'Requested Changes to Student Information', 'Confirm Changes', 'Submit Changes'],
       dialog: false,
       dialogMessage: null,
-
-      genderLabels: [],
-      genderLabel: '',
-      recordedData: {},
-      userPost: {
-        legalLastName: null,
-        legalFirstName: null,
-        legalMiddleNames: null,
-        dob: null,
-        genderCode: null,
-        email: null,
-      },
     };
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('request', ['genders', 'student', 'genderInfo', 'request']),
+    ...mapGetters('request', ['genders', 'student', 'genderInfo', 'updateData', 'recordedData']),
     dataReady() {
       return !!this.userInfo;
     },
   },
   watch: {
-    'userPost.email': function(newVal) {
-      if(newVal && this.userPost.email !== this.recordedData.email) {
+    'updateData.email': function(newVal) {
+      if(newVal && this.updateData.email !== this.recordedData.email) {
         this.steps = 4;
-      } else if(newVal && this.userPost.email === this.recordedData.email) {
+      } else if(newVal && this.updateData.email === this.recordedData.email) {
         this.steps = 3;
       }
     },
   },
-  created() {
-    this.genderLabels = this.genders.map(a => a.label);
-    if (this.student) {
-      this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email', 'pen']);
-      Object.assign(this.userPost, this.recordedData);
-      const gender = this.genderInfo(this.student.genderCode);
-      //this.student.genderLabel = gender.label;
-      this.genderLabel = gender.label;
-    }
-  },
   methods: {
-    ...mapMutations('request', ['setRequest']),
-    ...mapActions('request', ['postRequest']),
     setDialog(message) {
       this.dialogMessage = message;
       this.dialog = true;
     },
     closeDialog() {
       this.dialog = false;
-    },
-    setUserPost(request) {
-      this.userPost = request;
     },
     nextStep() {
       this.stepCount++;
