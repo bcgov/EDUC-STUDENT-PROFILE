@@ -1,12 +1,5 @@
 <template>
   <div>
-    <!-- <v-row align-content="center" class="flex-grow-0 pb-5">
-      <v-card style="margin-right: 1.4rem;margin-left: 1.4rem" height="100%" width="100%" elevation=0 color="#036"
-              class="white--text">
-        <v-card-title class="py-3 pl-5"><h1>Requested Changes to Student Information</h1></v-card-title>
-      </v-card>
-    </v-row> -->
-
     <v-alert
       dense
       outlined
@@ -17,16 +10,14 @@
       {{ alertMessage }}
     </v-alert>
 
-    <!-- <v-card color="#FFECA9" class="pa-3 mb-8 mx-3"> -->
     <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
       <h3>Guidance:</h3>
       <ul class="pt-2">
         <li>This form can only be completed by the owner of the PEN</li>
-        <li>This form can only be completed if you have already graduated from high school. If you are still attending a K-12 school, request changes at your school</li>
+        <li>This form can only be completed if you have already left high school. If you are still attending a K-12 school, request changes at your school</li>
         <li>If your name and/or gender has been legally changed, proof of this change may be requested</li>
       </ul>
     </v-alert>
-    <!-- </v-card> -->
 
     <v-container fluid class="py-0">
       <v-row>
@@ -196,8 +187,7 @@
               <v-select
                 id='gender'
                 color="#003366"
-                v-model="genderLabelChanged"
-                :rules="requiredRules(genderHint)"
+                v-model="request.genderLabel"
                 outlined
                 :items="genderLabels"
                 :hint="genderHint"
@@ -225,6 +215,7 @@
                 label="Edit"
                 dense
                 :disabled="enableDisableForm.disabled"
+                v-if="hasStudentRecord"
               ></v-checkbox>
               <v-text-field
                 id='email'
@@ -234,7 +225,7 @@
                 :hint="emailHint"
                 outlined
                 label="E-mail Address"
-                :disabled="enableDisableForm.disabled || !editEmail"
+                :disabled="enableDisableForm.disabled || (!editEmail && hasStudentRecord)"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="255"
                 dense
@@ -265,13 +256,21 @@
           <v-col id="confidential_information" cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-card height="100%" width="100%" elevation=2
                     class="black--text pa-4">
+              <p><strong>Collection Notice:</strong></p>
               <p>
-                <strong>CONFIDENTIAL INFORMATION.</strong> The information collected on this form will be 
-                used to verify your identity and may also be used to update your PEN file. All information 
-                provided on this form will be administered in accordance with the Freedom of Information 
-                and Protection of Privacy Act. For more information regarding the use of your personal 
-                information provided on this form, please contact the Student Information Services Branch, 
-                Data Management Unit, Ministry of Education.
+                The information included in this form is collected under ss. 26(c) of the Freedom of Information and Protection of Privacy Act, R.S.B.C. 1996, c. 165. 
+                The information you provide will be used in confirming your identity and communicating with you.
+              </p>
+              <p>
+                If you have any questions about the collection and use of this information, please contact:
+              </p>
+              <p>
+                <a href="mailto:pens.coordinator@gov.bc.ca">PEN Coordinator</a><br/>
+                Data Management Unit, Student Data & Educational Resource Services Branch<br/>
+                B.C. Ministry of Education<br/>
+                PO Box 9886 Stn Prov Govt<br/>
+                Victoria BC V8W 9T6<br/>
+                OR through Enquiry BC (Victoria): (250) 387-6121
               </p>
             </v-card>
           </v-col>
@@ -305,43 +304,15 @@
 </template>
 
 <script>
-import {mapGetters, mapMutations, mapActions} from 'vuex';
-import {LocalDate} from '@js-joda/core';
-import { isEqual } from 'lodash';
-import moment from 'moment';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
+import { LocalDate } from '@js-joda/core';
+import { isEqual, pick } from 'lodash';
 
 export default {
   name: 'requestForm',
-  props: {
-    recordedData: {
-      type: Object,
-      required: true
-    },
-    request: {
-      type: Object,
-      required: true
-    },
-    genderLabel: {
-      type: String,
-      required: true
-    },
-    changeRequest: {
-      type: Function,
-      required: true
-    },
-    nextStep: {
-      type: Function,
-      required: true
-    },
-    previousStep: {
-      type: Function,
-      required: true
-    },
-  },
   data() {
     return {
       localDate:LocalDate,
-      genderLabels: [],
       genderHint: 'As shown on current Government Photo ID',
       legalLastNameHint: 'As shown on current Government Photo ID. Note, If you have ONE name only – enter it into the Legal Last Name field and leave Legal First Name blank',
       emailHint: 'Valid Email Required',
@@ -353,9 +324,17 @@ export default {
       alert: false,
       alertMessage: null,
 
-      genderLabelChanged: null,
       declared: false,
       acceptance: false,
+
+      request: {
+        legalLastName: null,
+        legalFirstName: null,
+        legalMiddleNames: null,
+        dob: null,
+        genderCode: null,
+        email: null,
+      },
       
       editLegalLastName: false,
       editLegalFirstName: false,
@@ -369,7 +348,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('request', ['genders', 'student']),
+    ...mapGetters('request', ['genders', 'student', 'genderInfo', 'recordedData']),
+    hasStudentRecord() {
+      return !!this.student;
+    },
     emailRules() {
       return [
         v => !!v || this.emailHint,
@@ -381,37 +363,41 @@ export default {
         v => !(/[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u1100-\u11FF\u3040-\u309F\u30A0-\u30FF\u3130-\u318F\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF]/.test(v)) || 'Enter English characters only'
       ];
     },
+    genderLabels() {
+      return this.genders.map(a => a.label);
+    }
   },
   watch: {
     menu(val) {
       val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'));
     },
     editLegalLastName(val) {
-      this.request.legalLastName = val ? '' : this.student.legalLastName;
+      this.request.legalLastName = val ? '' : this.recordedData.legalLastName;
     },
     editLegalFirstName(val) {
-      this.request.legalFirstName = val ? '' : this.student.legalFirstName;
+      this.request.legalFirstName = val ? '' : this.recordedData.legalFirstName;
     },
     editLegalMiddleNames(val) {
-      this.request.legalMiddleNames = val ? '' : this.student.legalMiddleNames;
+      this.request.legalMiddleNames = val ? '' : this.recordedData.legalMiddleNames;
     },
     editBirthdate(val) {
-      this.request.dob = val ? '' : this.student.dob;
+      this.request.dob = val ? '' : this.recordedData.dob;
     },
     editGenderLabel(val) {
-      this.genderLabelChanged = val ? '' : this.genderLabel;
+      this.request.genderLabel = val ? '' : this.recordedData.genderLabel;
     },
     editEmail(val) {
-      this.request.email = val ? '' : this.student.email;
-    },    
-  },
-  created() {
-    this.genderLabels = this.genders.map(a => a.label);
-    this.genderLabelChanged = this.genderLabel;
+      this.request.email = val ? '' : this.recordedData.email;
+    },
+    recordedData: {
+      deep: true,
+      handler() {
+        Object.assign(this.request, this.recordedData);
+      }
+    }
   },
   methods: {
-    moment,
-    ...mapMutations('request', ['setRequest']),
+    ...mapMutations('request', ['setRequest', 'setUpdateData']),
     ...mapActions('request', ['postRequest']),
     requiredRules(hint = 'Required') {
       return [
@@ -442,14 +428,17 @@ export default {
     validateRequestForm() {
       this.validate();
       if (this.validForm) {
-        const code = this.genders.filter(it => (it.label === this.genderLabelChanged));
-        this.request.genderCode = code[0].genderCode;
+        if(this.request.genderLabel) {
+          const code = this.genders.filter(it => (it.label === this.request.genderLabel));
+          this.request.genderCode = code[0].genderCode;
+        }
 
-        if(isEqual(this.request, this.recordedData)) {
+        if(isEqual(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), 
+          pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']))) {
           this.setNoChangeErrorDialog();
         } else {
-          this.changeRequest(this.request);
-          this.nextStep();
+          this.setUpdateData(this.request);
+          this.$emit('next');
         }
       }
     },
@@ -465,6 +454,9 @@ export default {
       if(event.key === 'Tab' && event.type === 'keyup') {
         this.menu = true;
       }
+    },
+    previousStep() {
+      this.$emit('back');
     }
   }
 };

@@ -10,7 +10,7 @@
           <p class="mb-0">Name:</p>
         </v-col>
         <v-col xl="auto" lg="auto" md="auto" sm="auto">
-          <p class="ml-2 mb-0"><strong>{{fullName}}</strong></p>
+          <p class="ml-2 mb-0 names"><strong>{{fullName}}</strong></p>
         </v-col>
       </v-row>
       <v-row no-gutters>
@@ -45,13 +45,11 @@
         </v-col>
       </v-row>
     </v-container>
-    <slot name="actions"></slot>
   </v-card>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import moment from 'moment';
 
 export default {
   name: 'requestCard',
@@ -64,20 +62,21 @@ export default {
   computed: {
     ...mapGetters('request', ['genderInfo']),
     genderLabel() { 
-      return this.genderInfo(this.request.genderCode).label;
+      return this.request.genderCode && this.genderInfo(this.request.genderCode).label;
     },
     fullName() {
       return [this.request.legalFirstName, this.request.legalMiddleNames, this.request.legalLastName].filter(Boolean).join(' ').toUpperCase();
     }
   },
-  methods: {
-    moment,
-  }
 };
 </script>
 
 <style scoped>
 .v-toolbar /deep/ .v-toolbar__content {
   padding-left: 20px !important;
+}
+
+.names {
+  text-transform: uppercase;
 }
 </style>

@@ -9,6 +9,8 @@ export default {
     statuses: null,
     request: null,
     student: null,
+    recordedData: null,
+    updateData: null,
   },
   getters: {
     genders: state => state.genders,
@@ -17,6 +19,8 @@ export default {
     request: state => state.request,
     requestID: state => state.request.studentRequestID,
     student: state => state.student,
+    recordedData: state => state.recordedData,
+    updateData: state => state.updateData,
   },
   mutations: {
     setGenders: (state, genders) => {
@@ -31,11 +35,18 @@ export default {
     setStudent: (state, student) => {
       state.student = student;
     },
+    setRecordedData: (state, recordedData) => {
+      state.recordedData = recordedData;
+    },
+    setUpdateData: (state, updateData) => {
+      state.updateData = updateData;
+    },
   },
   actions: {
-    async postRequest(_context, { requestData, recordedData }){
+    async postRequest({commit}, { requestData, recordedData }){
       let request = pick(requestData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email']);
-      const recorded = mapKeys(recordedData, (_, key) => {
+      let recorded = pick(recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email', 'pen']);
+      recorded = mapKeys(recorded, (_, key) => {
         return 'recorded' + key.slice(0,1).toUpperCase() + key.slice(1);
       });
       request = { ...request, ...recorded };
@@ -44,6 +55,7 @@ export default {
         if(response.status !== 200){
           return false;
         }
+        commit('setRequest', response.data);
         return response.data;
       } catch(e) {
         console.log('Error while accessing API - ' + e);

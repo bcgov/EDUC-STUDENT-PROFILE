@@ -1,12 +1,5 @@
 <template>
-  <div>
-    <!-- <v-row align-content="center" class="flex-grow-0 pb-5">
-      <v-card style="margin-right: 1.4rem;margin-left: 1.4rem" height="100%" width="100%" elevation=0 color="#036"
-              class="white--text">
-        <v-card-title class="py-3 pl-5"><h1>UpdateMyPENInfo Summary Page</h1></v-card-title>
-      </v-card>
-    </v-row> -->
-
+  <div v-if="updateData">
     <v-alert
       dense
       outlined
@@ -25,7 +18,7 @@
       </ul>
     </v-alert>
 
-    <RequestCard :request="request" class="px-3">
+    <RequestCard :request="updateData" class="px-3">
       <template v-slot:hint>
         <v-row no-gutters>
           <p>
@@ -42,58 +35,37 @@
           </p>
         </v-row>
       </template>
-      <template v-slot:actions>
-        <v-card-actions class="justify-end px-0">
-          <v-btn
-            color="#003366"
-            class="white--text align-self-center"
-            id="previous-step"
-            @click="previousStep"
-          >
-            Back
-          </v-btn>
-          <v-btn
-            color="#003366"
-            class="white--text align-self-center"
-            id="next-step"
-            @click="submitRequest"
-            :loading="submitting"
-          >
-            {{ emailChanged ? 'Next' : 'Submit' }}
-          </v-btn>
-        </v-card-actions>
-      </template>
     </RequestCard>
+    <v-card-actions class="justify-end pr-2">
+      <v-btn
+        color="#003366"
+        class="white--text align-self-center"
+        id="previous-step"
+        @click="previousStep"
+      >
+        Back
+      </v-btn>
+      <v-btn
+        color="#003366"
+        class="white--text align-self-center"
+        id="next-step"
+        @click="submitRequest"
+        :loading="submitting"
+      >
+        {{ emailChanged ? 'Next' : 'Submit' }}
+      </v-btn>
+    </v-card-actions>
   </div>
 </template>
 
 <script>
-import {mapMutations, mapActions } from 'vuex';
-import moment from 'moment';
+import { mapGetters, mapActions } from 'vuex';
 import RequestCard from './RequestCard';
 
 export default {
   name: 'requestSummary',
   components: {
     RequestCard,
-  },
-  props: {
-    recordedData: {
-      type: Object,
-      required: true
-    },
-    request: {
-      type: Object,
-      required: true
-    },
-    nextStep: {
-      type: Function,
-      required: true
-    },
-    previousStep: {
-      type: Function,
-      required: true
-    },
   },
   data() {
     return {
@@ -104,14 +76,13 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('request', ['recordedData', 'updateData']),
     emailChanged() {
-      return this.recordedData.email !== this.request.email;
+      return this.recordedData.email !== this.updateData.email;
     },
   },
   methods: {
-    ...mapMutations('request', ['setRequest']),
     ...mapActions('request', ['postRequest']),
-    moment,
     setErrorAlert() {
       this.alertMessage = 'Sorry, an unexpected error seems to have occured. Please try again later.';
       this.alert = true;
@@ -120,9 +91,8 @@ export default {
     async submitRequest() {
       try {
         this.submitting = true;
-        const resData = await this.postRequest({ requestData: this.request, recordedData: this.recordedData });
+        const resData = await this.postRequest({ requestData: this.updateData, recordedData: this.recordedData });
         if (resData) {
-          this.setRequest(resData);
           if (this.emailChanged) {
             this.nextStep();
           } else {
@@ -138,7 +108,13 @@ export default {
         this.submitting = false;
       }
     },
-  }
+    nextStep() {
+      this.$emit('next');
+    },
+    previousStep() {
+      this.$emit('back');
+    }
+  },
 };
 </script>
 
