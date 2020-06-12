@@ -8,6 +8,7 @@ const lodash = require('lodash');
 const HttpStatus = require('http-status-codes');
 const jsonwebtoken = require('jsonwebtoken');
 const localDateTime = require('@js-joda/core').LocalDateTime;
+const ChronoUnit = require('@js-joda/core').ChronoUnit;
 const { ServiceError, ConflictStateError } = require('./error'); 
 
 let codes = null;
@@ -61,6 +62,14 @@ async function getLatestRequest(token, digitalID) {
     request = lodash.maxBy(data, 'statusUpdateDate') || null;
     if(request) {
       request.digitalID = null;
+      if (request.studentRequestStatusCode === RequestStatuses.COMPLETED) {
+        let updateTime = localDateTime.parse(request.statusUpdateDate);
+        let replicateTime = updateTime.truncatedTo(ChronoUnit.HOURS).withHour(config.get('studentProfile:replicateTime'));
+        if (config.get('studentProfile:replicateTime') <= updateTime.hour()) {
+          replicateTime = replicateTime.plusDays(1);
+        }
+        request.tomorrow = replicateTime.isAfter(localDateTime.now());
+      }
     }
   } catch(e) {
     if(!e.status || e.status !== HttpStatus.NOT_FOUND) {
@@ -281,7 +290,8 @@ async function submitRequest(req, res) {
     const accessToken = userInfo.jwt;
 
     if(req && req.session && req.session.request && req.session.request.studentRequestStatusCode !== RequestStatuses.REJECTED && 
-      req.session.request.studentRequestStatusCode !== RequestStatuses.ABANDONED) {
+      req.session.request.studentRequestStatusCode !== RequestStatuses.ABANDONED && 
+      req.session.request.studentRequestStatusCode !== RequestStatuses.COMPLETED) {
       return res.status(HttpStatus.CONFLICT).json({
         message: 'Submit Request not allowed'
       });
