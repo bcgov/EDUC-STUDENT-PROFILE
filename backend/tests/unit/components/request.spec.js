@@ -148,7 +148,7 @@ describe('getStudent', () => {
 
 describe('getLatestRequest', () => {
   const digitalID = 'ac337def-704b-169f-8170-653e2f7c001';
-  const requests = [
+  let requests = [
     { 
       digitalID,
       statusUpdateDate: '2020-03-03T23:05:40' 
@@ -204,7 +204,7 @@ describe('getLatestRequest', () => {
   });
 
   it('should return tomorrow with false value if current time is after replicateTime', async () => {
-    const requests = [
+    requests = [
       { 
         digitalID,
         statusUpdateDate: '2020-03-03T07:05:40',
@@ -225,7 +225,7 @@ describe('getLatestRequest', () => {
   });
 
   it('should return tomorrow with true value if current time is before replicateTime', async () => {
-    const requests = [
+    requests = [
       { 
         digitalID,
         statusUpdateDate: '2020-03-03T09:05:40',
@@ -246,7 +246,7 @@ describe('getLatestRequest', () => {
   });
 
   it('should return tomorrow with true value if current time is the day after statusUpdateDate but before replicateTime', async () => {
-    const requests = [
+    requests = [
       { 
         digitalID,
         statusUpdateDate: '2020-03-03T09:05:40',
@@ -267,7 +267,7 @@ describe('getLatestRequest', () => {
   });
 
   it('should return tomorrow with false value if current time is the day after statusUpdateDate but after replicateTimee', async () => {
-    const requests = [
+    requests = [
       { 
         digitalID,
         statusUpdateDate: '2020-03-03T09:05:40',
