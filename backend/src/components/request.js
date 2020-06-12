@@ -63,7 +63,7 @@ async function getLatestRequest(token, digitalID) {
     if(request) {
       request.digitalID = null;
       if (request.studentRequestStatusCode === RequestStatuses.COMPLETED) {
-        let updateTime = localDateTime.parse(request.statusUpdateDate);
+        const updateTime = localDateTime.parse(request.statusUpdateDate);
         let replicateTime = updateTime.truncatedTo(ChronoUnit.HOURS).withHour(config.get('studentProfile:replicateTime'));
         if (config.get('studentProfile:replicateTime') <= updateTime.hour()) {
           replicateTime = replicateTime.plusDays(1);
