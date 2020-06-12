@@ -72,7 +72,7 @@
                 label="Current Legal First Name(s) (optional)"
                 :disabled="enableDisableForm.disabled || !editLegalFirstName"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-                maxlength="40"
+                maxlength="25"
                 dense
                 :rules="charRules"
               ></v-text-field>
@@ -97,7 +97,7 @@
                 label="Current Legal Middle Name(s) (optional)"
                 :disabled="enableDisableForm.disabled || !editLegalMiddleNames"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-                maxlength="255"
+                maxlength="25"
                 dense
                 :rules="charRules"
               ></v-text-field>
@@ -123,7 +123,7 @@
                 label="Current Legal Last Name (optional)"
                 :disabled="enableDisableForm.disabled || !editLegalLastName"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-                maxlength="40"
+                maxlength="25"
                 dense
               ></v-text-field>
             </v-container>
