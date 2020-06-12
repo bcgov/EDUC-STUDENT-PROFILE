@@ -2,7 +2,6 @@ const HttpStatus = require('http-status-codes');
 const lodash = require('lodash');
 const config = require('../../../src/config/index');
 
-jest.mock('@js-joda/core');
 const LocalDateTime = require('@js-joda/core').LocalDateTime;
 jest.mock('../../../src/components/utils');
 const utils = require('../../../src/components/utils');
@@ -148,7 +147,7 @@ describe('getStudent', () => {
 
 describe('getLatestRequest', () => {
   const digitalID = 'ac337def-704b-169f-8170-653e2f7c001';
-  const requests = [
+  let requests = [
     { 
       digitalID,
       statusUpdateDate: '2020-03-03T23:05:40' 
@@ -201,6 +200,90 @@ describe('getLatestRequest', () => {
     utils.getData.mockRejectedValue(new Error('error'));
 
     expect(changeRequest.__get__('getLatestRequest')('token', digitalID)).rejects.toThrowError(ServiceError);
+  });
+
+  it('should return tomorrow with false value if current time is after replicateTime', async () => {
+    requests = [
+      { 
+        digitalID,
+        statusUpdateDate: '2020-03-03T07:05:40',
+        studentRequestStatusCode: 'COMPLETED',
+      },
+    ];
+
+    const localTime = LocalDateTime.parse('2020-03-03T10:05:40');
+    jest.spyOn(LocalDateTime, 'now');
+    LocalDateTime.now.mockReturnValue(localTime);
+
+    utils.getData.mockResolvedValue(requests);
+
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+
+    expect(result).toBeTruthy();
+    expect(result.tomorrow).toBeFalsy();
+  });
+
+  it('should return tomorrow with true value if current time is before replicateTime', async () => {
+    requests = [
+      { 
+        digitalID,
+        statusUpdateDate: '2020-03-03T09:05:40',
+        studentRequestStatusCode: 'COMPLETED',
+      },
+    ];
+
+    const localTime = LocalDateTime.parse('2020-03-03T10:05:40');
+    jest.spyOn(LocalDateTime, 'now');
+    LocalDateTime.now.mockReturnValue(localTime);
+
+    utils.getData.mockResolvedValue(requests);
+
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+
+    expect(result).toBeTruthy();
+    expect(result.tomorrow).toBeTruthy();
+  });
+
+  it('should return tomorrow with true value if current time is the day after statusUpdateDate but before replicateTime', async () => {
+    requests = [
+      { 
+        digitalID,
+        statusUpdateDate: '2020-03-03T09:05:40',
+        studentRequestStatusCode: 'COMPLETED',
+      },
+    ];
+
+    const localTime = LocalDateTime.parse('2020-03-04T07:05:40');
+    jest.spyOn(LocalDateTime, 'now');
+    LocalDateTime.now.mockReturnValue(localTime);
+
+    utils.getData.mockResolvedValue(requests);
+
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+
+    expect(result).toBeTruthy();
+    expect(result.tomorrow).toBeTruthy();
+  });
+
+  it('should return tomorrow with false value if current time is the day after statusUpdateDate but after replicateTimee', async () => {
+    requests = [
+      { 
+        digitalID,
+        statusUpdateDate: '2020-03-03T09:05:40',
+        studentRequestStatusCode: 'COMPLETED',
+      },
+    ];
+
+    const localTime = LocalDateTime.parse('2020-03-04T09:05:40');
+    jest.spyOn(LocalDateTime, 'now');
+    LocalDateTime.now.mockReturnValue(localTime);
+
+    utils.getData.mockResolvedValue(requests);
+
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+
+    expect(result).toBeTruthy();
+    expect(result.tomorrow).toBeFalsy();
   });
 });
 
