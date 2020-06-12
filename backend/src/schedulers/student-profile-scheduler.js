@@ -7,11 +7,12 @@ const {getApiCredentials} = require('../components/auth');
 const {getDataWithParams, putData} = require('../components/utils');
 const localDateTime = require('@js-joda/core').LocalDateTime;
 
-const redisClient = new Redis({
-  host: config.get('redis:host'),
-  port: config.get('redis:port'),
-  password: config.get('redis:password')
-});
+const redisClient = new Redis.Cluster([
+  {
+    port: config.get('redis:port'),
+    host: config.get('redis:host'),
+  }
+]);
 
 const Redlock = require('redlock');
 const redLock = new Redlock(
