@@ -39,41 +39,7 @@
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-else-if="status === requestStatuses.COMPLETED">
     <p class="mb-2"><strong>Your request to update your PEN information is complete</strong></p>
-    <p class="mb-2">Below are the requested changes you submitted to the Ministry of Education</p>
-    <v-container class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
-      <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2">PEN:</p>
-        </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ request.recordedPen }}</strong></p>
-        </v-col>
-      </v-row>
-      <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2">Name:</p>
-        </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ requestedFullName }}</strong></p>
-        </v-col>
-      </v-row>
-      <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2">Birthdate:</p>
-        </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ request.dob ? moment(request.dob).format('MMMM D, YYYY'):'' }}</strong></p>
-        </v-col>
-      </v-row>
-      <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2">Gender:</p>
-        </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ genderLabel }}</strong></p>
-        </v-col>
-      </v-row>
-    </v-container>
+    <p class="mb-2 comment" v-if="request.completeComment && request.completeComment.length > 0">{{request.completeComment}}</p>
 
     <p class="mb-2">For your reference, your student record at the Ministry of Education has been updated as shown below</p>
     <v-container class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
@@ -111,8 +77,8 @@
       </v-row>
     </v-container>
 
-    <p class="mb-2"><strong>If any of this information is not current, please contact <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.</strong></p>
-    <p class="mb-2">You now may wish to use your PEN to:
+    <p class="mb-2"><strong>If any of this information is not current, please submit a new request or contact <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.</strong></p>
+    <p class="mb-2">{{ request.tomorrow ? 'As of tomorrow morning 8am PST, you may use your PEN to' : 'You now may wish to use your PEN to:' }}
       <ul>
         <li>
           <a :href="transcriptUrl" target="_blank">

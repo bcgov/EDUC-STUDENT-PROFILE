@@ -43,6 +43,7 @@ nconf.defaults({
     apiEndpoint: process.env.STUDENT_PROFILE_API_ENDPOINT,
     clientId: process.env.STUDENT_PROFILE_CLIENT_ID,
     clientSecret: process.env.STUDENT_PROFILE_CLIENT_SECRET,
+    replicateTime: process.env.PEN_REQUEST_REPLICATE_TIME || 8,
   },
   tokenGenerate: {
     privateKey: process.env.UI_PRIVATE_KEY,
