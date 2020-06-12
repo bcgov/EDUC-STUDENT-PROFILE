@@ -55,11 +55,12 @@ app.use(bodyParser.urlencoded({
 
 
 app.use(morgan(config.get('server:morganFormat')));
-const redisClient = new Redis({
-  host: config.get('redis:host'),
-  port: config.get('redis:port'),
-  password: config.get('redis:password')
-});
+const redisClient = new Redis.Cluster([
+  {
+    port: config.get('redis:port'),
+    host: config.get('redis:host'),
+  }
+]);
 const RedisStore = connectRedis(session);
 const dbSession = new RedisStore({
   client: redisClient,
