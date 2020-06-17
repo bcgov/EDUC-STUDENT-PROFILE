@@ -19,7 +19,7 @@ function formatWithInspect(val, colors = true) {
   }
 
   const shouldFormat = typeof val !== 'string' && !hasAnsi(val);
-  const formattedVal = shouldFormat ? inspect(val, { depth: null, colors }) : stripAnsi(val);
+  const formattedVal = shouldFormat ? inspect(val, { depth: null, colors }) : (colors ? val : stripAnsi(val));
 
   return isPrimitive(val) ? formattedVal : `\n${formattedVal}`;
 }
@@ -70,10 +70,8 @@ const logger = createLogger({
   ]
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new transports.Console({
-    format: getDomainWinstonLoggerFormat(true)
-  }));
-};
+logger.add(new transports.Console({
+  format: getDomainWinstonLoggerFormat(true)
+}));
 
 module.exports = logger;
