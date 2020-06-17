@@ -3,7 +3,7 @@
 const config = require('./config/index');
 const http = require('http');
 //const fs = require('fs')
-const log = require('npmlog');
+const log = require('./components/logger');
 const localDateTime = require('@js-joda/core').LocalDateTime;
 //Add timestamp to log
 Object.defineProperty(log, 'heading', { get: () => { return localDateTime.now().toString(); } });

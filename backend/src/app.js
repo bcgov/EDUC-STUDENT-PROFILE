@@ -2,7 +2,7 @@
 
 const config = require('./config/index');
 const dotenv = require('dotenv');
-const log = require('npmlog');
+const log = require('./components/logger');
 const morgan = require('morgan');
 const session = require('express-session');
 const express = require('express');
@@ -53,14 +53,30 @@ app.use(bodyParser.urlencoded({
   limit: '50mb'
 }));
 
-
-app.use(morgan(config.get('server:morganFormat')));
-const redisClient = new Redis.Cluster([
-  {
-    port: config.get('redis:port'),
-    host: config.get('redis:host'),
+const logStream = {
+  write: (message) => {
+      log.info(message)
   }
-]);
+};
+
+app.use(morgan(config.get('server:morganFormat'), { "stream": logStream }));
+
+let redisClient;
+if (config.get('environment') !== undefined && config.get('environment') === 'local') {
+  redisClient = new Redis({
+    host: config.get('redis:host'),
+    port: config.get('redis:port'),
+    password: config.get('redis:password')
+  });
+} else {
+  redisClient = new Redis.Cluster([
+    {
+      port: config.get('redis:port'),
+      host: config.get('redis:host'),
+    }
+  ]);
+}
+
 const RedisStore = connectRedis(session);
 const dbSession = new RedisStore({
   client: redisClient,
@@ -90,12 +106,6 @@ app.use(session({
 //initialize routing and session. Cookies are now only reachable via requests (not js)
 app.use(passport.initialize());
 app.use(passport.session());
-
-//configure logging
-log.level = config.get('server:logLevel');
-log.addLevel('debug', 1500, {
-  fg: 'cyan'
-});
 
 //initialize our authentication strategy
 utils.getOidcDiscovery().then(discovery => {

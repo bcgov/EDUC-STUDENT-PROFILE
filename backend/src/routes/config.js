@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const HttpStatus = require('http-status-codes');
 const config = require('../config/index');
-const log = require('npmlog');
+const log = require('../components/logger');
 const router = express.Router();
 const {getAccessToken} = require('../components/utils');
 

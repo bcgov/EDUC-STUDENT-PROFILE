@@ -2,12 +2,13 @@
 
 const axios = require('axios');
 const config = require('../config/index');
-const log = require('npmlog');
+const log = require('./logger');
 const jsonwebtoken = require('jsonwebtoken');
 const qs = require('querystring');
 const utils = require('./utils');
 const HttpStatus = require('http-status-codes');
 const { ApiError } = require('./error'); 
+const { pick } =  require('lodash');
 
 const auth = {
   // Check if JWT Access Token has expired
@@ -140,7 +141,7 @@ const auth = {
       result.refreshToken = response.data.refresh_token;
       return result;
     } catch (error) {
-      log.error('getApiCredentials Error', error.response || error.message);
+      log.error('getApiCredentials Error', error.response ? pick(error.response, ['status', 'statusText', 'data']) : error.message);
       const status = error.response ? error.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
       throw new ApiError(status, { message: 'Get getApiCredentials error'}, error);
     }
