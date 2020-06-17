@@ -1,5 +1,4 @@
 const axios = require('axios');
-const config = require('../../../src/config/index');
 const MockAdapter = require('axios-mock-adapter');
 //const jsonwebtoken = require('jsonwebtoken');
 
