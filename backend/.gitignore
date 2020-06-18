@@ -34,3 +34,4 @@ realm.json
 # log files
 .*-audit.json
 *.log
+logs
