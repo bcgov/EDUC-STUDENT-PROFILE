@@ -3,7 +3,7 @@
 const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, generateJWTToken } = require('./utils');
 const { getApiCredentials } = require('./auth');
 const config = require('../config/index');
-const log = require('npmlog');
+const log = require('./logger');
 const lodash = require('lodash');
 const HttpStatus = require('http-status-codes');
 const jsonwebtoken = require('jsonwebtoken');

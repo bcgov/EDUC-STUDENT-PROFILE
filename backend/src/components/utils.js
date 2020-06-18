@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 const config = require('../config/index');
-const log = require('npmlog');
+const log = require('./logger');
 const HttpStatus = require('http-status-codes');
 const lodash = require('lodash');
 const { ApiError } = require('./error');
