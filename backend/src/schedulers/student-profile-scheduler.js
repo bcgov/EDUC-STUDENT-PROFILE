@@ -20,7 +20,7 @@ if (config.get('environment') !== undefined && config.get('environment') === 'lo
       port: config.get('redis:port'),
       host: config.get('redis:host'),
     }
-  ])
+  ]);
 }
 
 const Redlock = require('redlock');

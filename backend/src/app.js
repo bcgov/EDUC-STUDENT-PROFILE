@@ -55,11 +55,11 @@ app.use(bodyParser.urlencoded({
 
 const logStream = {
   write: (message) => {
-      log.info(message)
+    log.info(message);
   }
 };
 
-app.use(morgan(config.get('server:morganFormat'), { "stream": logStream }));
+app.use(morgan(config.get('server:morganFormat'), { 'stream': logStream }));
 
 let redisClient;
 if (config.get('environment') !== undefined && config.get('environment') === 'local') {
