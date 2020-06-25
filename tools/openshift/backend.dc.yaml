@@ -118,7 +118,7 @@ objects:
             secretName: student-profile-backend-cert
         - name: flb-sc-config-volume
           configMap:
-            name: flb-sc-config-map
+            name: "${APP_NAME}-flb-sc-config-map"
     test: false
     triggers:
     - type: ConfigChange
