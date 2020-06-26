@@ -1,6 +1,6 @@
 'use strict';
 
-const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, generateJWTToken } = require('./utils');
+const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, RequestApps, generateJWTToken } = require('./utils');
 const { getApiCredentials } = require('./auth');
 const config = require('../config/index');
 const log = require('./logger');
@@ -8,28 +8,31 @@ const lodash = require('lodash');
 const HttpStatus = require('http-status-codes');
 const jsonwebtoken = require('jsonwebtoken');
 const localDateTime = require('@js-joda/core').LocalDateTime;
-const ChronoUnit = require('@js-joda/core').ChronoUnit;
-const { ServiceError, ConflictStateError } = require('./error'); 
+const { ServiceError, ConflictStateError } = require('./error');
+const { setPenRequestReplicateStatus } = require('./penRequest');
+const { setStudentRequestReplicateStatus } = require('./studentRequest');
 
 let codes = null;
 
-function getRequest(req, res, next) {
-  const userInfo = getSessionUser(req);
-  if(!userInfo) {
-    return res.status(HttpStatus.UNAUTHORIZED).json({
-      status: HttpStatus.UNAUTHORIZED,
-      message: 'you are not authorized to access this page'
-    });
-  }
+function verifyRequest(requestType) {
+  return function getRequestHandler(req, res, next) {
+    const userInfo = getSessionUser(req);
+    if(!userInfo) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        status: HttpStatus.UNAUTHORIZED,
+        message: 'you are not authorized to access this page'
+      });
+    }
 
-  const requestID = req.params.id;
-  if(!req || !req.session || !req.session.request || req.session.request.studentRequestID !== requestID) {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      message: 'Wrong requestID'
-    });
-  }
+    const requestID = req.params.id;
+    if(!req || !req.session || !req.session[requestType] || req.session[requestType][`${requestType}ID`] !== requestID) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Wrong requestID'
+      });
+    }
 
-  next();
+    next();
+  };
 }
 
 async function getDigitalIdData(token, digitalID) {
@@ -55,21 +58,15 @@ async function getStudent(token, studentID, sexCodes) {
   return student;
 }
 
-async function getLatestRequest(token, digitalID) {
+async function getLatestRequest(token, digitalID, requestType, setReplicateStatus) {
   let request = null;
+  const url = config.get(`${requestType}:apiEndpoint`);
   try {
-    let data = await getData(token, `${config.get('studentProfile:apiEndpoint')}/?digitalID=${digitalID}`);
+    let data = await getData(token, `${url}/?digitalID=${digitalID}`);
     request = lodash.maxBy(data, 'statusUpdateDate') || null;
     if(request) {
       request.digitalID = null;
-      if (request.studentRequestStatusCode === RequestStatuses.COMPLETED) {
-        const updateTime = localDateTime.parse(request.statusUpdateDate);
-        let replicateTime = updateTime.truncatedTo(ChronoUnit.HOURS).withHour(config.get('studentProfile:replicateTime'));
-        if (config.get('studentProfile:replicateTime') <= updateTime.hour()) {
-          replicateTime = replicateTime.plusDays(1);
-        }
-        request.tomorrow = replicateTime.isAfter(localDateTime.now());
-      }
+      request = setReplicateStatus(request);
     }
   } catch(e) {
     if(!e.status || e.status !== HttpStatus.NOT_FOUND) {
@@ -108,8 +105,9 @@ async function getUserInfo(req, res) {
   return Promise.all([
     getDigitalIdData(accessToken, digitalID), 
     getServerSideCodes(accessToken), 
-    getLatestRequest(accessToken, digitalID)
-  ]).then(async ([digitalIdData, codes, request]) => {
+    getLatestRequest(accessToken, digitalID, 'penRequest', setPenRequestReplicateStatus),
+    getLatestRequest(accessToken, digitalID, 'studentRequest', setStudentRequestReplicateStatus),
+  ]).then(async ([digitalIdData, codes, penRequest, studentRequest]) => {
   
     const identityType = lodash.find(codes.identityTypes, ['identityTypeCode', digitalIdData.identityTypeCode]);
     if(! identityType) {
@@ -127,7 +125,8 @@ async function getUserInfo(req, res) {
     if(req && req.session){
       req.session.digitalIdentityData = digitalIdData;
       req.session.digitalIdentityData.identityTypeLabel = identityType.label;
-      req.session.request = request;
+      req.session.studentRequest = studentRequest;
+      req.session.penRequest = penRequest;
     } else {
       throw new ServiceError('userInfo error: session does not exist');
     }
@@ -136,7 +135,8 @@ async function getUserInfo(req, res) {
       accountType: userInfo._json.accountType,
       identityTypeLabel: identityType.label,
       ...(userInfo._json.accountType === 'BCSC' ? getDefaultBcscInput(userInfo) : {}),
-      request,
+      studentRequest,
+      penRequest,
       student,
     };
 
@@ -150,32 +150,35 @@ async function getUserInfo(req, res) {
   });
 }
 
-async function getCodes(req, res) {
-  try{
-    const accessToken = getAccessToken(req);
-    if(!accessToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No access token'
+function getCodes(requestType) {
+  return async function getCodesHandler(req, res) {
+    try{
+      const accessToken = getAccessToken(req);
+      if(!accessToken) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No access token'
+        });
+      }
+
+      const url = config.get(`${requestType}:apiEndpoint`);
+      const codeUrls = [
+        `${url}/gender-codes`, 
+        `${url}/statuses`,
+      ];
+
+      const [genderCodes, statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url)));
+      if(genderCodes){
+        // forcing sort if API did not return in sorted order.
+        genderCodes.sort((a,b)=> a.displayOrder - b.displayOrder);
+      }
+      return res.status(HttpStatus.OK).json({genderCodes, statusCodes});
+    } catch (e) {
+      log.error('getCodes Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: 'Get codes error'
       });
     }
-
-    const codeUrls = [
-      `${config.get('studentProfile:apiEndpoint')}/gender-codes`, 
-      `${config.get('studentProfile:apiEndpoint')}/statuses`,
-    ];
-
-    const [genderCodes, statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url)));
-    if(genderCodes){
-      // forcing sort if API did not return in sorted order.
-      genderCodes.sort((a,b)=> a.displayOrder - b.displayOrder);
-    }
-    return res.status(HttpStatus.OK).json({genderCodes, statusCodes});
-  } catch (e) {
-    log.error('getCodes Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Get codes error'
-    });
-  }
+  };
 }
 
 async function getServerSideCodes(accessToken) {
@@ -195,15 +198,16 @@ async function getServerSideCodes(accessToken) {
   return codes;
 }
 
-async function sendVerificationEmail(accessToken, emailAddress, requestId, identityTypeLabel) {
-  const verificationUrl = config.get('server:frontend') + '/api/student/verification?verificationToken';
+async function sendVerificationEmail(accessToken, emailAddress, requestId, identityTypeLabel, requestType) {
+  const verificationUrl = config.get('server:frontend') + `/api/${RequestApps[requestType]}/verification?verificationToken`;
   const reqData = {
     emailAddress,
-    requestId,
+    [`${requestType}Id`]: requestId,
     identityTypeLabel,
     verificationUrl: verificationUrl
   };
-  const url = config.get('email:apiEndpoint') + '/verify';
+  log.info('sendVerificationEmail reqData', reqData);
+  const url = config.get('email:apiEndpoint') + `/${RequestApps[requestType]}/verify`;
   try {
     const payload = {
       SCOPE: 'VERIFY_EMAIL'
@@ -257,9 +261,9 @@ async function getAutoMatchResults(accessToken, userInfo) {
   }
 }
 
-async function postRequest(accessToken, reqData, userInfo) {
+async function postRequest(accessToken, reqData, userInfo, requestType) {
   try{
-    const url = config.get('studentProfile:apiEndpoint') + '/';
+    const url = config.get(`${requestType}:apiEndpoint`) + '/';
 
     if(userInfo.accountType === 'BCSC') {
       const autoMatchResults = await getAutoMatchResults(accessToken, userInfo);
@@ -278,147 +282,147 @@ async function postRequest(accessToken, reqData, userInfo) {
   }
 }
 
-async function submitRequest(req, res) {
-  try{
-    const userInfo = getSessionUser(req);
-    if(!userInfo) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No session data'
-      });
-    }
-
-    const accessToken = userInfo.jwt;
-
-    if(req && req.session && req.session.request && req.session.request.studentRequestStatusCode !== RequestStatuses.REJECTED && 
-      req.session.request.studentRequestStatusCode !== RequestStatuses.ABANDONED && 
-      req.session.request.studentRequestStatusCode !== RequestStatuses.COMPLETED) {
-      return res.status(HttpStatus.CONFLICT).json({
-        message: 'Submit Request not allowed'
-      });
-    }
-
-    const resData = await postRequest(accessToken, req.body, userInfo._json);
-
-    req.session.request = resData;
-    if(req.body.email && req.body.email !== req.body.recordedEmail) {
-      sendVerificationEmail(accessToken, req.body.email, resData.studentRequestID, req.session.digitalIdentityData.identityTypeLabel).catch(e => 
-        log.error('sendVerificationEmail Error', e.stack)
-      );
-    }
-    
-    return res.status(HttpStatus.OK).json(resData);
-  } catch(e) {
-    log.error('submitRequest Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Submit request error',
-      errorSource: e.errorSource
-    });
-  }
-}
-
-async function postComment(req, res) {
-  try{
-    const accessToken = getAccessToken(req);
-    if(!accessToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No access token'
-      });
-    }
-
-    if(!req || !req.session || !req.session.request || req.session.request.studentRequestStatusCode !== RequestStatuses.RETURNED) {
-      return res.status(HttpStatus.CONFLICT).json({
-        message: 'Post comment not allowed'
-      });
-    }
-
-    const url = `${config.get('studentProfile:apiEndpoint')}/${req.params.id}/comments`;
-    const comment = {
-      studentRequestID: req.params.id,
-      staffMemberIDIRGUID: null,
-      staffMemberName: null,
-      commentContent: req.body.content,
-      commentTimestamp: localDateTime.now().toString()
-    };
-
-    const data = await postData(accessToken, comment, url);
-
-    const message = {
-      content: data.commentContent,
-      participantId: '1',
-      myself: true,
-      timestamp: data.commentTimestamp
-    };
-    return res.status(HttpStatus.OK).json(message);
-  } catch(e) {
-    log.error('postComment Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Post comment error'
-    });
-  }
-}
-
-async function getComments(req, res) {
-  try{
-    const userInfo = getSessionUser(req);
-    if(!userInfo) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No session data'
-      });
-    }
-
-    const accessToken = userInfo.jwt;
-    const url = `${config.get('studentProfile:apiEndpoint')}/${req.params.id}/comments`;
-
-    const apiResData = await getData(accessToken, url);
-
-    let response = {
-      participants: [],
-      myself: {
-        name: userInfo._json.displayName,
-        id: '1'
-      },
-      messages: []
-    };
-    apiResData.sort((a,b) => (a.commentTimestamp > b.commentTimestamp) ? 1 : ((b.commentTimestamp > a.commentTimestamp) ? -1 : 0));
-
-    apiResData.forEach(element => {
-      const participant = {
-        name: (element.staffMemberName ? element.staffMemberName : 'Student'),
-        id: (element.staffMemberIDIRGUID ? element.staffMemberIDIRGUID : '1')
-      };
-
-      if (participant && participant.id && participant.id.toUpperCase() !== response.myself.id.toUpperCase()) {
-        const index = response.participants.findIndex((e) => e.id === participant.id);
-
-        if (index === -1) {
-          response.participants.push(participant);
-        }
+function submitRequest(requestType, verifyRequestStatus) {
+  return async function submitRequestHandler(req, res) {
+    try{
+      const userInfo = getSessionUser(req);
+      if(!userInfo) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No session data'
+        });
       }
 
-      response.messages.push({
-        content: element.commentContent,
-        participantId: (element.staffMemberIDIRGUID ? element.staffMemberIDIRGUID : '1'),
-        myself: participant.id.toUpperCase() === response.myself.id.toUpperCase(),
-        timestamp: element.commentTimestamp
-      });
-    });
+      const accessToken = userInfo.jwt;
 
-    return res.status(HttpStatus.OK).json(response);
-  } catch (e) {
-    log.error('getComments Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Comments Get error'
-    });
-  }
+      if(req && req.session && req.session[requestType] && verifyRequestStatus(req.session[requestType])) {
+        return res.status(HttpStatus.CONFLICT).json({
+          message: `Submit ${requestType} not allowed`
+        });
+      }
+
+      const resData = await postRequest(accessToken, req.body, userInfo._json, requestType);
+
+      req.session[requestType] = resData;
+      if(req.body.email && req.body.email !== req.body.recordedEmail) {
+        sendVerificationEmail(accessToken, req.body.email, resData[`${requestType}ID`], req.session.digitalIdentityData.identityTypeLabel).catch(e => 
+          log.error('sendVerificationEmail Error', e.stack)
+        );
+      }
+
+      return res.status(HttpStatus.OK).json(resData);
+    } catch(e) {
+      log.error('submitRequest Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `Submit ${requestType} error`,
+        errorSource: e.errorSource
+      });
+    }
+  };
 }
 
-function beforeUpdateRequestAsInitrev(request) {
-  if(request.studentRequestStatusCode !== RequestStatuses.DRAFT) {
-    throw new ConflictStateError('Current Request Status: ' + request.studentRequestStatusCode);
+function postComment(requestType, createCommentReq) {
+  return async function postCommentHandler(req, res) {
+    try{
+      const accessToken = getAccessToken(req);
+      if(!accessToken) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No access token'
+        });
+      }
+
+      if(!req || !req.session || !req.session[requestType] || req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
+        return res.status(HttpStatus.CONFLICT).json({
+          message: `Post ${requestType} comment not allowed`
+        });
+      }
+
+      const endpoint = config.get(`${requestType}:apiEndpoint`);
+      const url = `${endpoint}/${req.params.id}/comments`;
+      const comment = createCommentReq(req.params.id, req.body.content);
+
+      const data = await postData(accessToken, comment, url);
+
+      const message = {
+        content: data.commentContent,
+        participantId: '1',
+        myself: true,
+        timestamp: data.commentTimestamp
+      };
+      return res.status(HttpStatus.OK).json(message);
+    } catch(e) {
+      log.error('postComment Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `Post ${requestType} comment error`
+      });
+    }
+  };
+}
+
+function getComments(requestType) {
+  return async function getCommentsHandler(req, res) {
+    try{
+      const userInfo = getSessionUser(req);
+      if(!userInfo) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No session data'
+        });
+      }
+
+      const accessToken = userInfo.jwt;
+      const endpoint = config.get(`${requestType}:apiEndpoint`);
+      const url = `${endpoint}/${req.params.id}/comments`;
+
+      const apiResData = await getData(accessToken, url);
+
+      let response = {
+        participants: [],
+        myself: {
+          name: userInfo._json.displayName,
+          id: '1'
+        },
+        messages: []
+      };
+      apiResData.sort((a,b) => (a.commentTimestamp > b.commentTimestamp) ? 1 : ((b.commentTimestamp > a.commentTimestamp) ? -1 : 0));
+
+      apiResData.forEach(element => {
+        const participant = {
+          name: (element.staffMemberName ? element.staffMemberName : 'Student'),
+          id: (element.staffMemberIDIRGUID ? element.staffMemberIDIRGUID : '1')
+        };
+
+        if (participant && participant.id && participant.id.toUpperCase() !== response.myself.id.toUpperCase()) {
+          const index = response.participants.findIndex((e) => e.id === participant.id);
+
+          if (index === -1) {
+            response.participants.push(participant);
+          }
+        }
+
+        response.messages.push({
+          content: element.commentContent,
+          participantId: (element.staffMemberIDIRGUID ? element.staffMemberIDIRGUID : '1'),
+          myself: participant.id.toUpperCase() === response.myself.id.toUpperCase(),
+          timestamp: element.commentTimestamp
+        });
+      });
+
+      return res.status(HttpStatus.OK).json(response);
+    } catch (e) {
+      log.error('getComments Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `${requestType} Comments Get error`
+      });
+    }
+  };
+}
+
+function beforeUpdateRequestAsInitrev(request, requestType) {
+  if(request[`${requestType}StatusCode`] !== RequestStatuses.DRAFT) {
+    throw new ConflictStateError(`Current ${requestType} Status: ` + request[`${requestType}StatusCode`]);
   }
 
   if(request.emailVerified !== EmailVerificationStatuses.NOT_VERIFIED) {
-    throw new ConflictStateError('Current Email Verification Status: ' + request.emailVerified);
+    throw new ConflictStateError(`Current ${requestType} Email Verification Status: ` + request.emailVerified);
   }
   
   request.initialSubmitDate = localDateTime.now().toString();
@@ -427,11 +431,11 @@ function beforeUpdateRequestAsInitrev(request) {
   return request;
 }
 
-async function setRequestAsInitrev(requestID) {
-  let data = await getApiCredentials(config.get('studentProfile:clientId'), config.get('studentProfile:clientSecret'));
+async function setRequestAsInitrev(requestID, requestType) {
+  let data = await getApiCredentials(config.get(`${requestType}:clientId`), config.get(`${requestType}:clientSecret`));
   const accessToken = data.accessToken;
 
-  return await updateRequestStatus(accessToken, requestID, RequestStatuses.INITREV, beforeUpdateRequestAsInitrev);
+  return await updateRequestStatus(accessToken, requestID, RequestStatuses.INITREV, requestType, beforeUpdateRequestAsInitrev);
 }
 
 function verifyEmailToken(token) {
@@ -454,48 +458,51 @@ function verifyEmailToken(token) {
   }
 }
 
-async function verifyEmail(req, res) {
-  const loggedin = getSessionUser(req);
-  const baseUrl = config.get('server:frontend');
-  const verificationUrl = baseUrl + '/verification/';
+function verifyEmail(requestType) {
+  return async function verifyEmailHandler(req, res) {
+    const loggedin = getSessionUser(req);
+    const baseUrl = config.get('server:frontend');
+    const verificationUrl = baseUrl + '/verification/';
 
-  if(! req.query.verificationToken) {
-    return res.redirect(verificationUrl + VerificationResults.TOKEN_ERROR);
-  }
-
-  try{
-    const [error, requestID] = verifyEmailToken(req.query.verificationToken);
-    if(error && error.name === 'TokenExpiredError') {
-      return res.redirect(loggedin ? baseUrl : (verificationUrl + VerificationResults.EXPIRED));
-    } else if (error) {
+    if(! req.query.verificationToken) {
       return res.redirect(verificationUrl + VerificationResults.TOKEN_ERROR);
     }
 
-    const data = await setRequestAsInitrev(requestID);
-    if(loggedin) {
-      req.session.request = data;
-    }
-    
-    return res.redirect(loggedin ? baseUrl : (verificationUrl + VerificationResults.OK));
-  }catch(e){
-    if(e instanceof ConflictStateError) {
+    try{
+      const [error, requestID] = verifyEmailToken(req.query.verificationToken);
+      if(error && error.name === 'TokenExpiredError') {
+        return res.redirect(loggedin ? baseUrl : (verificationUrl + VerificationResults.EXPIRED));
+      } else if (error) {
+        return res.redirect(verificationUrl + VerificationResults.TOKEN_ERROR);
+      }
+
+      const data = await setRequestAsInitrev(requestID, requestType);
+      if(loggedin) {
+        req.session[requestType] = data;
+      }
+
       return res.redirect(loggedin ? baseUrl : (verificationUrl + VerificationResults.OK));
-    } else {
-      log.error('verifyEmail Error', e.stack);
-      return res.redirect(verificationUrl + VerificationResults.SERVER_ERROR);
+    }catch(e){
+      if(e instanceof ConflictStateError) {
+        return res.redirect(loggedin ? baseUrl : (verificationUrl + VerificationResults.OK));
+      } else {
+        log.error('verifyEmail Error', e.stack);
+        return res.redirect(verificationUrl + VerificationResults.SERVER_ERROR);
+      }
     }
-  }
+  };
 }
 
-async function updateRequestStatus(accessToken, requestID, requestStatus, beforeUpdate) {
+async function updateRequestStatus(accessToken, requestID, requestStatus, requestType, beforeUpdate) {
   try {
-    let data = await getData(accessToken, `${config.get('studentProfile:apiEndpoint')}/${requestID}`);
+    const endpoint = config.get(`${requestType}:apiEndpoint`);
+    let data = await getData(accessToken, `${endpoint}/${requestID}`);
 
-    let request = beforeUpdate(data);
-    request.studentRequestStatusCode = requestStatus;
+    let request = beforeUpdate(data, requestType);
+    request[`${requestType}StatusCode`] = requestStatus;
     request.statusUpdateDate = localDateTime.now().toString();
 
-    data = await putData(accessToken, request, config.get('studentProfile:apiEndpoint'));
+    data = await putData(accessToken, request, endpoint);
     data.digitalID = null;
 
     return data;
@@ -508,167 +515,180 @@ async function updateRequestStatus(accessToken, requestID, requestStatus, before
   }
 }
 
-function beforeUpdateRequestAsSubsrev(request) {
-  if(request.studentRequestStatusCode !== RequestStatuses.RETURNED) {
-    throw new ConflictStateError('Current Request Status: ' + request.studentRequestStatusCode);
+function beforeUpdateRequestAsSubsrev(request, requestType) {
+  if(request[`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
+    throw new ConflictStateError(`Current ${requestType} Status: ` + request[`${requestType}StatusCode`]);
   }
 
   return request;
+} 
+
+function setRequestAsSubsrev(requestType) {
+  return async function setRequestAsSubsrevHandler(req, res) {
+    try{
+      const accessToken = getAccessToken(req);
+      if(!accessToken) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No access token'
+        });
+      }
+
+      const requestID = req.params.id;
+      const requestStatus = req.body[`${requestType}StatusCode`];
+
+      if(! requestStatus) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: `No ${requestType}StatusCode data`
+        });
+      }
+
+      if(requestStatus !== RequestStatuses.SUBSREV) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: `Wrong ${requestType}StatusCode`
+        });
+      }
+
+      let data = await updateRequestStatus(accessToken, requestID, requestStatus, requestType, beforeUpdateRequestAsSubsrev);
+      req.session[requestType] = data;
+
+      return res.status(HttpStatus.OK).json(data);
+    } catch(e) {
+      log.error('setRequestAsSubsrev Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `Set ${requestType} as subsrev error`,
+        errorSource: e.errorSource
+      });
+    }
+  };
 }
 
-async function setRequestAsSubsrev(req, res) {
-  try{
-    const accessToken = getAccessToken(req);
-    if(!accessToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No access token'
+function resendVerificationEmail(requestType) {
+  return async function resendVerificationEmailHandler(req, res) {
+    try{
+      const accessToken = getAccessToken(req);
+      if(!accessToken) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No access token'
+        });
+      }
+
+      if(req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.DRAFT) {
+        return res.status(HttpStatus.CONFLICT).json({
+          message: `Resend ${requestType} verification email not allowed`
+        });
+      }
+
+      const data = await sendVerificationEmail(accessToken, req.session[requestType].email, req.session[requestType][`${requestType}ID`], 
+        req.session.digitalIdentityData.identityTypeLabel, requestType);
+
+      return res.status(HttpStatus.OK).json(data);
+    } catch(e) {
+      log.error('resendVerificationEmail Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `Resend ${requestType} verification email error`,
+        errorSource: e.errorSource
       });
     }
-
-    const requestID = req.params.id;
-    const requestStatus = req.body.studentRequestStatusCode;
-
-    if(! requestStatus) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: 'No requestStatus data'
-      });
-    }
-
-    if(requestStatus !== RequestStatuses.SUBSREV) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: 'Wrong requestStatus'
-      });
-    }
-
-    let data = await updateRequestStatus(accessToken, requestID, requestStatus, beforeUpdateRequestAsSubsrev);
-    req.session.request = data;
-
-    return res.status(HttpStatus.OK).json(data);
-  } catch(e) {
-    log.error('setRequestAsSubsrev Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Set request as subsrev error',
-      errorSource: e.errorSource
-    });
-  }
+  };
 }
 
-async function resendVerificationEmail(req, res) {
-  try{
-    const accessToken = getAccessToken(req);
-    if(!accessToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No access token'
+function uploadFile(requestType) {
+  return async function uploadFileHandler(req, res) {
+    try{
+      const accessToken = getAccessToken(req);
+      if(!accessToken) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No access token'
+        });
+      }
+
+      if(!req.session[requestType] || req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
+        return res.status(HttpStatus.CONFLICT).json({
+          message: `Upload ${requestType} file not allowed`
+        });
+      }
+
+      const endpoint = config.get(`${requestType}:apiEndpoint`);
+      const url = `${endpoint}/${req.params.id}/documents`;
+
+      const data = await postData(accessToken, req.body, url);
+      return res.status(HttpStatus.OK).json(data);
+    } catch(e) {
+      log.error('uploadFile Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `Upload ${requestType} file error`
       });
     }
-
-    if(req.session.request.studentRequestStatusCode !== RequestStatuses.DRAFT) {
-      return res.status(HttpStatus.CONFLICT).json({
-        message: 'Resend email not allowed'
-      });
-    }
-
-    const data = await sendVerificationEmail(accessToken, req.session.request.email, req.session.request.studentRequestID, 
-      req.session.digitalIdentityData.identityTypeLabel);
-
-    return res.status(HttpStatus.OK).json(data);
-  } catch(e) {
-    log.error('resendVerificationEmail Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Resend verification email error',
-      errorSource: e.errorSource
-    });
-  }
+  };
 }
 
-async function uploadFile(req, res) {
-  try{
-    const accessToken = getAccessToken(req);
-    if(!accessToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No access token'
-      });
-    }
-
-    if(!req.session.request || req.session.request.studentRequestStatusCode !== RequestStatuses.RETURNED) {
-      return res.status(HttpStatus.CONFLICT).json({
-        message: 'Upload file not allowed'
-      });
-    }
-
-    const url = `${config.get('studentProfile:apiEndpoint')}/${req.params.id}/documents`;
-
-    const data = await postData(accessToken, req.body, url);
-    return res.status(HttpStatus.OK).json(data);
-  } catch(e) {
-    log.error('uploadFile Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Upload file error'
-    });
-  }
-}
-
-async function getDocument(token, requestID, documentID, includeDocData = 'Y') {
+async function getDocument(token, requestID, documentID, requestType, includeDocData = 'Y') {
   try {
-    return await getData(token, `${config.get('studentProfile:apiEndpoint')}/${requestID}/documents/${documentID}?includeDocData=${includeDocData}`);  
+    const endpoint = config.get(`${requestType}:apiEndpoint`);
+    return await getData(token, `${endpoint}/${requestID}/documents/${documentID}?includeDocData=${includeDocData}`);  
   } catch (e) {
     throw new ServiceError('getDocument error', e);
   }
 }
 
-async function deleteDocument(req, res) {
-  try{
-    const accessToken = getAccessToken(req);
-    if(!accessToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No access token'
+function deleteDocument(requestType) {
+  return async function deleteDocumentHandler(req, res) {
+    try{
+      const accessToken = getAccessToken(req);
+      if(!accessToken) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No access token'
+        });
+      }
+
+      let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'N');
+
+      if(!req.session[requestType] || resData.createDate <= req.session[requestType].statusUpdateDate || 
+        req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
+        return res.status(HttpStatus.CONFLICT).json({
+          message: `Delete ${requestType} file not allowed`
+        });
+      }
+
+      const endpoint = config.get(`${requestType}:apiEndpoint`);
+      const url = `${endpoint}/${req.params.id}/documents/${req.params.documentId}`;
+
+      await deleteData(accessToken, url);
+      return res.status(HttpStatus.OK).json();
+    } catch (e) {
+      log.error('deleteDocument Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `Delete ${requestType} document error`,
+        errorSource: e.errorSource
       });
     }
-
-    let resData = await getDocument(accessToken, req.params.id, req.params.documentId, 'N');
-
-    if(!req.session.request || resData.createDate <= req.session.request.statusUpdateDate || 
-      req.session.request.studentRequestStatusCode !== RequestStatuses.RETURNED) {
-      return res.status(HttpStatus.CONFLICT).json({
-        message: 'Delete file not allowed'
-      });
-    }
-
-    const url = `${config.get('studentProfile:apiEndpoint')}/${req.params.id}/documents/${req.params.documentId}`;
-
-    await deleteData(accessToken, url);
-    return res.status(HttpStatus.OK).json();
-  } catch (e) {
-    log.error('deleteDocument Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Delete document error',
-      errorSource: e.errorSource
-    });
-  }
+  };
 }
 
-async function downloadFile(req, res) {
-  try{
-    const accessToken = getAccessToken(req);
-    if(!accessToken) {
-      return res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'No access token'
+function downloadFile(requestType) {
+  return async function downloadFileHandler(req, res) {
+    try{
+      const accessToken = getAccessToken(req);
+      if(!accessToken) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No access token'
+        });
+      }
+
+      let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'Y');
+
+      res.setHeader('Content-disposition', 'attachment; filename=' + resData.fileName);
+      res.setHeader('Content-type', resData.fileExtension);
+
+      return res.status(HttpStatus.OK).send(Buffer.from(resData.documentData, 'base64'));
+    } catch (e) {
+      log.error('downloadFile Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `Download ${requestType} file error`,
+        errorSource: e.errorSource
       });
     }
-
-    let resData = await getDocument(accessToken, req.params.id, req.params.documentId, 'Y');
-
-    res.setHeader('Content-disposition', 'attachment; filename=' + resData.fileName);
-    res.setHeader('Content-type', resData.fileExtension);
-
-    return res.status(HttpStatus.OK).send(Buffer.from(resData.documentData, 'base64'));
-  } catch (e) {
-    log.error('downloadFile Error', e.stack);
-    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      message: 'Download file error',
-      errorSource: e.errorSource
-    });
-  }
+  };
 }
 
 module.exports = {
@@ -681,7 +701,7 @@ module.exports = {
   verifyEmailToken,
   setRequestAsSubsrev,
   resendVerificationEmail,
-  getRequest,
+  verifyRequest,
   deleteDocument,
   downloadFile,
   uploadFile

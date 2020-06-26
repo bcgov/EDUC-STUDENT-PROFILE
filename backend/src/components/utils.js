@@ -199,7 +199,6 @@ const RequestStatuses = Object.freeze({
   INITREV: 'INITREV',
   RETURNED: 'RETURNED',
   SUBSREV: 'SUBSREV',
-  COMPLETED: 'COMPLETED',
   REJECTED: 'REJECTED',
   ABANDONED: 'ABANDONED'
 });
@@ -214,6 +213,11 @@ const VerificationResults = Object.freeze({
   SERVER_ERROR: 'server-error',
   EXPIRED: 'expired',
   OK: 'ok'
+});
+
+const RequestApps = Object.freeze({
+  penRequest: 'gmp',
+  studentRequest: 'ump'
 });
 
 function computeSMRetUrl(req, token) {
@@ -261,6 +265,7 @@ const utils = {
   RequestStatuses,
   VerificationResults,
   EmailVerificationStatuses,
+  RequestApps,
   computeSMRetUrl,
   generateJWTToken
 };

@@ -7,21 +7,24 @@ jest.mock('../../../src/components/utils');
 const utils = require('../../../src/components/utils');
 const changeRequest = require('../../../src/components/request');
 const {  __RewireAPI__: rewireRequest} =  require('../../../src/components/request');
-const { ServiceError, ApiError, ConflictStateError } = require('../../../src/components/error'); 
+const { ServiceError, ApiError, ConflictStateError } = require('../../../src/components/error');
 const { mockRequest, mockResponse } = require('../helpers'); 
+const { setStudentRequestReplicateStatus, verifyStudentRequestStatus } = require('../../../src/components/studentRequest');
 
-describe('getRequest', () => {
+describe('verifyRequest', () => {
   const requestID = 'RequestID';
   const params = {
     id: requestID,
     documentId: 'documentId'
   };
+  const requestType = 'studentRequest';
   const session = {
-    request: {
+    [requestType]: {
       studentRequestID: requestID,
     }
   };
   const userInfo = { };
+  const verifyRequest = changeRequest.verifyRequest(requestType);
 
   let req;
   let res;
@@ -41,14 +44,14 @@ describe('getRequest', () => {
   });
 
   it('should call next', () => {
-    changeRequest.getRequest(req, res, next);
+    verifyRequest(req, res, next);
     expect(next).toHaveBeenCalled();
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
     utils.getSessionUser.mockReturnValue(null);
 
-    changeRequest.getRequest(req, res, next);
+    verifyRequest(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -57,7 +60,7 @@ describe('getRequest', () => {
     const session = {
     };
     req = mockRequest(null, session, params);
-    changeRequest.getRequest(req, res, next);
+    verifyRequest(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
   });
@@ -67,7 +70,7 @@ describe('getRequest', () => {
       studentRequestID: 'OtherRequestID,'
     };
     req = mockRequest(null, session, params);
-    changeRequest.getRequest(req, res, next);
+    verifyRequest(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
   });
@@ -161,37 +164,39 @@ describe('getLatestRequest', () => {
       statusUpdateDate: '2020-03-04T10:05:40' 
     },
   ];
+  const requestType = 'studentRequest';
+  const setReplicateStatus = setStudentRequestReplicateStatus;
 
   const spy = jest.spyOn(utils, 'getData');
 
   afterEach(() => {
     spy.mockClear();
   });
-
+  
   it('should return the last request', async () => {
     utils.getData.mockResolvedValue(requests);
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
 
     expect(result).toBeTruthy();
     expect(result.statusUpdateDate).toEqual('2020-03-05T07:05:59');
     expect(result.digitalID).toBeNull();
-    expect(spy).toHaveBeenCalledWith('token', config.get('studentProfile:apiEndpoint') + `/?digitalID=${digitalID}`);
+    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `/?digitalID=${digitalID}`);
   });
 
   it('should return null if no requests', async () => {
     utils.getData.mockResolvedValue([]);
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
 
     expect(result).toBeNull();
-    expect(spy).toHaveBeenCalledWith('token', config.get('studentProfile:apiEndpoint') + `/?digitalID=${digitalID}`);
+    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `/?digitalID=${digitalID}`);
   });
 
   it('should return null if getData return NOT_FOUND', async () => {
     utils.getData.mockRejectedValue(new ApiError(HttpStatus.NOT_FOUND, { message: 'API Get error' }));
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
 
     expect(result).toBeNull();
   });
@@ -199,7 +204,7 @@ describe('getLatestRequest', () => {
   it('should throw ServiceError if getData is failed', async () => {
     utils.getData.mockRejectedValue(new Error('error'));
 
-    expect(changeRequest.__get__('getLatestRequest')('token', digitalID)).rejects.toThrowError(ServiceError);
+    expect(changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus)).rejects.toThrowError(ServiceError);
   });
 
   it('should return tomorrow with false value if current time is after replicateTime', async () => {
@@ -217,7 +222,7 @@ describe('getLatestRequest', () => {
 
     utils.getData.mockResolvedValue(requests);
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
 
     expect(result).toBeTruthy();
     expect(result.tomorrow).toBeFalsy();
@@ -238,7 +243,7 @@ describe('getLatestRequest', () => {
 
     utils.getData.mockResolvedValue(requests);
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
 
     expect(result).toBeTruthy();
     expect(result.tomorrow).toBeTruthy();
@@ -259,7 +264,7 @@ describe('getLatestRequest', () => {
 
     utils.getData.mockResolvedValue(requests);
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
 
     expect(result).toBeTruthy();
     expect(result.tomorrow).toBeTruthy();
@@ -280,7 +285,7 @@ describe('getLatestRequest', () => {
 
     utils.getData.mockResolvedValue(requests);
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
 
     expect(result).toBeTruthy();
     expect(result.tomorrow).toBeFalsy();
@@ -466,7 +471,8 @@ describe('getUserInfo', () => {
       displayName: sessionUser._json.displayName,
       accountType: sessionUser._json.accountType,
       identityTypeLabel: lodash.find(codes.identityTypes, ['identityTypeCode', digitalIdData.identityTypeCode]).label,
-      request,
+      studentRequest: request,
+      penRequest: request,
       student: null,
     });
   });
@@ -493,7 +499,8 @@ describe('getUserInfo', () => {
       displayName: sessionUser._json.displayName,
       accountType: sessionUser._json.accountType,
       identityTypeLabel: lodash.find(codes.identityTypes, ['identityTypeCode', digitalIdData.identityTypeCode]).label,
-      request,
+      studentRequest: request,
+      penRequest: request,
       student,
     });
   });
@@ -521,7 +528,8 @@ describe('getUserInfo', () => {
       accountType: bcscUser._json.accountType,
       ...bcscInfo,
       identityTypeLabel: lodash.find(codes.identityTypes, ['identityTypeCode', digitalIdData.identityTypeCode]).label,
-      request,
+      studentRequest: request,
+      penRequest: request,
       student: null,
     });
   });
@@ -566,6 +574,7 @@ describe('getCodes', () => {
       displayOrder: 1
     }
   ];
+  const getCodes = changeRequest.getCodes('studentRequest');
 
   let req;
   let res;
@@ -585,7 +594,7 @@ describe('getCodes', () => {
   });
 
   it('should return codes', async () => {
-    const response = await changeRequest.getCodes(req, res);
+    const response = await getCodes(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith({
@@ -598,7 +607,7 @@ describe('getCodes', () => {
   it('should return UNAUTHORIZED if no access token', async () => {
     utils.getAccessToken.mockReturnValue(null);
 
-    await changeRequest.getCodes(req, res);
+    await getCodes(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -606,7 +615,7 @@ describe('getCodes', () => {
   it('should return INTERNAL_SERVER_ERROR if exceptions thrown', async () => {
     utils.getData.mockRejectedValue(new Error('test error'));
 
-    await changeRequest.getCodes(req, res);
+    await getCodes(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
@@ -621,6 +630,7 @@ describe('sendVerificationEmail', () => {
   const token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTQ09QRSI6IlZFUklGWV9FTUFJTCIsImlhdCI6MTU4OTQ4NDY0NCwiZXhwIjoxNTg5NTcxMDQ0LCJpc3MiOiJWZXJpZnlFbWFpbEFQSSIsInN1YiI6Im5hbWVAdGVzdC5jb20iLCJqdGkiOiJwZW5SZXF1ZXN0SWQifQ.SVa1Cm7wIMioC9S98-PxFC1BWXanfD941ySp23aNr_w';
   const generateTokenSpy = jest.spyOn(utils, 'generateJWTToken');
   const spy = jest.spyOn(utils, 'postData');
+  const requestType = 'studentRequest';
 
   afterEach(() => {
     spy.mockClear();
@@ -629,13 +639,13 @@ describe('sendVerificationEmail', () => {
   it('should return response data', async () => {
     utils.postData.mockResolvedValue(response);
     utils.generateJWTToken.mockResolvedValue(token);
-    const result = await changeRequest.__get__('sendVerificationEmail')('token', emailAddress, requestId, identityTypeLabel);
+    const result = await changeRequest.__get__('sendVerificationEmail')('token', emailAddress, requestId, identityTypeLabel, requestType);
 
     const reqData = {
       emailAddress,
-      requestId,
+      studentRequestId: requestId,
       identityTypeLabel,
-      verificationUrl: config.get('server:frontend') + '/api/student/verification?verificationToken',
+      verificationUrl: config.get('server:frontend') + '/api/ump/verification?verificationToken',
       jwtToken:token
     };
     expect(result).toBeTruthy();
@@ -643,13 +653,13 @@ describe('sendVerificationEmail', () => {
     expect(generateTokenSpy).toHaveBeenCalledWith(requestId,emailAddress,'VerifyEmailAPI','HS256',{
       SCOPE: 'VERIFY_EMAIL'
     });
-    expect(spy).toHaveBeenCalledWith('token', reqData, config.get('email:apiEndpoint') + '/verify');
+    expect(spy).toHaveBeenCalledWith('token', reqData, config.get('email:apiEndpoint') + '/ump/verify');
   });
 
   it('should throw ServiceError if postData is failed', async () => {
     utils.postData.mockRejectedValue(new Error('error'));
 
-    expect(changeRequest.__get__('sendVerificationEmail')('token', emailAddress, requestId, identityTypeLabel)).rejects.toThrowError(ServiceError);
+    expect(changeRequest.__get__('sendVerificationEmail')('token', emailAddress, requestId, identityTypeLabel, requestType)).rejects.toThrowError(ServiceError);
   });
 });
 
@@ -761,13 +771,14 @@ describe('getAutoMatchResults', () => {
   });
 });
 
-describe('updateRequestStatus', () => {
+describe('postRequest', () => {
   const reqData = { legalLastName: 'legalLastName' };
   const userInfo = {
     digitalIdentityID: 'digitalIdentityID',
     displayName: 'Firstname Lastname',
     accountType: 'BCEID',
   };
+  const requestType = 'studentRequest';
 
   const spy = jest.spyOn(utils, 'postData');
 
@@ -779,7 +790,7 @@ describe('updateRequestStatus', () => {
   it('should return request data', async () => {
     utils.postData.mockResolvedValue({studentRequestID: 'requestID'});
 
-    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo);
+    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual('requestID');
@@ -789,7 +800,7 @@ describe('updateRequestStatus', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentProfile:apiEndpoint') + '/');
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/');
   });
 
   it('should return request data with autoMatchResults if accountType is BCSC', async () => {
@@ -805,7 +816,7 @@ describe('updateRequestStatus', () => {
     utils.postData.mockResolvedValue({studentRequestID: 'requestID'});
     rewireRequest.__Rewire__('getAutoMatchResults', () => Promise.resolve(autoMatchResults));
 
-    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo);
+    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual('requestID');
@@ -816,7 +827,7 @@ describe('updateRequestStatus', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentProfile:apiEndpoint') + '/');
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/');
   });
 
   it('should return request data with ZEROMATCHES if accountType is BCSC and no autoMatchResults', async () => {
@@ -835,7 +846,7 @@ describe('updateRequestStatus', () => {
     utils.getDataWithParams.mockResolvedValue(autoMatchRes);
     utils.postData.mockResolvedValue({studentRequestID: 'requestID'});
 
-    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo);
+    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual('requestID');
@@ -846,7 +857,7 @@ describe('updateRequestStatus', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentProfile:apiEndpoint') + '/');
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/');
   });
 
   it('should throw ServiceError if postData is failed', async () => {
@@ -879,6 +890,9 @@ describe('submitRequest', () => {
     }
   };
 
+  const requestType = 'studentRequest';
+  const submitRequest = changeRequest.submitRequest(requestType, verifyStudentRequestStatus);
+
   let session;
 
   let req;
@@ -909,31 +923,31 @@ describe('submitRequest', () => {
   it('should return UNAUTHORIZED if no session', async () => {
     utils.getSessionUser.mockReturnValue(null);
 
-    await changeRequest.getUserInfo(req, res);
+    await submitRequest(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
 
   it('should return request response and send verification email', async () => {
 
-    await changeRequest.submitRequest(req, res);
+    await submitRequest(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(requestRes);
-    expect(req.session.request).toEqual(requestRes);
+    expect(req.session[requestType]).toEqual(requestRes);
   });
 
   it('should return CONFLICT if the status of existed request is not REJECTED', async () => {
     session = {
       ...session,
-      request: {
+      [requestType]: {
         studentRequestStatusCode: utils.RequestStatuses.DRAFT,
       }
     };
 
     req = mockRequest(request, session);
 
-    await changeRequest.submitRequest(req, res);
+    await submitRequest(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
@@ -941,7 +955,7 @@ describe('submitRequest', () => {
   it('should return INTERNAL_SERVER_ERROR if exceptions thrown', async () => {
     rewireRequest.__Rewire__('postRequest', () => Promise.reject(new ServiceError('error')));
 
-    await changeRequest.submitRequest(req, res);
+    await submitRequest(req, res);
     
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
@@ -949,17 +963,17 @@ describe('submitRequest', () => {
   it('should return request response if sending verification email failed', async () => {
     rewireRequest.__Rewire__('sendVerificationEmail', () => Promise.reject(new ServiceError('error')));
 
-    await changeRequest.submitRequest(req, res);
+    await submitRequest(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(requestRes);
-    expect(req.session.request).toEqual(requestRes);
+    expect(req.session[requestType]).toEqual(requestRes);
   });
 
   it('should return request response if the status of existed request is REJECTED', async () => {
     session = {
       ...session,
-      request: {
+      [requestType]: {
         studentRequestStatusCode: utils.RequestStatuses.REJECTED,
       }
     };
@@ -969,11 +983,11 @@ describe('submitRequest', () => {
     rewireRequest.__ResetDependency__('sendVerificationEmail');
     utils.postData.mockReturnValueOnce({studentRequestID: 'requestID'}).mockReturnValueOnce({});
 
-    await changeRequest.submitRequest(req, res);
+    await submitRequest(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(requestRes);
-    expect(req.session.request).toEqual(requestRes);
+    expect(req.session[requestType]).toEqual(requestRes);
   });
 });
 
@@ -984,6 +998,7 @@ describe('updateRequestStatus', () => {
     studentRequestID: requestID,
     digitalID: 'digitalID'
   };
+  const requestType = 'studentRequest';
 
   const getDataSpy = jest.spyOn(utils, 'getData');
   const putDataSpy = jest.spyOn(utils, 'putData');
@@ -1002,7 +1017,7 @@ describe('updateRequestStatus', () => {
     utils.getData.mockResolvedValue(request);
     utils.putData.mockResolvedValue(request);
 
-    const result = await changeRequest.__get__('updateRequestStatus')('token', requestID, utils.RequestStatuses.INITREV, () => request);
+    const result = await changeRequest.__get__('updateRequestStatus')('token', requestID, utils.RequestStatuses.INITREV, requestType, () => request);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual(requestID);
@@ -1010,31 +1025,33 @@ describe('updateRequestStatus', () => {
     expect(result.studentRequestStatusCode).toEqual(utils.RequestStatuses.INITREV);
     expect(result.statusUpdateDate).toEqual(localDateTime);
 
-    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentProfile:apiEndpoint')}/${requestID}`);
-    expect(putDataSpy).toHaveBeenCalledWith('token', request ,config.get('studentProfile:apiEndpoint'));
+    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}`);
+    expect(putDataSpy).toHaveBeenCalledWith('token', request ,config.get('studentRequest:apiEndpoint'));
   });
 
   it('should throw ConflictStateError if ConflictStateError is already raised', async () => {
     utils.getData.mockResolvedValue(request);
 
-    expect(changeRequest.__get__('updateRequestStatus')('token', requestID, utils.RequestStatuses.INITREV, () => { throw new ConflictStateError(); })).rejects.toThrowError(ConflictStateError);
+    expect(changeRequest.__get__('updateRequestStatus')('token', requestID, utils.RequestStatuses.INITREV, requestType, () => { throw new ConflictStateError(); })).rejects.toThrowError(ConflictStateError);
   });
 
   it('should throw ServiceError if other errors are already raised', async () => {
     utils.getData.mockResolvedValue(request);
     utils.putData.mockRejectedValue(new Error('error'));
 
-    expect(changeRequest.__get__('updateRequestStatus')('token', requestID, utils.RequestStatuses.INITREV, () => request)).rejects.toThrowError(ServiceError);
+    expect(changeRequest.__get__('updateRequestStatus')('token', requestID, utils.RequestStatuses.INITREV, requestType, () => request)).rejects.toThrowError(ServiceError);
   });
 });
 
 describe('beforeUpdateRequestAsSubsrev', () => {
+  const requestType = 'studentRequest';
+
   it('should throw ConflictStateError if request is not RETURNED', async () => {
     let request = {
       studentRequestStatusCode: utils.RequestStatuses.INITREV,
     };
 
-    expect(() => changeRequest.__get__('beforeUpdateRequestAsSubsrev')(request)).toThrowError(ConflictStateError);
+    expect(() => changeRequest.__get__('beforeUpdateRequestAsSubsrev')(request, requestType)).toThrowError(ConflictStateError);
   });
 
   it('should return request if request is RETURNED', async () => {
@@ -1042,7 +1059,7 @@ describe('beforeUpdateRequestAsSubsrev', () => {
       studentRequestStatusCode: utils.RequestStatuses.RETURNED,
     };
 
-    const result = await changeRequest.__get__('beforeUpdateRequestAsSubsrev')(request);
+    const result = await changeRequest.__get__('beforeUpdateRequestAsSubsrev')(request, requestType);
 
     expect(result).toEqual(request);
   });
@@ -1059,6 +1076,8 @@ describe('setRequestAsSubsrev', () => {
   };
   jest.spyOn(utils, 'getAccessToken');
   const updateRequestStatusSpy = jest.fn();
+  const requestType = 'studentRequest';
+  const setRequestAsSubsrev = changeRequest.setRequestAsSubsrev(requestType);
 
   let req;
   let res;
@@ -1077,17 +1096,17 @@ describe('setRequestAsSubsrev', () => {
   });
 
   it('should return OK and request data', async () => {
-    await changeRequest.setRequestAsSubsrev(req, res);
+    await setRequestAsSubsrev(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(request);
-    expect(req.session.request).toEqual(request);
-    expect(updateRequestStatusSpy).toHaveBeenCalledWith(accessToken, requestID, reqBody.studentRequestStatusCode, rewireRequest.__get__('beforeUpdateRequestAsSubsrev'));
+    expect(req.session[requestType]).toEqual(request);
+    expect(updateRequestStatusSpy).toHaveBeenCalledWith(accessToken, requestID, reqBody.studentRequestStatusCode, requestType, rewireRequest.__get__('beforeUpdateRequestAsSubsrev'));
   });
 
   it('should return UNAUTHORIZED if no access token in session', async () => {
     utils.getAccessToken.mockReturnValue(null);
-    await changeRequest.setRequestAsSubsrev(req, res);
+    await setRequestAsSubsrev(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -1097,14 +1116,14 @@ describe('setRequestAsSubsrev', () => {
       studentRequestStatusCode: utils.RequestStatuses.INITREV
     };
     req = mockRequest(reqBody, undefined, {id: requestID});
-    await changeRequest.setRequestAsSubsrev(req, res);
+    await setRequestAsSubsrev(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
   });
 
   it('should return BAD_REQUEST if no requestStatus in request body', async () => {
     req = mockRequest({}, undefined, {id: requestID});
-    await changeRequest.setRequestAsSubsrev(req, res);
+    await setRequestAsSubsrev(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
   });
@@ -1112,7 +1131,7 @@ describe('setRequestAsSubsrev', () => {
   it('should return INTERNAL_SERVER_ERROR if errors thrown', async () => {
     updateRequestStatusSpy.mockRejectedValue(new Error('test error'));
     rewireRequest.__Rewire__('updateRequestStatus', updateRequestStatusSpy);
-    await changeRequest.setRequestAsSubsrev(req, res);
+    await setRequestAsSubsrev(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
@@ -1130,8 +1149,9 @@ describe('resendVerificationEmail', () => {
     identityTypeLabel: 'identityTypeLabel'
   };
   const accessToken = 'token';
+  const requestType = 'studentRequest';
   const session = {
-    request,
+    [requestType]: request,
     digitalIdentityData
   };
   const resData = {
@@ -1139,6 +1159,7 @@ describe('resendVerificationEmail', () => {
   };
   jest.spyOn(utils, 'getAccessToken');
   const sendVerificationEmailSpy = jest.fn();
+  const resendVerificationEmail = changeRequest.resendVerificationEmail(requestType);
 
   let req;
   let res;
@@ -1157,16 +1178,16 @@ describe('resendVerificationEmail', () => {
   });
 
   it('should return OK and response data', async () => {
-    await changeRequest.resendVerificationEmail(req, res);
+    await resendVerificationEmail(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(resData);
-    expect(sendVerificationEmailSpy).toHaveBeenCalledWith(accessToken, request.email, request.studentRequestID, digitalIdentityData.identityTypeLabel);
+    expect(sendVerificationEmailSpy).toHaveBeenCalledWith(accessToken, request.email, request.studentRequestID, digitalIdentityData.identityTypeLabel, requestType);
   });
 
   it('should return UNAUTHORIZED if no access token in session', async () => {
     utils.getAccessToken.mockReturnValue(null);
-    await changeRequest.resendVerificationEmail(req, res);
+    await resendVerificationEmail(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -1178,11 +1199,11 @@ describe('resendVerificationEmail', () => {
       email: 'user@test.com'
     };
     const session = {
-      request,
+      [requestType]: request,
       digitalIdentityData
     };
     req = mockRequest(null, session);
-    await changeRequest.resendVerificationEmail(req, res);
+    await resendVerificationEmail(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
@@ -1190,7 +1211,7 @@ describe('resendVerificationEmail', () => {
   it('should return INTERNAL_SERVER_ERROR if errors thrown', async () => {
     sendVerificationEmailSpy.mockRejectedValue(new Error('test error'));
     rewireRequest.__Rewire__('sendVerificationEmail', sendVerificationEmailSpy);
-    await changeRequest.resendVerificationEmail(req, res);
+    await resendVerificationEmail(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
