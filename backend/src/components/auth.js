@@ -100,7 +100,7 @@ const auth = {
 
   generateUiToken() {
     const i  = config.get('tokenGenerate:issuer');
-    const s = 'user@pen.bc.ca';
+    const s = 'user@penrequest.ca';
     const a  = config.get('server:frontend');
     const signOptions = {
       issuer:  i,

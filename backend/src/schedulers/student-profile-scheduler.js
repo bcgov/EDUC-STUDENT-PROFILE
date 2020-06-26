@@ -54,22 +54,32 @@ const expectedDraftRequests = config.get('scheduler:expectedDraftRequest');
 const dateTime = localDateTime.now().minusDays(numDaysAllowedInDraftStatus);
 const draftToAbandonRequestJob = new CronJob(schedulerCronPenrequestDraft, () => {
 
-  redLock.lock('locks:student-profile-request:draft-abandoned', 60000).then(async function (lock) {
-    return await findAndUpdateDraftProfileRequestsToAbandoned(lock);
+  redLock.lock('locks:student-profile-request:draft-abandoned', 60000).then(function (lock) {
+    return Promise.all([
+      findAndUpdateDraftProfileRequestsToAbandoned('penRequest'),
+      findAndUpdateDraftProfileRequestsToAbandoned('studentRequest'),
+    ]).finally(() => {
+      // unlock your resource when you are done
+      return lock.unlock().catch(function (err) {
+        // we weren't able to reach redis; your lock will eventually
+        // expire, but you probably want to log this error
+        log.info(`Error while trying to release lock ${err}`);
+      });
+    });
   }).catch((err) => {
     log.info(`this pod could not acquire lock, check other pods. ${err}`);
   });
 
 });
 
-async function findAndUpdateDraftProfileRequestsToAbandoned(lock) {
+async function findAndUpdateDraftProfileRequestsToAbandoned(requestType) {
   try {
     await new Promise(resolve => setTimeout(resolve, 5000)); // set a time out of 5 seconds to start the process after that, as we dont want to release the lock before 5 seconds, so that other pods will acquire it.
-    log.info(`starting job for moving pen requests in draft status for more than ${numDaysAllowedInDraftStatus} days to abandon status based on cron ${schedulerCronPenrequestDraft}, ${process.pid}`);
-    const data = await getApiCredentials();
+    log.info(`starting job for moving ${requestType}s in draft status for more than ${numDaysAllowedInDraftStatus} days to abandon status based on cron ${schedulerCronPenrequestDraft}, ${process.pid}`);
+    const data = await getApiCredentials(config.get(`${requestType}:clientId`), config.get(`${requestType}:clientSecret`));
     const accessToken = data.accessToken;
     let searchListCriteria = [];
-    searchListCriteria.push({key: 'studentRequestStatusCode', operation: 'eq', value: 'DRAFT', valueType: 'STRING'});
+    searchListCriteria.push({key: `${requestType}StatusCode`, operation: 'eq', value: 'DRAFT', valueType: 'STRING'});
     searchListCriteria.push({
       key: 'statusUpdateDate',
       operation: 'lt',
@@ -83,30 +93,22 @@ async function findAndUpdateDraftProfileRequestsToAbandoned(lock) {
         searchCriteriaList: JSON.stringify(searchListCriteria)
       }
     };
-    const result = await getDataWithParams(accessToken, config.get('studentProfile:apiEndpoint') + '/paginated', params);
+    const result = await getDataWithParams(accessToken, config.get(`${requestType}:apiEndpoint`) + '/paginated', params);
     log.silly(JSON.stringify(result));
     if (result['content'] && result['content'].length > 0) {
-      const updatePenReqResult = [];
+      const updateReqResult = [];
       for (const profileReqIndex in result['content']) {
         const profileReq = result['content'][profileReqIndex];
         profileReq.statusUpdateDate = localDateTime.now().toString();
-        profileReq.studentRequestStatusCode = 'ABANDONED';
-        const putDataResult = putData(accessToken, profileReq, config.get('studentProfile:apiEndpoint'));
-        updatePenReqResult.push(putDataResult);
+        profileReq[`${requestType}StatusCode`] = 'ABANDONED';
+        const putDataResult = putData(accessToken, profileReq, config.get(`${requestType}:apiEndpoint`));
+        updateReqResult.push(putDataResult);
 
       }
-      await Promise.allSettled(updatePenReqResult);
+      await Promise.allSettled(updateReqResult);
     }
-
-    // unlock your resource when you are done
-    return lock.unlock()
-      .catch(function (err) {
-        // we weren't able to reach redis; your lock will eventually
-        // expire, but you probably want to log this error
-        log.info(`Error while trying to release lock ${err}`);
-      });
   } catch (e) {
-    log.error(`Error occurred while executing findAndUpdateDraftPenRequestsToAbandoned ${e}`);
+    log.error(`Error occurred while executing findAndUpdateDraftProfileRequestsToAbandoned ${e}`);
   }
 
 }

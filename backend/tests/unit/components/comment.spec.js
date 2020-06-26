@@ -9,6 +9,7 @@ jest.mock('../../../src/components/auth');
 
 const changeRequest = require('../../../src/components/request');
 const { mockRequest, mockResponse } = require('../helpers'); 
+const { createStudentRequestCommentReq } = require('../../../src/components/studentRequest');
 
 describe('postComment', () => {
   const localDateTime = '2020-01-01T12:00:00';
@@ -22,11 +23,14 @@ describe('postComment', () => {
   const params = {
     id: 'requestId',
   };
+  const requestType = 'studentRequest';
   const session = {
-    request: {
+    [requestType]: {
       studentRequestStatusCode: utils.RequestStatuses.RETURNED,
     }
   };
+
+  const postComment = changeRequest.postComment(requestType, createStudentRequestCommentReq);
 
   let req;
   let res;
@@ -48,7 +52,7 @@ describe('postComment', () => {
   });
 
   it('should return response data', async () => {
-    await changeRequest.postComment(req, res);
+    await postComment(req, res);
 
     const commentRes = {
       content: postRes.commentContent,
@@ -67,13 +71,13 @@ describe('postComment', () => {
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(commentRes);
-    expect(spy).toHaveBeenCalledWith('token', postReq, `${config.get('studentProfile:apiEndpoint')}/${params.id}/comments`);
+    expect(spy).toHaveBeenCalledWith('token', postReq, `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`);
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
     utils.getAccessToken.mockReturnValue(null);
 
-    await changeRequest.postComment(req, res);
+    await postComment(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -84,7 +88,7 @@ describe('postComment', () => {
     };
     req = mockRequest(comment, session, params);
 
-    await changeRequest.postComment(req, res);
+    await postComment(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
@@ -95,7 +99,7 @@ describe('postComment', () => {
     };
     req = mockRequest(comment, session, params);
 
-    await changeRequest.postComment(req, res);
+    await postComment(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
@@ -103,7 +107,7 @@ describe('postComment', () => {
   it('should return INTERNAL_SERVER_ERROR if postData is failed', async () => {
     utils.postData.mockRejectedValue(new Error('test error'));
 
-    await changeRequest.postComment(req, res);
+    await postComment(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
@@ -122,6 +126,8 @@ describe('getComments', () => {
       accountType: 'BCEID',
     }
   };
+
+  const getComments = changeRequest.getComments('studentRequest');
 
   let req;
   let res;
@@ -169,7 +175,7 @@ describe('getComments', () => {
     ];
     utils.getData.mockResolvedValue(getRes);
 
-    await changeRequest.getComments(req, res);
+    await getComments(req, res);
 
     const commentsRes = {
       participants: [
@@ -216,11 +222,11 @@ describe('getComments', () => {
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(commentsRes);
-    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentProfile:apiEndpoint')}/${params.id}/comments`);
+    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`);
   });
 
   it('should return empty array of messages when no comment', async () => {
-    await changeRequest.getComments(req, res);
+    await getComments(req, res);
 
     const commentsRes = {
       participants: [],
@@ -233,13 +239,13 @@ describe('getComments', () => {
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(commentsRes);
-    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentProfile:apiEndpoint')}/${params.id}/comments`);
+    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`);
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
     utils.getSessionUser.mockReturnValue(null);
 
-    await changeRequest.getComments(req, res);
+    await getComments(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -247,7 +253,7 @@ describe('getComments', () => {
   it('should return INTERNAL_SERVER_ERROR if getData is failed', async () => {
     utils.getData.mockRejectedValue(new Error('test error'));
 
-    await changeRequest.getComments(req, res);
+    await getComments(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });

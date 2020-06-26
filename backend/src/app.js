@@ -23,7 +23,9 @@ const OidcStrategy = require('passport-openidconnect-kc-idp').Strategy;
 
 const apiRouter = express.Router();
 const authRouter = require('./routes/auth');
-const studentRouter = require('./routes/student');
+const userRouter = require('./routes/user');
+const studentRequestRouter = require('./routes/studentRequest');
+const penRequestRouter = require('./routes/penRequest');
 const configRouter = require('./routes/config');
 const promMid = require('express-prometheus-middleware');
 const actuator = require('express-actuator');
@@ -204,7 +206,9 @@ apiRouter.get('/', (_req, res) => {
 app.use(/(\/api)?/, apiRouter);
 
 apiRouter.use('/auth', authRouter);
-apiRouter.use('/student', studentRouter);
+apiRouter.use('/user', userRouter);
+apiRouter.use('/ump', studentRequestRouter);
+apiRouter.use('/gmp', penRequestRouter);
 apiRouter.use('/config',configRouter);
 
 //Handle 500 error

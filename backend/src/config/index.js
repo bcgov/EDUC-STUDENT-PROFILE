@@ -39,10 +39,16 @@ nconf.defaults({
     clientSecret: process.env.SOAM_CLIENT_SECRET,
     discovery: process.env.SOAM_DISCOVERY
   },
-  studentProfile: {
+  studentRequest: {
     apiEndpoint: process.env.STUDENT_PROFILE_API_ENDPOINT,
     clientId: process.env.STUDENT_PROFILE_CLIENT_ID,
     clientSecret: process.env.STUDENT_PROFILE_CLIENT_SECRET,
+    replicateTime: process.env.STUDENT_PROFILE_REPLICATE_TIME || 8,
+  },
+  penRequest: {
+    apiEndpoint: process.env.PEN_REQUEST_API_ENDPOINT,
+    clientId: process.env.PEN_REQUEST_CLIENT_ID,
+    clientSecret: process.env.PEN_REQUEST_CLIENT_SECRET,
     replicateTime: process.env.PEN_REQUEST_REPLICATE_TIME || 8,
   },
   tokenGenerate: {

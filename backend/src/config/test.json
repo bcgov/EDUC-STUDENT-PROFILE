@@ -21,7 +21,10 @@
   "student": {
     "apiEndpoint": "http://localhost"
   },
-  "studentProfile": {
+  "studentRequest": {
+    "apiEndpoint": "http://localhost"
+  },
+  "penRequest": {
     "apiEndpoint": "http://localhost"
   },
   "email": {
