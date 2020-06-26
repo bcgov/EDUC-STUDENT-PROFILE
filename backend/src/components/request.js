@@ -107,9 +107,9 @@ async function getUserInfo(req, res) {
     getServerSideCodes(accessToken), 
     getLatestRequest(accessToken, digitalID, 'penRequest', setPenRequestReplicateStatus),
     getLatestRequest(accessToken, digitalID, 'studentRequest', setStudentRequestReplicateStatus),
-  ]).then(async ([digitalIdData, codes, penRequest, studentRequest]) => {
+  ]).then(async ([digitalIdData, codesData, penRequest, studentRequest]) => {
   
-    const identityType = lodash.find(codes.identityTypes, ['identityTypeCode', digitalIdData.identityTypeCode]);
+    const identityType = lodash.find(codesData.identityTypes, ['identityTypeCode', digitalIdData.identityTypeCode]);
     if(! identityType) {
       log.error('getIdentityType Error identityTypeCode', digitalIdData.identityTypeCode);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -119,7 +119,7 @@ async function getUserInfo(req, res) {
 
     let student = null;
     if(digitalIdData.studentID) {
-      student = await getStudent(accessToken, digitalIdData.studentID, codes.sexCodes);
+      student = await getStudent(accessToken, digitalIdData.studentID, codesData.sexCodes);
     }
 
     if(req && req.session){
@@ -160,10 +160,10 @@ function getCodes(requestType) {
         });
       }
 
-      const url = config.get(`${requestType}:apiEndpoint`);
+      const endpoint = config.get(`${requestType}:apiEndpoint`);
       const codeUrls = [
-        `${url}/gender-codes`, 
-        `${url}/statuses`,
+        `${endpoint}/gender-codes`, 
+        `${endpoint}/statuses`,
       ];
 
       const [genderCodes, statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url)));
