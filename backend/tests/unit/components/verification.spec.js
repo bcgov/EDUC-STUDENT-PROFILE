@@ -159,6 +159,7 @@ describe('verifyEmail', () => {
   const request = {
     studentRequestID: 'requestID'
   };
+  const appName = 'ump';
   const query = {
     verificationToken: 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxMjM0NTY3ODkwIiwiU0NPUEUiOiJWRVJJRllfRU1BSUwiLCJpYXQiOjE1MTYyMzkwMjJ9.3Qlu82ltNX0DJKwWedrT5MX2Nk9hn8cKbd6PpktTVAl_RTH42lkaolhdOFwlrC5g1kJh9rt-QmF8ABDqlpWpHA',
   };
@@ -187,7 +188,7 @@ describe('verifyEmail', () => {
   it('should redirect to home url if the user logged in', async () => {
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(config.get('server:frontend'));
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}`);
     expect(req.session[requestType]).toEqual(request);
     expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
   });
@@ -196,7 +197,7 @@ describe('verifyEmail', () => {
     utils.getSessionUser.mockReturnValue();
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/verification/${utils.VerificationResults.OK}`);
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.OK}`);
     expect(req.session[requestType]).toBeFalsy();
     expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
   });
@@ -205,7 +206,7 @@ describe('verifyEmail', () => {
     req = mockRequest();
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/verification/${utils.VerificationResults.TOKEN_ERROR}`);
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.TOKEN_ERROR}`);
   });
 
   it('should redirect to home url if verificationToken expired and the user logged in', async () => {
@@ -215,7 +216,7 @@ describe('verifyEmail', () => {
     req = mockRequest(null, undefined, undefined, query);
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(config.get('server:frontend'));
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}`);
   });
 
   it('should redirect to EXPIRED url if verificationToken expired and the user not logged in', async () => {
@@ -226,7 +227,7 @@ describe('verifyEmail', () => {
     utils.getSessionUser.mockReturnValue();
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/verification/${utils.VerificationResults.EXPIRED}`);
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.EXPIRED}`);
   });
 
   it('should redirect to TOKEN_ERROR url if wrong token SCOPE', async () => {
@@ -236,7 +237,7 @@ describe('verifyEmail', () => {
     req = mockRequest(null, undefined, undefined, query);
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/verification/${utils.VerificationResults.TOKEN_ERROR}`);
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.TOKEN_ERROR}`);
   });
 
   it('should redirect to home url if ConflictStateError thrown and the user logged in', async () => {
@@ -245,7 +246,7 @@ describe('verifyEmail', () => {
 
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(config.get('server:frontend'));
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}`);
     expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
   });
 
@@ -256,7 +257,7 @@ describe('verifyEmail', () => {
 
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/verification/${utils.VerificationResults.OK}`);
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.OK}`);
     expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
   });
 
@@ -266,7 +267,7 @@ describe('verifyEmail', () => {
 
     await verifyEmail(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/verification/${utils.VerificationResults.SERVER_ERROR}`);
+    expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.SERVER_ERROR}`);
     expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
   });
 });

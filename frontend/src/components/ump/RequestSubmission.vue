@@ -67,7 +67,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('request', ['request']),
+    ...mapGetters(['requestType']),
+    ...mapGetters('studentRequest', ['request']),
   },
   methods: {
     setSuccessAlert(alertMessage) {
@@ -82,7 +83,7 @@ export default {
     },
     resendVerificationEmail() {
       this.sending = true;
-      ApiService.resendVerificationEmail(this.request.studentRequestID).then(() => {
+      ApiService.resendVerificationEmail(this.request.studentRequestID, this.requestType).then(() => {
         this.setSuccessAlert('Your verification email has been sent successfully.');
       }).catch(() => {
         this.setErrorAlert('Sorry, an unexpected error seems to have occurred. You can click on the resend button again later.');

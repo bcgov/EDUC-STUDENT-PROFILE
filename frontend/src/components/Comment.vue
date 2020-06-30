@@ -107,7 +107,7 @@
 <script>
 import DocumentChip from './DocumentChip.vue';
 import DocumentUpload from './DocumentUpload';
-import { mapGetters, mapActions, mapMutations } from 'vuex';
+import { mapGetters } from 'vuex';
 import { RequestStatuses } from '@/utils/constants';
 import ApiService from '@/common/apiService';
 
@@ -137,8 +137,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('request', ['requestID']),
-    ...mapGetters('comment', ['unsubmittedComment']),
+    ...mapGetters(['requestType']),
+    requestID() {
+      return this.$store.getters[`${this.requestType}/requestID`];
+    },
+    unsubmittedComment() {
+      return this.$store.getters[`${this.requestType}/unsubmittedComment`];
+    },
     iconSize() {
       switch (this.$vuetify.breakpoint.name) {
       case 'xs': return '30px';
@@ -163,10 +168,18 @@ export default {
     }
   },
   methods: {
-    ...mapActions('comment', ['postComment']),
-    ...mapMutations('document', ['setUnsubmittedDocuments']),
-    ...mapMutations('comment', ['setCommentSubmitted']),
-    ...mapMutations('request', ['setRequest']),
+    postComment(commentData) {
+      return this.$store.dispatch(`${this.requestType}/postComment`, commentData);
+    },
+    setUnsubmittedDocuments(unsubmittedDocuments) {
+      this.$store.commit(`${this.requestType}/setUnsubmittedDocuments`, unsubmittedDocuments);
+    },
+    setCommentSubmitted(documents) {
+      this.$store.commit(`${this.requestType}/setCommentSubmitted`, documents);
+    },
+    setRequest(request) {
+      this.$store.commit(`${this.requestType}/setRequest`, request);
+    },
     setSuccessAlert() {
       this.alertMessage = 'Your request has been submitted. It will be reviewed during business hours in the order received.';
       this.alertType = 'bootstrap-success';
@@ -182,7 +195,7 @@ export default {
       this.showConfirm = false;
     },
     updateRequestStatus() {
-      return ApiService.updateRequestStatus(this.requestID, RequestStatuses.SUBSREV).then(statusRes => {
+      return ApiService.updateRequestStatus(this.requestID, RequestStatuses.SUBSREV, this.requestType).then(statusRes => {
         this.updatedRequest = statusRes.data;
         this.setSuccessAlert();
         this.showConfirm=false;

@@ -21,7 +21,8 @@ describe('DocumentChip.vue', () => {
   const vuetify = new Vuetify();
 
   const deleteFileSpy = jest.fn();
-  const store = mockStore(deleteFileSpy);
+  const requestType = 'studentRequest';
+  const store = mockStore(requestType, deleteFileSpy);
 
   const document = {
     fileSize: 1048576,
@@ -64,7 +65,7 @@ describe('DocumentChip.vue', () => {
     const listHtml = wrapper.find('.v-list').html();
     expect(listHtml).toContain('Canadian Passport');
     expect(listHtml).toContain(document.fileName);
-    expect(listHtml).toContain(`${ApiRoutes.REQUEST}/requestID/documents/${document.documentID}/download/${document.fileName}`);
+    expect(listHtml).toContain(`${ApiRoutes[requestType].REQUEST}/requestID/documents/${document.documentID}/download/${document.fileName}`);
     expect(listHtml).toContain('2020-03-01, 13:23:34');
     expect(listHtml).toContain('1 MB');
     expect(wrapper.find('.v-card').html()).toContain('Delete');
@@ -118,22 +119,20 @@ describe('DocumentChip.vue', () => {
 });
 
 
-function mockStore(deleteFile) {
+function mockStore(requestType, deleteFile) {
   const documentTypeCodes = [
     {label:'Canadian Birth Certificate', documentTypeCode:'CABIRTH', displayOrder:'3'},
     {label:'Canadian Passport', documentTypeCode:'CAPASSPORT', displayOrder:'1'},
     {label:'Canadian Driver’s License', documentTypeCode:'CADL', displayOrder:'2'},
   ];
 
-  const requestStore = {
-    namespaced: true,
+  const rootStore = {
     getters: {
-      requestID: jest.fn().mockReturnValue('requestID')
+      requestType: jest.fn().mockReturnValue(requestType)
     }
   };
 
   const documentStore = {
-    namespaced: true,
     actions: {
       deleteFile
     },
@@ -142,10 +141,20 @@ function mockStore(deleteFile) {
     },
   };
 
+  const requestStore = {
+    namespaced: true,
+    getters: {
+      requestID: jest.fn().mockReturnValue('requestID')
+    },
+    modules: {
+      document: documentStore
+    }
+  };
+
   let store = new Vuex.Store({
     modules: { 
-      document: documentStore,
-      request: requestStore
+      root: rootStore,
+      [requestType]: requestStore
     }
   });
 

@@ -78,7 +78,7 @@
 
 <script>
 import { humanFileSize } from '@/utils/file';
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters } from 'vuex';
 import { ApiRoutes } from '@/utils/constants';
 import { find } from 'lodash';
 
@@ -108,8 +108,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('document', ['documentTypeCodes']),
-    ...mapGetters('request', ['requestID']),
+    ...mapGetters(['requestType']),
+    documentTypeCodes() {
+      return this.$store.getters[`${this.requestType}/documentTypeCodes`];
+    },
+    requestID() {
+      return this.$store.getters[`${this.requestType}/requestID`];
+    },
     documentType() {
       const typeCode = find(this.documentTypeCodes, ['documentTypeCode', this.document.documentTypeCode]);
       return typeCode && typeCode.label;
@@ -121,11 +126,13 @@ export default {
       return this.document.createDate.replace(/T/, ', ').replace(/\..+/, '');
     },
     documentUrl() {
-      return `${ApiRoutes.REQUEST}/${this.requestID}/documents/${this.document.documentID}/download/${this.document.fileName}`;
+      return `${ApiRoutes[this.requestType].REQUEST}/${this.requestID}/documents/${this.document.documentID}/download/${this.document.fileName}`;
     },
   },
   methods: {
-    ...mapActions('document', ['deleteFile']),
+    deleteFile(documentData) {
+      return this.$store.dispatch(`${this.requestType}/deleteFile`, documentData);
+    },
     setSuccessAlert(alertMessage) {
       this.alertMessage = alertMessage;
       this.alertType = 'bootstrap-success';

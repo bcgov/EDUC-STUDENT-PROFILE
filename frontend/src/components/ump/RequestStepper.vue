@@ -1,5 +1,4 @@
 <template>
-  <!-- <v-card> -->
     <v-stepper class="mainCard" v-model="stepCount" v-if="dataReady">
       <v-row align-content="center" class="flex-grow-0 pb-5">
         <v-card style="margin-right: 1.4rem;margin-left: 1.4rem" height="100%" width="100%" elevation=0 color="#036"
@@ -49,28 +48,6 @@
         </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
-
-    <!-- <v-dialog
-      v-model="dialog"
-      width="500px"
-    >
-      <v-card>
-        <v-card-text class="fullPadding">
-          {{ dialogMessage }}
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="#003366"
-            class="white--text"
-            @click="closeDialog"
-          >
-            Close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-  <!-- </v-card> -->
 </template>
 
 <script>
@@ -99,7 +76,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('request', ['genders', 'student', 'genderInfo', 'updateData', 'recordedData']),
+    ...mapGetters('ump', ['recordedData', 'updateData']),
     dataReady() {
       return !!this.userInfo;
     },

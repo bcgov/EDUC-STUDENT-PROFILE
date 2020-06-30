@@ -1,19 +1,26 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import VueMeta from 'vue-meta';
 
 import moment from 'moment';
 
 import Home from '@/components/Home.vue';
 import Logout from './components/Logout';
 import SessionExpired from './components/SessionExpired';
-import RequestPage from '@/components/RequestPage.vue';
-import Verification from '@/components/Verification.vue';
+//import PenRequestPage from '@/components/gmp/RequestPage.vue';
+import StudentRequestPage from '@/components/ump/RequestPage.vue';
+//import PenRequestVerification from '@/components/gmp/Verification.vue';
+import StudentRequestVerification from '@/components/ump/Verification.vue';
 import ErrorPage from '@/components/ErrorPage.vue';
 import LoginError from '@/components/LoginError.vue';
+import RouterView from '@/components/RouterView.vue';
+import Ump from '@/components/ump/Ump.vue';
+//import Gmp from '@/components/ump/Gmp.vue';
 
 Vue.prototype.moment = moment;
 
 Vue.use(VueRouter);
+Vue.use(VueMeta);
 
 const router = new VueRouter({
   mode: 'history',
@@ -25,15 +32,43 @@ const router = new VueRouter({
       component: Home
     },
     {
-      path: '/request',
-      name: 'request',
-      component: RequestPage
+      path: '/ump',
+      component: RouterView,
+      children: [
+        {
+          path: '',
+          name: 'ump',
+          component: Ump
+        },
+        {
+          path: 'request',
+          name: 'student-request',
+          component: StudentRequestPage
+        },
+        {
+          path: 'verification/:status',
+          name: 'student-request-verification',
+          component: StudentRequestVerification
+        },
+      ]
     },
-    {
-      path: '/verification/:status',
-      name: 'verification',
-      component: Verification
-    },
+    // {
+    //   path: '/gmp',
+    //   name: 'gmp',
+    //   component: Gmp,
+    //   children: [
+    //     {
+    //       path: 'request',
+    //       name: 'pen-request',
+    //       component: PenRequestPage
+    //     },
+    //     {
+    //       path: 'verification/:status',
+    //       name: 'pen-request-verification',
+    //       component: PenRequestVerification
+    //     },
+    //   ]
+    // },
     {
       path: '/error',
       name: 'error',

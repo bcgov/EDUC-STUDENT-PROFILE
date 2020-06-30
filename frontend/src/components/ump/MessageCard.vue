@@ -96,7 +96,7 @@
 
 <script>
 import { mapGetters,mapActions } from 'vuex';
-import { RequestStatuses } from '@/utils/constants';
+import { StudentRequestStatuses } from '@/utils/constants';
 
 export default {
   name: 'messageCard',
@@ -107,7 +107,8 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('request', ['request', 'student', 'genderInfo']),
+    ...mapGetters('studentRequest', ['request', 'genderInfo']),
+    ...mapGetters(['student']),
     ...mapGetters('config',['numDaysAllowedInDraftStatus']),
     status() {
       return this.request.studentRequestStatusCode;
@@ -116,7 +117,7 @@ export default {
       return 'the Ministry of Education';
     },
     requestStatuses() {
-      return RequestStatuses;
+      return StudentRequestStatuses;
     },
     timedout() {
       return Math.floor(new Date() - new Date(this.request.statusUpdateDate)) / (1000*60*60) > 24;

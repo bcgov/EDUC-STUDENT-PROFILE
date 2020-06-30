@@ -106,8 +106,9 @@ export default {
     async getUserInfo({commit}){
       const userInfoRes = await ApiService.getUserInfo();
       commit('setUserInfo', userInfoRes.data);
-      commit('request/setRequest', userInfoRes.data.request, { root: true });
-      commit('request/setStudent', userInfoRes.data.student, { root: true });
+      commit('studentRequest/setRequest', userInfoRes.data.studentRequest, { root: true });
+      commit('penRequest/setRequest', userInfoRes.data.penRequest, { root: true });
+      commit('setStudent', userInfoRes.data.student, { root: true });
     },
     //retrieves the json web token from local storage. If not in local storage, retrieves it from API
     async getJwtToken(context) {

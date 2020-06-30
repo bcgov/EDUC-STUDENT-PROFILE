@@ -1,6 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import VueRouter from 'vue-router';
+jest.mock('../../../src/common/staticConfig', () => {
+  return {
+    VUE_APP_BCEID_REG_URL: 'https://bceid.ca/'
+  };
+});
 import App from '@/App.vue';
 import Vuex from 'vuex';
 import Vue from 'vue';

@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="full-height" v-if="isAuthenticated && !hasPen">
+  <v-container fluid class="full-height" v-if="isAuthenticated">
     <!-- request form -->
     <article id="request-form-container" class="top-banner full-height">
       <v-row align="center" justify="center">

@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import Vue from 'vue';
 import Vuex from 'vuex';
@@ -17,8 +17,7 @@ describe('Home.vue', () => {
 
     Vue.use(Vuetify);
     Vue.use(Vuex);
-
-    wrapper = mount(Home, {
+    wrapper = shallowMount(Home, {
       Vue,
       store
     });
@@ -29,7 +28,7 @@ describe('Home.vue', () => {
   });
 
   it('Check that computed properties are accurate', () => {
-    expect(wrapper.vm.hasRequest).toBeFalsy();
-    expect(wrapper.vm.hasPen).toBeFalsy();
+    expect(wrapper.vm.isAuthenticated).toBeFalsy();
+    expect(wrapper.vm.isLoading).toBeTruthy();
   });
 });

@@ -7,7 +7,7 @@
         <v-row align="center" justify="center" style="margin-right: 0;margin-left: 0">
           <Login></Login>
         </v-row>
-  </article>
+    </article>
   </v-container>
 
   <v-container fluid class="full-height" v-else-if="isLoading">
@@ -23,60 +23,39 @@
     </article>
   </v-container>
 
-  <v-container fluid class="full-height" v-else-if="isAuthenticated && hasRequest">
-    <article id="request-display-container" class="top-banner full-height">
-        <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
-          <v-col class="pt-1 pt-sm-3" xs="11" sm="11" md="10" lg="8" xl="6">
-            <RequestDisplay></RequestDisplay>
-          </v-col>
-        </v-row>
-    </article>
-  </v-container>
-
-  <v-container fluid class="full-height" v-else-if="isAuthenticated && !hasRequest">
-    <!-- request form -->
-    <article id="request-form-container" class="top-banner full-height">
-        <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
-          <v-col xs="10" sm="10" md="10" lg="10" xl="10">
-            <RequestStepper></RequestStepper>
-          </v-col>
-        </v-row>
-    </article>
-  </v-container>
-
-
-  <v-container fluid class="full-height" v-else>
-    <article id="request-form-container" class="top-banner full-height">
-      <v-row align="center" justify="center">
-        <v-skeleton-loader type="image"></v-skeleton-loader>
-      </v-row>
-    </article>
+  <v-container fluid class="home-cards" v-else>
+    <v-row justify=center align=center>
+      <!-- <v-col cols="6">
+        <v-card>
+          <v-card-actions>
+            <router-link to="gmp">Get My PEN</router-link>
+          </v-card-actions>
+        </v-card>
+      </v-col> -->
+      <v-col cols="6">
+        <v-card>
+          <v-card-actions>
+            <router-link to="ump">Update My PEN Info</router-link>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
 import Login from './Login';
-import RequestStepper from './RequestStepper';
-import RequestDisplay from './RequestDisplay';
 import ModalJourney from './ModalJourney';
 import { mapGetters } from 'vuex';
+
 export default {
   name: 'home',
   components: {
     Login,
-    RequestStepper,
-    RequestDisplay,
-    ModalJourney
+    ModalJourney,
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'userInfo', 'isLoading']),
-    ...mapGetters('request', ['request', 'student']),
-    hasStudentRecord() {
-      return !!this.student;
-    },
-    hasRequest() {
-      return !!this.request;
-    },
+    ...mapGetters('auth', ['isAuthenticated', 'isLoading']),
   },
 };
 </script>
@@ -96,12 +75,10 @@ export default {
   .full-height{
     height: 100%;
   }
-  .infoTab{
-    padding: 10px 0px;
-    background-color: #fafafa
-  }
-  .bottomContainer{
-    padding-bottom: 30px
+  .home-cards{
+    max-width:80%;
+    margin: 2rem;
+    padding-bottom: 1vh;
   }
 </style>
 

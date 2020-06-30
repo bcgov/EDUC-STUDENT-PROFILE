@@ -1,7 +1,6 @@
 import ApiService from '@/common/apiService';
 
 export default {
-  namespaced: true,
   state: {
     requestComments: null,
     unsubmittedComment: null,
@@ -30,8 +29,8 @@ export default {
     },
   },
   actions: {
-    async postComment({commit}, {requestID, comment}){
-      const response = await ApiService.postComment(requestID, comment);
+    async postComment({commit, rootGetters}, {requestID, comment}){
+      const response = await ApiService.postComment(requestID, comment, rootGetters.requestType);
       commit('setUnsubmittedComment', response.data);
     },
   }

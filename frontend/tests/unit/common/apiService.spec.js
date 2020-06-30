@@ -33,10 +33,11 @@ describe('apiService.js', () => {
   });
 
   it('should respond to axios post with 200', () => {
-    mockAxios.onPost(ApiRoutes.REQUEST).reply(200);
+    const requestType = 'studentRequest';
+    mockAxios.onPost(ApiRoutes[requestType].REQUEST).reply(200);
 
     const info = {message: 'fakeMessage'};
-    const response = ApiService.postRequest(info);
+    const response = ApiService.postRequest(info, requestType);
     expect(response).toBeTruthy();
   });
 });
