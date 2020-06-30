@@ -1,20 +1,14 @@
 <template>
     <div :class="commentObject.color" :style="highlight ? {backgroundColor: '#fef4dd'} : {}">
       <v-row>
-          <v-col class="pa-0 iconCol" md="auto">
-              <!-- <v-avatar> -->
-                  <v-icon :size="iconSize">{{ commentObject.icon }}</v-icon>
-              <!-- </v-avatar> -->
-          </v-col>
-          <v-col class="pa-0 header-col">
-            <p class="username mb-0" href="#">
-                <strong>{{ commentObject.name }}</strong> at {{ commentObject.timestamp}}
-            </p>
-            <!-- <p class="timestamp"> 
-              On {{ commentObject.timestamp}},
-              <strong>{{ commentObject.name }}</strong> said:
-            </p> -->
-          </v-col>
+        <v-col class="pa-0 iconCol" md="auto">
+          <v-icon :size="iconSize">{{ commentObject.icon }}</v-icon>
+        </v-col>
+        <v-col class="pa-0 header-col">
+          <p class="username mb-0" href="#">
+            <strong>{{ commentObject.name }}</strong> at {{ commentObject.timestamp}}
+          </p>
+        </v-col>
       </v-row>
       <v-row class="ml-6 ml-sm-7 mr-1">
         <v-col class="content-col">
@@ -72,8 +66,7 @@ export default {
       }
       
       //split the hour/minute object, make fixes, then add it back to the datatime object
-      let fixTime = d.dateTime;
-      fixTime = (d.dateTime).split(' ');
+      let fixTime = (d.dateTime).split(' ');
       fixTime[1] = String(d.hour) + ':' +  d.minute;
       fixTime = fixTime.join(' ');
   
