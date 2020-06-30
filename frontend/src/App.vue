@@ -15,6 +15,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import ModalIdle from './components/ModalIdle';
 import MsieBanner from './components/MsieBanner';
+import StaticConfig from './common/staticConfig';
 
 export default {
   name: 'app',
@@ -23,6 +24,9 @@ export default {
     Footer,
     ModalIdle,
     MsieBanner
+  },
+  metaInfo: {
+    meta: StaticConfig.VUE_APP_META_DATA
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'loginError', 'isLoading']),
@@ -36,12 +40,13 @@ export default {
   methods: {
     ...mapMutations('auth', ['setLoading']),
     ...mapActions('auth', ['getJwtToken', 'getUserInfo', 'logout']),
-    ...mapActions('request', ['getCodes']),
+    ...mapActions('studentRequest', { getStudentRequestCodes: 'getCodes'}),
+    ...mapActions('penRequest', { getPenRequestCodes: 'getCodes'}),
   },
   async created() {
     this.setLoading(true);
     this.getJwtToken().then(() => 
-      Promise.all([this.getCodes(), this.getUserInfo()])
+      Promise.all([this.getPenRequestCodes('penRequest'), this.getStudentRequestCodes('studentRequest'), this.getUserInfo()])
     ).catch(e => {
       if(! e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
         this.logout();

@@ -304,7 +304,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, pick } from 'lodash';
 
@@ -348,7 +348,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('request', ['genders', 'student', 'genderInfo', 'recordedData']),
+    ...mapGetters('studentRequest', ['genders', 'genderInfo']),
+    ...mapGetters(['student']),
+    ...mapGetters('ump', ['recordedData']),
     hasStudentRecord() {
       return !!this.student;
     },
@@ -397,8 +399,8 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('request', ['setRequest', 'setUpdateData']),
-    ...mapActions('request', ['postRequest']),
+    ...mapMutations('studentRequest', ['setRequest']),
+    ...mapMutations('ump', ['setUpdateData']),
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,

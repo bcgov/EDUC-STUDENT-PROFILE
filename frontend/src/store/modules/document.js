@@ -1,8 +1,7 @@
 import ApiService from '@/common/apiService';
-import {getData, postData} from '@/store/modules/helpers';
+//import {getData, postData} from '@/store/modules/helpers';
 
 export default {
-  namespaced: true,
   state: {
     documentTypeCodes: null,
     unsubmittedDocuments: [],
@@ -23,16 +22,16 @@ export default {
     },
   },
   actions: {
-    async getDocumentTypeCodes({commit}) {
-      const response = await ApiService.getDocumentTypeCodes();
+    async getDocumentTypeCodes({commit, rootGetters}) {
+      const response = await ApiService.getDocumentTypeCodes(rootGetters.requestType);
       commit('setDocumentTypeCodes', response.data);
     },
-    async deleteFile({commit, getters}, {requestID, documentID}){
-      await ApiService.deleteDocument(requestID, documentID);
+    async deleteFile({commit, getters, rootGetters}, {requestID, documentID}){
+      await ApiService.deleteDocument(requestID, documentID, rootGetters.requestType);
       const documents = getters.unsubmittedDocuments.filter(document => document.documentID !== documentID);
       commit('setUnsubmittedDocuments', documents);
     },
-    getFileRequirements: () => getData(ApiService.getFileRequirements),
-    uploadFile: (_context, fileData) => postData(ApiService.uploadFile, _context, fileData),
+    //getFileRequirements: () => getData(ApiService.getFileRequirements),
+    //uploadFile: (_context, fileData) => postData(ApiService.uploadFile, _context, fileData),
   }
 };

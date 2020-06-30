@@ -304,7 +304,7 @@ function submitRequest(requestType, verifyRequestStatus) {
 
       req.session[requestType] = resData;
       if(req.body.email && req.body.email !== req.body.recordedEmail) {
-        sendVerificationEmail(accessToken, req.body.email, resData[`${requestType}ID`], req.session.digitalIdentityData.identityTypeLabel).catch(e => 
+        sendVerificationEmail(accessToken, req.body.email, resData[`${requestType}ID`], req.session.digitalIdentityData.identityTypeLabel, requestType).catch(e => 
           log.error('sendVerificationEmail Error', e.stack)
         );
       }
@@ -462,7 +462,8 @@ function verifyEmail(requestType) {
   return async function verifyEmailHandler(req, res) {
     const loggedin = getSessionUser(req);
     const baseUrl = config.get('server:frontend');
-    const verificationUrl = baseUrl + '/verification/';
+    const appUrl = `${baseUrl}/${RequestApps[requestType]}`;
+    const verificationUrl = `${baseUrl}/${RequestApps[requestType]}/verification/`;
 
     if(! req.query.verificationToken) {
       return res.redirect(verificationUrl + VerificationResults.TOKEN_ERROR);
@@ -471,7 +472,7 @@ function verifyEmail(requestType) {
     try{
       const [error, requestID] = verifyEmailToken(req.query.verificationToken);
       if(error && error.name === 'TokenExpiredError') {
-        return res.redirect(loggedin ? baseUrl : (verificationUrl + VerificationResults.EXPIRED));
+        return res.redirect(loggedin ? appUrl : (verificationUrl + VerificationResults.EXPIRED));
       } else if (error) {
         return res.redirect(verificationUrl + VerificationResults.TOKEN_ERROR);
       }
@@ -481,10 +482,10 @@ function verifyEmail(requestType) {
         req.session[requestType] = data;
       }
 
-      return res.redirect(loggedin ? baseUrl : (verificationUrl + VerificationResults.OK));
+      return res.redirect(loggedin ? appUrl : (verificationUrl + VerificationResults.OK));
     }catch(e){
       if(e instanceof ConflictStateError) {
-        return res.redirect(loggedin ? baseUrl : (verificationUrl + VerificationResults.OK));
+        return res.redirect(loggedin ? appUrl : (verificationUrl + VerificationResults.OK));
       } else {
         log.error('verifyEmail Error', e.stack);
         return res.redirect(verificationUrl + VerificationResults.SERVER_ERROR);

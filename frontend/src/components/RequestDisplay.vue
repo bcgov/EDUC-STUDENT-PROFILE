@@ -3,7 +3,7 @@
     <v-row class="flex-grow-0 pb-5">
       <v-card height="100%" width="100%" elevation=0 color="#036" class="white--text">
         <v-card-title class="request-display-header px-1 px-sm-5">
-          <h1>{{status === requestStatuses.RETURNED ? 'Provide More Info for UpdateMyPENInfo Request' : 'UpdateMyPENInfo Request Status'}}</h1>
+          <h1>{{title}}</h1>
         </v-card-title>
       </v-card>
     </v-row>
@@ -21,35 +21,50 @@
       </v-alert>
     </v-row>
     <v-row class="pb-5">
-      <MessageCard></MessageCard>
+      <slot name="message"></slot>
     </v-row>
     <v-row>
-      <StatusCard @success-alert="setSuccessAlert" @error-alert="setErrorAlert"></StatusCard>
+      <StatusCard
+        :can-create-request="canCreateRequest"
+        :new-request-text="newRequestText"
+        @success-alert="setSuccessAlert" 
+        @error-alert="setErrorAlert"
+      ></StatusCard>
     </v-row>
     <v-row>
       <Chat v-if="status !== requestStatuses.DRAFT && status !== requestStatuses.INITREV && status !== requestStatuses.ABANDONED"></Chat>
     </v-row>
     <v-row>
-      <RequestCard v-if="status !== requestStatuses.ABANDONED" :request="request"></RequestCard>
+      <slot name="request" v-if="status !== requestStatuses.ABANDONED"></slot>
     </v-row>
   </v-card>
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters } from 'vuex';
 import { RequestStatuses } from '@/utils/constants';
 import Chat from './Chat';
-import RequestCard from './RequestCard';
-import MessageCard from './MessageCard';
 import StatusCard from './StatusCard';
 
 export default {
   name: 'requestDisplay',
   components: {
     Chat,
-    RequestCard,
-    MessageCard,
     StatusCard
+  },
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+    canCreateRequest: {
+      type: Function,
+      required: true
+    },
+    newRequestText: {
+      type: String,
+      required: true
+    }
   },
   data() {
     return {
@@ -61,9 +76,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('request', ['request']),
+    ...mapGetters(['requestType']),
     status() {
-      return this.request.studentRequestStatusCode;
+      return this.request[`${this.requestType}StatusCode`];
+    },
+    request() {
+      return this.$store.getters[`${this.requestType}/request`];
     },
     requestStatuses() {
       return RequestStatuses;
@@ -73,7 +91,6 @@ export default {
     window.scrollTo(0,0);
   },
   methods: {
-    ...mapMutations('request', ['setRequest']),
     setSuccessAlert(alertMessage) {
       this.alertMessage = alertMessage;
       this.alertType = 'bootstrap-success';

@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import Vuetify from 'vuetify';
 import Vuex from 'vuex';
 import Vue from 'vue';
-import RequestForm from '@/components/RequestForm.vue';
+import RequestForm from '@/components/ump/RequestForm.vue';
 
 describe('RequestForm.vue', () => {
   let wrapper;
@@ -52,11 +52,18 @@ describe('RequestForm.vue', () => {
     //   dob: '1989-09-04',
     //   email: 'wayne@test.com'
     // }
+    const requestType = 'studentRequest';
+    const rootGetters = {
+      requestType: jest.fn().mockReturnValue(requestType),
+      student: jest.fn().mockReturnValue(student),
+    };
+
+    const umpGetters = {
+      recordedData: jest.fn().mockReturnValue(recordedData),
+    };
     
     const requestGetters = {
       genders: jest.fn().mockReturnValue(genderCodes),
-      student: jest.fn().mockReturnValue(student),
-      recordedData: jest.fn().mockReturnValue(recordedData),
     };
 
     const authGetters = {
@@ -64,16 +71,23 @@ describe('RequestForm.vue', () => {
     };
 
     store = new Vuex.Store({
-      modules: { 
+      modules: {
+        root: {
+          getters: rootGetters,
+        },
         auth: {
           namespaced: true,
           getters: authGetters, 
         },
-        request: {
+        [requestType]: {
           namespaced: true,
           actions,
           getters: requestGetters,
-        }
+        },
+        ump: {
+          namespaced: true,
+          getters: umpGetters,
+        },
       }
     });
 

@@ -68,7 +68,7 @@
 <script>
 import { humanFileSize, getFileNameWithMaxNameLength } from '@/utils/file';
 import ApiService from '@/common/apiService';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters } from 'vuex';
 import { sortBy } from 'lodash';
 
 export default {
@@ -103,8 +103,13 @@ export default {
     });
   },
   computed: {
-    ...mapGetters('document', ['documentTypeCodes']),
-    ...mapGetters('request', ['requestID']),
+    ...mapGetters(['requestType']),
+    documentTypeCodes() {
+      return this.$store.getters[`${this.requestType}/documentTypeCodes`];
+    },
+    requestID() {
+      return this.$store.getters[`${this.requestType}/requestID`];
+    },
     dataReady () {
       return this.validForm && this.file;
     },
@@ -114,7 +119,9 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('document', ['setUploadedDocument']),
+    setUploadedDocument(document) {
+      this.$store.commit(`${this.requestType}/setUploadedDocument`, document);
+    },
     closeForm() {
       this.resetForm();
       this.$emit('close:form');
@@ -174,7 +181,7 @@ export default {
         documentData: btoa(env.target.result)
       };
 
-      return ApiService.uploadFile(this.requestID, document).then(response => {
+      return ApiService.uploadFile(this.requestID, document, this.requestType).then(response => {
         this.setUploadedDocument(response.data);
         this.resetForm();
         this.setSuccessAlert();
@@ -193,7 +200,7 @@ export default {
       }
     },
     async getFileRules() {
-      const response = await ApiService.getFileRequirements();
+      const response = await ApiService.getFileRequirements(this.requestType);
       const fileRequirements = response.data;
       const maxSize = fileRequirements.maxSize;
       this.fileRules = [

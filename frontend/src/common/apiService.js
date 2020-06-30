@@ -78,9 +78,9 @@ export default {
     }
   },
 
-  async postRequest(userInfo){
+  async postRequest(userInfo, requestType){
     try{
-      const response = await apiAxios.post(ApiRoutes.REQUEST, userInfo);
+      const response = await apiAxios.post(ApiRoutes[requestType].REQUEST, userInfo);
       return response;
     } catch(e) {
       console.log(`Failed to post to Nodejs API - ${e}`);
@@ -88,9 +88,9 @@ export default {
     }
   },
 
-  async updateRequestStatus(requestId, status){
+  async updateRequestStatus(requestId, status, requestType){
     try{
-      const response = await apiAxios.patch(`${ApiRoutes.REQUEST}/${requestId}`, {studentRequestStatusCode: status});
+      const response = await apiAxios.patch(`${ApiRoutes[requestType].REQUEST}/${requestId}`, { [`${requestType}StatusCode`]: status});
       return response;
     } catch(e) {
       console.log(`Failed to post to Nodejs API - ${e}`);
@@ -98,9 +98,9 @@ export default {
     }
   },
 
-  async getCodes() {
+  async getCodes(requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes.CODES);
+      const response = await apiAxios.get(ApiRoutes[requestType].CODES);
       return response;
     } catch(e) {
       console.log(`Failed to get from Nodejs API - ${e}`);
@@ -108,9 +108,9 @@ export default {
     }
   },
 
-  async getDocumentTypeCodes() {
+  async getDocumentTypeCodes(requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes.DOCUMENT_TYPE_CODES);
+      const response = await apiAxios.get(ApiRoutes[requestType].DOCUMENT_TYPE_CODES);
       return response;
     } catch(e) {
       console.log(`Failed to get from Nodejs getDocumentTypeCodes API - ${e}`);
@@ -118,9 +118,9 @@ export default {
     }
   },
 
-  async getFileRequirements() {
+  async getFileRequirements(requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes.FILE_REQUIREMENTS);
+      const response = await apiAxios.get(ApiRoutes[requestType].FILE_REQUIREMENTS);
       return response;
     } catch(e) {
       console.log(`Failed to get from Nodejs getFileRequirements API - ${e}`);
@@ -128,9 +128,9 @@ export default {
     }
   },
 
-  async uploadFile(requestId, fileData){
+  async uploadFile(requestId, fileData, requestType){
     try{
-      const response = await apiAxios.post(`${ApiRoutes.REQUEST}/${requestId}/documents`, fileData);
+      const response = await apiAxios.post(`${ApiRoutes[requestType].REQUEST}/${requestId}/documents`, fileData);
       return response;
     } catch(e) {
       console.log(`Failed to post to Nodejs uploadFile API - ${e}`);
@@ -138,9 +138,9 @@ export default {
     }
   },
 
-  async getRequest(requestId) {
+  async getRequest(requestId, requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes.REQUEST + `/${requestId}`);
+      const response = await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}`);
       return response;
     } catch(e) {
       console.log(`Failed to get from Nodejs getRequest API - ${e}`);
@@ -148,9 +148,9 @@ export default {
     }
   },
 
-  async getDocumentList(requestId) {
+  async getDocumentList(requestId, requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes.REQUEST + `/${requestId}` + '/documents');
+      const response = await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents');
       return response;
     } catch(e) {
       console.log(`Failed to get from Nodejs getDocumentList API - ${e}`);
@@ -158,9 +158,9 @@ export default {
     }
   },
 
-  async getDocument(requestId, documentId) {
+  async getDocument(requestId, documentId, requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes.REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
+      const response = await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
       return response;
     } catch(e) {
       console.log(`Failed to get from Nodejs getDocument API - ${e}`);
@@ -168,9 +168,9 @@ export default {
     }
   },
 
-  async deleteDocument(requestId, documentId) {
+  async deleteDocument(requestId, documentId, requestType) {
     try{
-      const response = await apiAxios.delete(ApiRoutes.REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
+      const response = await apiAxios.delete(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
       return response;
     } catch(e) {
       console.log(`Failed to deleteDocument from Nodejs API - ${e}`);
@@ -178,9 +178,9 @@ export default {
     }
   },
 
-  async getCommentList(requestId) {
+  async getCommentList(requestId, requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes.REQUEST + `/${requestId}` + '/comments');
+      const response = await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/comments');
       return response;
     } catch(e) {
       console.log(`Failed to get from Nodejs getCommentList API - ${e}`);
@@ -188,9 +188,9 @@ export default {
     }
   },
 
-  async postComment(requestId, message){
+  async postComment(requestId, message, requestType){
     try{
-      const response = await apiAxios.post(ApiRoutes.REQUEST + `/${requestId}` + '/comments', message);
+      const response = await apiAxios.post(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/comments', message);
       return response;
     } catch(e) {
       console.log(`Failed to post to Nodejs postComment API - ${e}`);
@@ -208,9 +208,9 @@ export default {
     }
   },
 
-  async resendVerificationEmail(requestId){
+  async resendVerificationEmail(requestId, requestType){
     try{
-      const response = await apiAxios.post(ApiRoutes.REQUEST+ `/${requestId}` + '/verification-email');
+      const response = await apiAxios.post(ApiRoutes[requestType].REQUEST+ `/${requestId}` + '/verification-email');
       return response;
     } catch(e) {
       console.log(`Failed to post to Nodejs resendVerificationEmail API - ${e}`);

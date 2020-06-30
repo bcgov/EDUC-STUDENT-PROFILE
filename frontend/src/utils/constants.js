@@ -1,6 +1,7 @@
 const baseRoot = '/api';
 const authRoot = baseRoot + '/auth';
-const apiRoot = baseRoot + '/student';
+const gmpRoot = baseRoot + '/gmp';
+const umpRoot = baseRoot + '/ump';
 let object;
 
 object = {
@@ -17,13 +18,20 @@ object = {
 export const AuthRoutes = Object.freeze(object);
 
 export const ApiRoutes = Object.freeze({
-  REQUEST: apiRoot + '/request',
-  CODES: apiRoot + '/codes',
-  DOCUMENT_TYPE_CODES: apiRoot + '/document-type-codes',
-  FILE_REQUIREMENTS: apiRoot + '/file-requirements',
-  // FILE_UPLOAD: apiRoot + '/document',
-  USER: apiRoot + '/user',
-  CONFIG: baseRoot + '/config'
+  USER: baseRoot + '/user',
+  CONFIG: baseRoot + '/config',
+  studentRequest: {
+    REQUEST: umpRoot + '/requests',
+    CODES: umpRoot + '/codes',
+    DOCUMENT_TYPE_CODES: umpRoot + '/document-type-codes',
+    FILE_REQUIREMENTS: umpRoot + '/file-requirements',
+  },
+  penRequest: {
+    REQUEST: gmpRoot + '/requests',
+    CODES: gmpRoot + '/codes',
+    DOCUMENT_TYPE_CODES: gmpRoot + '/document-type-codes',
+    FILE_REQUIREMENTS: gmpRoot + '/file-requirements',
+  }
 });
 
 export const RequestStatuses = Object.freeze({
@@ -31,9 +39,19 @@ export const RequestStatuses = Object.freeze({
   INITREV: 'INITREV',
   RETURNED: 'RETURNED',
   SUBSREV: 'SUBSREV',
-  COMPLETED: 'COMPLETED',
   REJECTED: 'REJECTED',
   ABANDONED: 'ABANDONED'
+});
+
+export const StudentRequestStatuses = Object.freeze({
+  ...RequestStatuses,
+  COMPLETED: 'COMPLETED',
+});
+
+export const PenRequestStatuses = Object.freeze({
+  ...RequestStatuses,
+  AUTO: 'AUTO',
+  MANUAL: 'MANUAL'
 });
 
 export const VerificationResults = Object.freeze({

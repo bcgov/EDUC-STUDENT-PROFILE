@@ -210,7 +210,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('request', ['genders', 'student', 'genderInfo']),
+    ...mapGetters('studentRequest', ['genders', 'genderInfo']),
+    ...mapGetters(['student']),
     hasStudentRecord() {
       return !!this.student;
     },
@@ -264,7 +265,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('request', ['setRecordedData']),
+    ...mapMutations('ump', ['setRecordedData']),
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,

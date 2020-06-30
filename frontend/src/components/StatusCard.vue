@@ -28,18 +28,10 @@
             </v-row>
         </v-card>
     </div>
-    <div class="pa-0 align-self-start" v-if="status === requestStatuses.REJECTED || status === requestStatuses.COMPLETED">
+    <div class="pa-0 align-self-start" v-if="canCreateRequest(status)">
       <v-card height="100%" width="100%" elevation=0>
         <v-row no-gutters justify="end" class="pb-5">
-          <v-btn color="#38598a" dark class="ml-2 text-none" @click.stop="$router.push('request')">Create a new Request</v-btn>
-        </v-row>
-      </v-card>
-    </div>
-    <div class="pa-0 align-self-start" v-if="status === requestStatuses.ABANDONED">
-      <v-card height="100%" width="100%" elevation=0>
-        <v-row no-gutters justify="end" class="pb-5">
-          <v-btn color="#38598a" dark class="ml-2 text-none" @click.stop="$router.push('request')">Create a new Request
-          </v-btn>
+          <v-btn color="#38598a" dark class="ml-2 text-none" @click.stop="$router.push({ path: 'request', append: true })">{{newRequestText}}</v-btn>
         </v-row>
       </v-card>
     </div>
@@ -60,19 +52,38 @@ import { RequestStatuses } from '@/utils/constants';
 import ApiService from '@/common/apiService';
 
 export default {
-  name: 'messageCard',
+  name: 'statusCard',
+  props: {
+    canCreateRequest: {
+      type: Function,
+      required: true
+    },
+    newRequestText: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
       sending: false,
     };
   },
   computed: {
-    ...mapGetters('request', ['request', 'statuses']),
+    ...mapGetters(['requestType']),
+    request() {
+      return this.$store.getters[`${this.requestType}/request`];
+    },
+    statuses() {
+      return this.$store.getters[`${this.requestType}/statuses`];
+    },
+    statusCodeName() {
+      return `${this.requestType}StatusCode`;
+    },
     status() {
-      return this.request.studentRequestStatusCode;
+      return this.request[this.statusCodeName];
     },
     statusLabel() {
-      const statusCode = find(this.statuses, ['studentRequestStatusCode', this.status]);
+      const statusCode = find(this.statuses, [this.statusCodeName, this.status]);
       return statusCode && statusCode.label;
     },
     requestStatuses() {
@@ -85,7 +96,7 @@ export default {
   methods: {
     resendVerificationEmail() {
       this.sending = true;
-      ApiService.resendVerificationEmail(this.request.studentRequestID).then(() => {
+      ApiService.resendVerificationEmail(this.request[`${this.requestType}ID`], this.requestType).then(() => {
         this.$emit('success-alert', 'Your verification email has been sent successfully.');
       }).catch(() => {
         this.$emit('error-alert', 'Sorry, an unexpected error seems to have occurred. You can click on the resend button again later.');

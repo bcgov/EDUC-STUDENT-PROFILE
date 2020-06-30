@@ -61,6 +61,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import RequestCard from './RequestCard';
+import { pick, mapKeys } from 'lodash';
 
 export default {
   name: 'requestSummary',
@@ -76,22 +77,30 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('request', ['recordedData', 'updateData']),
+    ...mapGetters('ump', ['recordedData', 'updateData']),
     emailChanged() {
       return this.recordedData.email !== this.updateData.email;
     },
   },
   methods: {
-    ...mapActions('request', ['postRequest']),
+    ...mapActions('studentRequest', ['postRequest']),
     setErrorAlert() {
       this.alertMessage = 'Sorry, an unexpected error seems to have occured. Please try again later.';
       this.alert = true;
       window.scrollTo(0,0);
     },
+    createRequestData() {
+      let request = pick(this.updateData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email']);
+      let recorded = pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email', 'pen']);
+      recorded = mapKeys(recorded, (_, key) => {
+        return 'recorded' + key.slice(0,1).toUpperCase() + key.slice(1);
+      });
+      return { ...request, ...recorded };
+    },
     async submitRequest() {
       try {
         this.submitting = true;
-        const resData = await this.postRequest({ requestData: this.updateData, recordedData: this.recordedData });
+        const resData = await this.postRequest(this.createRequestData());
         if (resData) {
           if (this.emailChanged) {
             this.nextStep();

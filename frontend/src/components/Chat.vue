@@ -69,10 +69,10 @@
   </v-container>
 </template>
 <script>
-import SingleComment from './Single-comment.vue';
+import SingleComment from './SingleComment.vue';
 import Comments from './Comment.vue';
 import ApiService from '@/common/apiService';
-import { mapGetters, mapActions, mapMutations } from 'vuex';
+import { mapGetters } from 'vuex';
 import { groupBy, sortBy, findLastIndex } from 'lodash';
 import { RequestStatuses } from '@/utils/constants';
 
@@ -90,9 +90,19 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('request', ['request']),
-    ...mapGetters('document', ['unsubmittedDocuments']),
-    ...mapGetters('comment', ['commentHistory', 'requestComments']),
+    ...mapGetters(['requestType']),
+    request() {
+      return this.$store.getters[`${this.requestType}/request`];
+    },
+    unsubmittedDocuments() {
+      return this.$store.getters[`${this.requestType}/unsubmittedDocuments`];
+    },
+    commentHistory() {
+      return this.$store.getters[`${this.requestType}/commentHistory`];
+    },
+    requestComments() {
+      return this.$store.getters[`${this.requestType}/requestComments`];
+    },
     myself() {
       return { name: this.userInfo.displayName, id: '1' };
     },
@@ -100,16 +110,19 @@ export default {
       return this.commentHistory && this.commentHistory.length > 0;
     },
     status() {
-      return this.request.studentRequestStatusCode;
+      return this.request[`${this.requestType}StatusCode`];
     },
     requestStatuses() {
       return RequestStatuses;
     },
+    requestID() {
+      return this.request[`${this.requestType}ID`];
+    }
   },
   created() {
     Promise.all([
-      ApiService.getDocumentList(this.request.studentRequestID),
-      ApiService.getCommentList(this.request.studentRequestID),
+      ApiService.getDocumentList(this.requestID, this.requestType),
+      ApiService.getCommentList(this.requestID, this.requestType),
       this.getDocumentTypeCodes()
     ]).then(([documentRes, commentRes]) => {
       this.participants = commentRes.data.participants;
@@ -139,9 +152,21 @@ export default {
     });
   },
   methods: {
-    ...mapActions('document', ['getDocumentTypeCodes']),
-    ...mapMutations('document', ['setUnsubmittedDocuments']),
-    ...mapMutations('comment', ['setCommentHistory', 'setUnsubmittedComment', 'setRequestComments']),
+    getDocumentTypeCodes() {
+      return this.$store.dispatch(`${this.requestType}/getDocumentTypeCodes`);
+    },
+    setUnsubmittedDocuments(unsubmittedDocuments) {
+      this.$store.commit(`${this.requestType}/setUnsubmittedDocuments`, unsubmittedDocuments);
+    },
+    setCommentHistory(commentHistory) {
+      this.$store.commit(`${this.requestType}/setCommentHistory`, commentHistory);
+    },
+    setUnsubmittedComment(unsubmittedComment) {
+      this.$store.commit(`${this.requestType}/setUnsubmittedComment`, unsubmittedComment);
+    },
+    setRequestComments(requestComments) {
+      this.$store.commit(`${this.requestType}/setRequestComments`, requestComments);
+    },
     linkDocumentsToComments(messages, documents) {
       const myMessages = messages.filter(message => message.myself);
       documents = sortBy(documents, ['createDate']);

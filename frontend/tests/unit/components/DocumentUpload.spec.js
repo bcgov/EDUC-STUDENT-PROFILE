@@ -19,7 +19,8 @@ describe('DocumentUpload.vue', () => {
   const vuetify = new Vuetify();
 
   const setUploadedDocumentSpy = jest.fn();
-  const store = mockStore(setUploadedDocumentSpy);
+  const requestType = 'studentRequest';
+  const store = mockStore(requestType, setUploadedDocumentSpy);
 
   jest.spyOn(ApiService, 'getFileRequirements');
   const uploadFileSpy = jest.spyOn(ApiService, 'uploadFile');
@@ -190,22 +191,20 @@ describe('DocumentUpload.vue', () => {
 });
 
 
-function mockStore(setUploadedDocument) {
+function mockStore(requestType, setUploadedDocument) {
   const documentTypeCodes = [
     {label:'Canadian Birth Certificate', documentTypeCode:'CABIRTH', displayOrder:'3'},
     {label:'Canadian Passport', documentTypeCode:'CAPASSPORT', displayOrder:'1'},
     {label:'Canadian Driver’s License', documentTypeCode:'CADL', displayOrder:'2'},
   ];
 
-  const requestStore = {
-    namespaced: true,
+  const rootStore = {
     getters: {
-      requestID: jest.fn().mockReturnValue('requestID')
+      requestType: jest.fn().mockReturnValue(requestType)
     }
   };
 
   const documentStore = {
-    namespaced: true,
     actions: {
       uploadFile: jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(false)
     },
@@ -217,11 +216,21 @@ function mockStore(setUploadedDocument) {
     }
   };
 
+  const requestStore = {
+    namespaced: true,
+    getters: {
+      requestID: jest.fn().mockReturnValue('requestID')
+    },
+    modules: {
+      document: documentStore
+    }
+  };
+
   let store = new Vuex.Store({
     modules: { 
       auth,
-      document: documentStore,
-      request: requestStore
+      root: rootStore,
+      [requestType]: requestStore
     }
   });
 

@@ -60,7 +60,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('request', ['genderInfo']),
+    ...mapGetters('studentRequest', ['genderInfo']),
     genderLabel() { 
       return this.request.genderCode && this.genderInfo(this.request.genderCode).label;
     },

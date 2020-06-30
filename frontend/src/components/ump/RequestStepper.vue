@@ -99,7 +99,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('request', ['genders', 'student', 'genderInfo', 'updateData', 'recordedData']),
+    ...mapGetters('ump', ['recordedData', 'updateData']),
     dataReady() {
       return !!this.userInfo;
     },

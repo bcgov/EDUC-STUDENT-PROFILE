@@ -1,26 +1,22 @@
 import ApiService from '@/common/apiService';
-import {getData} from '@/store/modules/helpers';
-import { find, pick, mapKeys } from 'lodash';
+//import {getData} from '@/store/modules/helpers';
+import { find } from 'lodash';
+import document from '@/store/modules/document.js';
+import comment from '@/store/modules/comment.js';
 
 export default {
   namespaced: true,
-  state: {
+  state: () => ({
     genders: null,
     statuses: null,
     request: null,
-    student: null,
-    recordedData: null,
-    updateData: null,
-  },
+  }),
   getters: {
     genders: state => state.genders,
     genderInfo: state => genderCode => find(state.genders, ['genderCode', genderCode]),
     statuses: state => state.statuses,
     request: state => state.request,
-    requestID: state => state.request.studentRequestID,
-    student: state => state.student,
-    recordedData: state => state.recordedData,
-    updateData: state => state.updateData,
+    requestID: (state, getters, rootState, rootGetters) => state.request[`${rootGetters.requestType}ID`],
   },
   mutations: {
     setGenders: (state, genders) => {
@@ -32,26 +28,11 @@ export default {
     setRequest: (state, request) => {
       state.request = request;
     },
-    setStudent: (state, student) => {
-      state.student = student;
-    },
-    setRecordedData: (state, recordedData) => {
-      state.recordedData = recordedData;
-    },
-    setUpdateData: (state, updateData) => {
-      state.updateData = updateData;
-    },
   },
   actions: {
-    async postRequest({commit}, { requestData, recordedData }){
-      let request = pick(requestData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email']);
-      let recorded = pick(recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email', 'pen']);
-      recorded = mapKeys(recorded, (_, key) => {
-        return 'recorded' + key.slice(0,1).toUpperCase() + key.slice(1);
-      });
-      request = { ...request, ...recorded };
+    async postRequest({commit, rootGetters}, request){
       try {
-        const response = await ApiService.postRequest(request);
+        const response = await ApiService.postRequest(request, rootGetters.requestType);
         if(response.status !== 200){
           return false;
         }
@@ -62,11 +43,15 @@ export default {
         return false;
       }
     },
-    async getCodes({commit}) {
-      const response = await ApiService.getCodes();
+    async getCodes({commit}, requestType) {
+      const response = await ApiService.getCodes(requestType);
       commit('setGenders', response.data.genderCodes);
       commit('setStatuses', response.data.statusCodes);
     },
-    getRequest: (_context, requestId) => getData(ApiService.getRequest, requestId),
+    //getRequest: (_context, { requestId, requestType }) => getData(ApiService.getRequest, requestId),
+  },
+  modules: {
+    document, 
+    comment,
   }
 };

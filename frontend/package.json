@@ -21,7 +21,6 @@
     "start": "npm run dev"
   },
   "dependencies": {
-    "minimist": "1.2.5",
     "@babel/polyfill": "^7.8.3",
     "@babel/preset-env": "7.3.4",
     "@fortawesome/fontawesome-free": "5.11.2",
@@ -36,6 +35,7 @@
     "http-status-codes": "^1.4.0",
     "idle-vue": "^2.0.5",
     "jest-junit": "^7.0.0",
+    "minimist": "1.2.5",
     "moment": "^2.24.0",
     "nconf": "^0.10.0",
     "path": "^0.12.7",
@@ -47,6 +47,7 @@
     "testcafe": "1.6.0",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.1",
+    "vue-meta": "^2.4.0",
     "vue-quick-chat": "^1.0.9",
     "vue-router": "^3.1.6",
     "vuetify": "^2.2.15",
