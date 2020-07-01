@@ -7,15 +7,15 @@ import moment from 'moment';
 import Home from '@/components/Home.vue';
 import Logout from './components/Logout';
 import SessionExpired from './components/SessionExpired';
-//import PenRequestPage from '@/components/gmp/RequestPage.vue';
+import PenRequestPage from '@/components/gmp/RequestPage.vue';
 import StudentRequestPage from '@/components/ump/RequestPage.vue';
-//import PenRequestVerification from '@/components/gmp/Verification.vue';
+import PenRequestVerification from '@/components/gmp/Verification.vue';
 import StudentRequestVerification from '@/components/ump/Verification.vue';
 import ErrorPage from '@/components/ErrorPage.vue';
 import LoginError from '@/components/LoginError.vue';
 import RouterView from '@/components/RouterView.vue';
 import Ump from '@/components/ump/Ump.vue';
-//import Gmp from '@/components/ump/Gmp.vue';
+import Gmp from '@/components/gmp/Gmp.vue';
 
 Vue.prototype.moment = moment;
 
@@ -52,23 +52,27 @@ const router = new VueRouter({
         },
       ]
     },
-    // {
-    //   path: '/gmp',
-    //   name: 'gmp',
-    //   component: Gmp,
-    //   children: [
-    //     {
-    //       path: 'request',
-    //       name: 'pen-request',
-    //       component: PenRequestPage
-    //     },
-    //     {
-    //       path: 'verification/:status',
-    //       name: 'pen-request-verification',
-    //       component: PenRequestVerification
-    //     },
-    //   ]
-    // },
+    {
+      path: '/gmp',
+      component: RouterView,
+      children: [
+        {
+          path: '',
+          name: 'gmp',
+          component: Gmp
+        },
+        {
+          path: 'request',
+          name: 'pen-request',
+          component: PenRequestPage
+        },
+        {
+          path: 'verification/:status',
+          name: 'pen-request-verification',
+          component: PenRequestVerification
+        },
+      ]
+    },
     {
       path: '/error',
       name: 'error',

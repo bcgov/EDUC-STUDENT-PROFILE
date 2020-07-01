@@ -76,7 +76,7 @@ async function findAndUpdateDraftProfileRequestsToAbandoned(requestType) {
   try {
     await new Promise(resolve => setTimeout(resolve, 5000)); // set a time out of 5 seconds to start the process after that, as we dont want to release the lock before 5 seconds, so that other pods will acquire it.
     log.info(`starting job for moving ${requestType}s in draft status for more than ${numDaysAllowedInDraftStatus} days to abandon status based on cron ${schedulerCronPenrequestDraft}, ${process.pid}`);
-    const data = await getApiCredentials(config.get(`${requestType}:clientId`), config.get(`${requestType}:clientSecret`));
+    const data = await getApiCredentials(config.get('oidc:clientId'), config.get('oidc:clientSecret'));
     const accessToken = data.accessToken;
     let searchListCriteria = [];
     searchListCriteria.push({key: `${requestType}StatusCode`, operation: 'eq', value: 'DRAFT', valueType: 'STRING'});

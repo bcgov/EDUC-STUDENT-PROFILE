@@ -25,13 +25,13 @@
 
   <v-container fluid class="home-cards" v-else>
     <v-row justify=center align=center>
-      <!-- <v-col cols="6">
+      <v-col cols="6">
         <v-card>
           <v-card-actions>
             <router-link to="gmp">Get My PEN</router-link>
           </v-card-actions>
         </v-card>
-      </v-col> -->
+      </v-col>
       <v-col cols="6">
         <v-card>
           <v-card-actions>
