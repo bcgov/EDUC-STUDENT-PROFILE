@@ -1,6 +1,7 @@
 <template>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-if="status === requestStatuses.INITREV || status === requestStatuses.SUBSREV">
-    <p class="mb-2"><strong>Your email has been verified and your PEN request has now been submitted for processing.</strong></p>
+    <p class="mb-2" v-if="status === requestStatuses.INITREV"><strong>Your email has been verified and your PEN request has now been submitted for processing.</strong></p>
+    <p class="mb-2" v-else><strong>Your PEN request has now been re-submitted for processing.</strong></p>
     <ul>
       <li>Requests are processed M-F 8am – 4:30pm excluding stat holidays</li>
       <li>In most cases you will get a response within one business day</li>
