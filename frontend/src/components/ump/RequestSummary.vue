@@ -105,7 +105,7 @@ export default {
           if (this.emailChanged) {
             this.nextStep();
           } else {
-            this.$router.replace({name: 'home'});
+            this.$router.replace({name: 'ump'});
           }
         } else {
           this.setErrorAlert();

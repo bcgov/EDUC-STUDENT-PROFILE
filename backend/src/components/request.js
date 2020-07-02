@@ -432,7 +432,7 @@ function beforeUpdateRequestAsInitrev(request, requestType) {
 }
 
 async function setRequestAsInitrev(requestID, requestType) {
-  let data = await getApiCredentials(config.get(`${requestType}:clientId`), config.get(`${requestType}:clientSecret`));
+  let data = await getApiCredentials(config.get('oidc:clientId'), config.get('oidc:clientSecret'));
   const accessToken = data.accessToken;
 
   return await updateRequestStatus(accessToken, requestID, RequestStatuses.INITREV, requestType, beforeUpdateRequestAsInitrev);
