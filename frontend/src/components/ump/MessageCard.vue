@@ -1,7 +1,8 @@
 <template>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-if="status === requestStatuses.INITREV || status === requestStatuses.SUBSREV">
-    <p class="mb-2" v-if="request.email === request.recordedEmail"><strong>Your request to update your student information with the changes below has been submitted.</strong></p>
-    <p class="mb-2" v-else><strong>Your email has been verified and your UpdateMyPENInfo request has now been submitted for processing.</strong></p>
+    <p class="mb-2" v-if="request.email === request.recordedEmail && status === requestStatuses.INITREV"><strong>Your request to update your student information with the changes below has been submitted.</strong></p>
+    <p class="mb-2" v-else-if="status === requestStatuses.INITREV"><strong>Your email has been verified and your UpdateMyPENInfo request has now been submitted for processing.</strong></p>
+    <p class="mb-2" v-else><strong>Your UpdateMyPENInfo request has now been re-submitted for processing.</strong></p>
     <ul>
       <li>Requests are processed M-F 8am - 4:30pm excluding stat holidays</li>
       <li>In most cases you will get a response within one business day</li>
