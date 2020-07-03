@@ -45,34 +45,34 @@
     <p class="mb-2">For your reference, your student record at the Ministry of Education has been updated as shown below</p>
     <v-container class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
       <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
+        <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-2">PEN:</p>
         </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
+        <v-col xl="9" lg="9" md="9" sm="8" xs="8">
           <p class="mb-2"><strong>{{ student.pen }}</strong></p>
         </v-col>
       </v-row>
       <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
+        <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-2">Name:</p>
         </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
+        <v-col xl="9" lg="9" md="9" sm="8" xs="8">
           <p class="mb-2"><strong>{{ updatedFullName }}</strong></p>
         </v-col>
       </v-row>
       <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
+        <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-2">Birthdate:</p>
         </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
+        <v-col xl="9" lg="9" md="9" sm="8" xs="8">
           <p class="mb-2"><strong>{{ student.dob ? moment(student.dob).format('MMMM D, YYYY'):'' }}</strong></p>
         </v-col>
       </v-row>
       <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
+        <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-2">Gender:</p>
         </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
+        <v-col xl="9" lg="9" md="9" sm="8" xs="8">
           <p class="mb-2"><strong>{{ student.sexLabel }}</strong></p>
         </v-col>
       </v-row>
