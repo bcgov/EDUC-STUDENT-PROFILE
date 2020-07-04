@@ -44,7 +44,22 @@
     </article>
   </v-container>
 
-  <v-container fluid class="full-height" v-else-if="isAuthenticated && !hasPen && !hasPenRequest">
+  <v-container fluid class="full-height" v-else-if="isAuthenticated && (hasInflightStudentRequest || hasCompletedStudentRequest)">
+    <article id="request-display-container" class="top-banner full-height">
+        <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
+          <v-col class="pt-1 pt-sm-3" xs="10" sm="8" md="6" lg="5" xl="3">
+            <v-card class="student-request-card">
+              <v-card-text>
+                <p v-if="hasInflightStudentRequest"><strong>You already have your PEN and don't need to request it again. Your PEN is {{student.pen}}</strong></p>
+                <p v-else><strong>Hi {{student.legalFirstName || ''}}, you already have your PEN and don't need to request it again. Your PEN is {{student.pen}}</strong></p>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+    </article>
+  </v-container>
+
+  <v-container fluid class="full-height" v-else-if="isAuthenticated">
     <!-- pen request form -->
     <article id="request-form-container" class="top-banner full-height">
         <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
@@ -72,8 +87,9 @@ import RequestDisplay from '../RequestDisplay';
 import ModalJourney from '../ModalJourney';
 import MessageCard from './MessageCard';
 import RequestCard from './RequestCard';
-import { PenRequestStatuses } from '@/utils/constants';
+import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
 import { mapGetters, mapMutations } from 'vuex';
+import { pick, values } from 'lodash';
 export default {
   name: 'home',
   components: {
@@ -87,6 +103,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'userInfo', 'isLoading']),
     ...mapGetters('penRequest', ['request']),
+    ...mapGetters('studentRequest', {studentRequest: 'request'}),
     ...mapGetters(['student']),
     hasPen() {
       return !!this.student && !!this.student.pen;
@@ -99,6 +116,12 @@ export default {
     },
     newRequestText() {
       return 'Create a new PEN Request';
+    },
+    hasInflightStudentRequest() {
+      return this.studentRequest && values(pick(StudentRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === this.studentRequest.studentRequestStatusCode);
+    },
+    hasCompletedStudentRequest() {
+      return this.studentRequest && this.studentRequest.studentRequestStatusCode === StudentRequestStatuses.COMPLETED;
     }
   },
   created() {
@@ -134,6 +157,10 @@ export default {
   }
   .bottomContainer{
     padding-bottom: 30px
+  }
+
+  .student-request-card{
+    background: #F2E8D5;
   }
 </style>
 
