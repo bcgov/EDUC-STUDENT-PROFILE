@@ -12,7 +12,6 @@ const cors = require('cors');
 const utils = require('./components/utils');
 const auth = require('./components/auth');
 const bodyParser = require('body-parser');
-const Redis = require('ioredis');
 const connectRedis = require('connect-redis');
 dotenv.config();
 
@@ -63,36 +62,20 @@ const logStream = {
 
 app.use(morgan(config.get('server:morganFormat'), { 'stream': logStream }));
 
-let redisClient;
-if (config.get('environment') !== undefined && config.get('environment') === 'local') {
-  redisClient = new Redis({
-    host: config.get('redis:host'),
-    port: config.get('redis:port'),
-    password: config.get('redis:password')
-  });
-} else {
-  redisClient = new Redis.Cluster([
-    {
-      port: config.get('redis:port'),
-      host: config.get('redis:host'),
-    }
-  ]);
-}
 
+const Redis = require('./util/redis/redis-client');
+Redis.init(); // call the init to initialize appropriate client, and reuse it across the app.
 const RedisStore = connectRedis(session);
 const dbSession = new RedisStore({
-  client: redisClient,
+  client: Redis.getRedisClient(),
   prefix: 'student-profile-sess:',
-});
-redisClient.on('error', (error)=>{
-  log.error(`error occurred in redis client. ${error}`);
 });
 const cookie = {
   secure: true,
   httpOnly: true,
   maxAge: 1800000 //30 minutes in ms. this is same as session time. DO NOT MODIFY, IF MODIFIED, MAKE SURE SAME AS SESSION TIME OUT VALUE.
 };
-if (config.get('environment') !== undefined && config.get('environment') === 'local') {
+if ('local' === config.get('environment')) {
   cookie.secure = false;
 }
 //sets cookies for security purposes (prevent cookie access, allow secure connections only, etc)
