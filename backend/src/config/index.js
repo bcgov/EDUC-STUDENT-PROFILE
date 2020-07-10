@@ -76,6 +76,8 @@ nconf.defaults({
     schedulerCronProfileRequestDraft:process.env.SCHEDULER_CRON_PROFILE_REQUEST_DRAFT,
     numDaysAllowedInDraftStatus:process.env.NUM_DAYS_ALLOWED_IN_DRAFT_STATUS,
     expectedDraftRequests: process.env.EXPECTED_DRAFT_REQUESTS,
+    numDaysAllowedInReturnStatusBeforeEmail:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL,
+    numDaysAllowedInReturnStatusBeforeAbandoned:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED
   }
 });
 module.exports = nconf;
