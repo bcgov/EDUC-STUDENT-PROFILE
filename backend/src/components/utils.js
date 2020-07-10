@@ -48,9 +48,9 @@ async function deleteData(token, url) {
 
     log.info('delete Data Url', url);
     const response = await axios.delete(url, delConfig);
-    log.info('delete Data Status', response.status);
-    log.info('delete Data StatusText', response.statusText);
-    log.verbose('delete Data Res', response.data);
+    log.info(`delete Data Status for url ${url} :: is :: `, response.status);
+    log.info(`delete Data StatusText for url ${url}  :: is :: `, response.statusText);
+    log.verbose(`delete Data Response for url ${url}  :: is :: `, minify(response.data));
 
     return response.data;
   } catch (e) {
@@ -90,9 +90,9 @@ async function getData(token, url) {
 
     log.info('get Data Url', url);
     const response = await axios.get(url, getDataConfig);
-    log.info('get Data Status', response.status);
-    log.info('get Data StatusText', response.statusText);
-    log.verbose('get Data Res', minify(response.data));
+    log.info(`get Data Status for url ${url} :: is :: `, response.status);
+    log.info(`get Data StatusText for url ${url}  :: is :: `, response.statusText);
+    log.verbose(`get Data Response for url ${url}  :: is :: `, minify(response.data));
 
     return response.data;
   } catch (e) {
@@ -110,9 +110,9 @@ async function getDataWithParams(token, url, params) {
 
     log.info('get Data Url', url);
     const response = await axios.get(url, params);
-    log.info('get Data Status', response.status);
-    log.info('get Data StatusText', response.statusText);
-    log.verbose('get Data Res', minify(response.data));
+    log.info(`get Data Status for url ${url} :: is :: `, response.status);
+    log.info(`get Data StatusText for url ${url}  :: is :: `, response.statusText);
+    log.verbose(`get Data Response for url ${url}  :: is :: `, minify(response.data));
 
     return response.data;
   } catch (e) {
@@ -155,10 +155,9 @@ async function postData(token, data, url) {
     data.updateUser='STUDENT-PROFILE';
     const response = await axios.post(url, data, postDataConfig);
 
-    log.info('post Data Status', response.status);
-    log.info('post Data StatusText', response.statusText);
-
-    log.verbose('post Data Res', response.data);
+    log.info(`post Data Status for url ${url} :: is :: `, response.status);
+    log.info(`post Data StatusText for url ${url}  :: is :: `, response.statusText);
+    log.verbose(`post Data Response for url ${url}  :: is :: `, minify(response.data));
 
     return response.data;
   } catch(e) {
@@ -181,10 +180,9 @@ async function putData(token, data, url) {
     data.updateUser='STUDENT-PROFILE';
     const response = await axios.put(url, data, putDataConfig);
 
-    log.info('put Data Status', response.status);
-    log.info('put Data StatusText', response.statusText);
-
-    log.verbose('put Data Res', response.data);
+    log.info(`put Data Status for url ${url} :: is :: `, response.status);
+    log.info(`put Data StatusText for url ${url}  :: is :: `, response.statusText);
+    log.verbose(`put Data Response for url ${url}  :: is :: `, minify(response.data));
 
     return response.data;
   } catch(e) {
