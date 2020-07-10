@@ -12,10 +12,9 @@ const expectedDraftRequests = config.get('scheduler:expectedDraftRequest');
 const numDaysAllowedInReturnedStatusBeforeEmail = config.get('scheduler:numDaysAllowedInReturnStatusBeforeEmail');
 const numDaysAllowedInReturnedStatusBeforeAbandoned = config.get('scheduler:numDaysAllowedInReturnStatusBeforeAbandoned');
 
-function getSearchListCriteriaForDraftRequests(requestType) {
-  const dateTime = localDateTime.now().minusDays(numDaysAllowedInDraftStatus);
+function getSearchCriteriaList(requestType, dateTime, statusCodeValue) {
   let searchListCriteria = [];
-  searchListCriteria.push({key: `${requestType}StatusCode`, operation: 'eq', value: 'DRAFT', valueType: 'STRING'});
+  searchListCriteria.push({key: `${requestType}StatusCode`, operation: 'eq', value: statusCodeValue, valueType: 'STRING'});
   searchListCriteria.push({
     key: 'statusUpdateDate',
     operation: 'lt',
@@ -23,32 +22,21 @@ function getSearchListCriteriaForDraftRequests(requestType) {
     valueType: 'DATE_TIME'
   });
   return searchListCriteria;
+}
+
+function getSearchListCriteriaForDraftRequests(requestType) {
+  const dateTime = localDateTime.now().minusDays(numDaysAllowedInDraftStatus);
+  return getSearchCriteriaList(requestType, dateTime, 'DRAFT');
 }
 
 function getSearchListCriteriaForAbandoningReturnedRequests(requestType) {
   const dateTime = localDateTime.now().minusDays(numDaysAllowedInReturnedStatusBeforeAbandoned);
-  let searchListCriteria = [];
-  searchListCriteria.push({key: `${requestType}StatusCode`, operation: 'eq', value: 'RETURNED', valueType: 'STRING'});
-  searchListCriteria.push({
-    key: 'statusUpdateDate',
-    operation: 'lt',
-    value: dateTime.toString(),
-    valueType: 'DATE_TIME'
-  });
-  return searchListCriteria;
+  return getSearchCriteriaList(requestType, dateTime, 'RETURNED');
 }
 
 function getSearchListCriteriaForSendingEmailForReturnedRequests(requestType) {
   const dateTime = localDateTime.now().minusDays(numDaysAllowedInReturnedStatusBeforeEmail);
-  let searchListCriteria = [];
-  searchListCriteria.push({key: `${requestType}StatusCode`, operation: 'eq', value: 'RETURNED', valueType: 'STRING'});
-  searchListCriteria.push({
-    key: 'statusUpdateDate',
-    operation: 'lt',
-    value: dateTime.toString(),
-    valueType: 'DATE_TIME'
-  });
-  return searchListCriteria;
+  return getSearchCriteriaList(requestType, dateTime, 'RETURNED');
 }
 
 function getSearchCriteriaParam(searchListCriteria) {
