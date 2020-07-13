@@ -8,7 +8,7 @@ const localDateTime = require('@js-joda/core').LocalDateTime;
 const redisUtil = require('../util/redis/redis-utils');
 const schedulerCronPenRequestDraft = config.get('scheduler:schedulerCronProfileRequestDraft');
 const numDaysAllowedInDraftStatus = config.get('scheduler:numDaysAllowedInDraftStatus');
-const expectedDraftRequests = config.get('scheduler:expectedDraftRequest');
+const expectedDraftRequests = config.get('scheduler:expectedDraftRequests');
 const numDaysAllowedInReturnedStatusBeforeEmail = config.get('scheduler:numDaysAllowedInReturnStatusBeforeEmail');
 const numDaysAllowedInReturnedStatusBeforeAbandoned = config.get('scheduler:numDaysAllowedInReturnStatusBeforeAbandoned');
 
@@ -72,7 +72,7 @@ const draftToAbandonRequestJob = new CronJob(schedulerCronPenRequestDraft, async
       findAndUpdateReturnedRequestsToAbandoned('penRequest', data.accessToken),
       findAndUpdateReturnedRequestsToAbandoned('studentRequest', data.accessToken),
       findAndSendEmailForStaleReturnedRequests('penRequest', data.accessToken),
-      findAndSendEmailForStaleReturnedRequests('studentRequest', data.accessToken),
+      findAndSendEmailForStaleReturnedRequests('studentRequest', data.accessToken)
     ]);
   } catch (e) {
     log.info(`locks:student-profile-request:draft-abandoned, check other pods. ${e}`);
@@ -118,11 +118,11 @@ async function findAndSendEmailForStaleReturnedRequests(requestType, token) {
     if (result['content'] && result['content'].length > 0) {
       for (const element of result['content']) {
         const emailRequest = {
-          emailAddress: element.emailAddress
+          emailAddress: element.email
         };
         try {
           const getDataResult = await getData(token, `${config.get('digitalID:apiEndpoint')}/${element.digitalID}`);
-          emailRequest.identityType = getDataResult.identityType;
+          emailRequest.identityType = getDataResult.identityTypeCode;
         } catch (e) {
           log.error('error getting data from Digital ID API', e); // just log the message and continue.
           continue;
