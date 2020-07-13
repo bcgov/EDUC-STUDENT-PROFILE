@@ -50,9 +50,14 @@
           <v-col class="pt-1 pt-sm-3" xs="10" sm="8" md="6" lg="5" xl="3">
             <v-card class="student-request-card">
               <v-card-text>
-                <p v-if="hasInflightStudentRequest"><strong>You already have your PEN and don't need to request it again. Your PEN is {{student.pen}}</strong></p>
-                <p v-else><strong>Hi {{student.legalFirstName || ''}}, you already have your PEN and don't need to request it again. Your PEN is {{student.pen}}</strong></p>
+                <p v-if="hasInflightStudentRequest" class="ma-0"><strong>You have been provided your PEN and don't need to request it again. Your PEN is {{student.pen}}</strong></p>
+                <p v-else class="ma-0"><strong>Hi {{student.legalFirstName || ''}}, you have been provided your PEN and don't need to request it again. Your PEN is {{student.pen}}</strong></p>
               </v-card-text>
+              <v-card-actions>
+                <v-row align="center" justify="center">
+                  <v-btn id="home-button" @click="$router.push('home')" class="mb-2" dark color="#003366">GetMyPEN</v-btn>
+                </v-row>
+              </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
