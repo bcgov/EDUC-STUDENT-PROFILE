@@ -55,7 +55,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-row align="center" justify="center">
-                  <v-btn id="home-button" @click="$router.push('home')" class="mb-2" dark color="#003366">GetMyPEN</v-btn>
+                  <v-btn id="home-button" @click="$router.push('home')" class="mb-2" dark color="#003366">Home <v-icon>fa-home</v-icon></v-btn>
                 </v-row>
               </v-card-actions>
             </v-card>
