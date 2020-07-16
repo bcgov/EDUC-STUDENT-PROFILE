@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ApiRoutes } from '@/utils/constants';
+import {ApiRoutes} from '@/utils/constants';
 import AuthService from '@/common/authService';
 
 // Buffer concurrent requests while refresh token is being acquired
@@ -80,8 +80,7 @@ export default {
 
   async postRequest(userInfo, requestType){
     try{
-      const response = await apiAxios.post(ApiRoutes[requestType].REQUEST, userInfo);
-      return response;
+      return await apiAxios.post(ApiRoutes[requestType].REQUEST, userInfo);
     } catch(e) {
       console.log(`Failed to post to Nodejs API - ${e}`);
       throw e;
@@ -90,8 +89,7 @@ export default {
 
   async updateRequestStatus(requestId, status, requestType){
     try{
-      const response = await apiAxios.patch(`${ApiRoutes[requestType].REQUEST}/${requestId}`, { [`${requestType}StatusCode`]: status});
-      return response;
+      return await apiAxios.patch(`${ApiRoutes[requestType].REQUEST}/${requestId}`, {[`${requestType}StatusCode`]: status});
     } catch(e) {
       console.log(`Failed to post to Nodejs API - ${e}`);
       throw e;
@@ -100,8 +98,7 @@ export default {
 
   async getCodes(requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes[requestType].CODES);
-      return response;
+      return await apiAxios.get(ApiRoutes[requestType].CODES);
     } catch(e) {
       console.log(`Failed to get from Nodejs API - ${e}`);
       throw e;
@@ -110,8 +107,7 @@ export default {
 
   async getDocumentTypeCodes(requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes[requestType].DOCUMENT_TYPE_CODES);
-      return response;
+      return await apiAxios.get(ApiRoutes[requestType].DOCUMENT_TYPE_CODES);
     } catch(e) {
       console.log(`Failed to get from Nodejs getDocumentTypeCodes API - ${e}`);
       throw e;
@@ -120,8 +116,7 @@ export default {
 
   async getFileRequirements(requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes[requestType].FILE_REQUIREMENTS);
-      return response;
+      return await apiAxios.get(ApiRoutes[requestType].FILE_REQUIREMENTS);
     } catch(e) {
       console.log(`Failed to get from Nodejs getFileRequirements API - ${e}`);
       throw e;
@@ -130,8 +125,7 @@ export default {
 
   async uploadFile(requestId, fileData, requestType){
     try{
-      const response = await apiAxios.post(`${ApiRoutes[requestType].REQUEST}/${requestId}/documents`, fileData);
-      return response;
+      return await apiAxios.post(`${ApiRoutes[requestType].REQUEST}/${requestId}/documents`, fileData);
     } catch(e) {
       console.log(`Failed to post to Nodejs uploadFile API - ${e}`);
       throw e;
@@ -140,8 +134,7 @@ export default {
 
   async getRequest(requestId, requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}`);
-      return response;
+      return await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}`);
     } catch(e) {
       console.log(`Failed to get from Nodejs getRequest API - ${e}`);
       throw e;
@@ -150,8 +143,7 @@ export default {
 
   async getDocumentList(requestId, requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents');
-      return response;
+      return await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents');
     } catch(e) {
       console.log(`Failed to get from Nodejs getDocumentList API - ${e}`);
       throw e;
@@ -160,8 +152,7 @@ export default {
 
   async getDocument(requestId, documentId, requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
-      return response;
+      return await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
     } catch(e) {
       console.log(`Failed to get from Nodejs getDocument API - ${e}`);
       throw e;
@@ -170,8 +161,7 @@ export default {
 
   async deleteDocument(requestId, documentId, requestType) {
     try{
-      const response = await apiAxios.delete(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
-      return response;
+      return await apiAxios.delete(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
     } catch(e) {
       console.log(`Failed to deleteDocument from Nodejs API - ${e}`);
       throw e;
@@ -180,19 +170,17 @@ export default {
 
   async getCommentList(requestId, requestType) {
     try{
-      const response = await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/comments');
-      return response;
+      return await apiAxios.get(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/comments');
     } catch(e) {
       console.log(`Failed to get from Nodejs getCommentList API - ${e}`);
       throw e;
     }
   },
 
-  async postComment(requestId, message, requestType){
-    try{
-      const response = await apiAxios.post(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/comments', message);
-      return response;
-    } catch(e) {
+  async postComment(requestId, message, requestType) {
+    try {
+      return await apiAxios.post(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/comments', message);
+    } catch (e) {
       console.log(`Failed to post to Nodejs postComment API - ${e}`);
       throw e;
     }
@@ -200,8 +188,7 @@ export default {
 
   async getUserInfo() {
     try{
-      const response = await apiAxios.get(ApiRoutes.USER);
-      return response;
+      return await apiAxios.get(ApiRoutes.USER);
     } catch(e) {
       console.log(`Failed to get from Nodejs getUserInfo API - ${e}`);
       throw e;
@@ -210,8 +197,7 @@ export default {
 
   async resendVerificationEmail(requestId, requestType){
     try{
-      const response = await apiAxios.post(ApiRoutes[requestType].REQUEST+ `/${requestId}` + '/verification-email');
-      return response;
+      return await apiAxios.post(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/verification-email');
     } catch(e) {
       console.log(`Failed to post to Nodejs resendVerificationEmail API - ${e}`);
       throw e;

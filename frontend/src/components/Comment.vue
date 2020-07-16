@@ -207,24 +207,41 @@ export default {
       if(!this.replyEmpty) {
         this.alert = false;
         this.submitting = true;
-        if(!this.partialSubmitted) {
+        if(this.requestType ==='penRequest'){
           const messageToSend = {
             content: this.reply,
             myself: true,
             participantId: 1
           };
-          this.postComment({ requestID: this.requestID, comment: messageToSend }).then(() => {
-            return this.updateRequestStatus();
+          ApiService.postComment(this.requestID, messageToSend, this.requestType).then(() => {
+            this.setSuccessAlert();
+            this.showConfirm=false;
           }).catch(() => {
             this.setErrorAlert();
           }).finally(() => {
             this.submitting = false;
           });
-        } else {
-          this.updateRequestStatus().finally(() => {
-            this.submitting = false;
-          });
+        }else {
+          if(!this.partialSubmitted) {
+            const messageToSend = {
+              content: this.reply,
+              myself: true,
+              participantId: 1
+            };
+            this.postComment({ requestID: this.requestID, comment: messageToSend }).then(() => {
+              return this.updateRequestStatus();
+            }).catch(() => {
+              this.setErrorAlert();
+            }).finally(() => {
+              this.submitting = false;
+            });
+          } else {
+            this.updateRequestStatus().finally(() => {
+              this.submitting = false;
+            });
+          }
         }
+
       }
     },
     dismissAlert() {

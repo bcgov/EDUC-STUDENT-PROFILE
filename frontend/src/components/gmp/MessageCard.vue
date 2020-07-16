@@ -1,5 +1,8 @@
 <template>
-  <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-if="status === requestStatuses.INITREV || status === requestStatuses.SUBSREV">
+  <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-if="isSagaInProgress">
+    <p class="mb-2" ><strong>Thank you. Your request has been accepted.</strong></p>
+  </v-alert>
+  <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-success" v-else-if="status === requestStatuses.INITREV || status === requestStatuses.SUBSREV">
     <p class="mb-2" v-if="status === requestStatuses.INITREV"><strong>Your email has been verified and your PEN request has now been submitted for processing.</strong></p>
     <p class="mb-2" v-else><strong>Your PEN request has now been re-submitted for processing.</strong></p>
     <ul>
@@ -118,6 +121,9 @@ export default {
     ...mapGetters(['student']),
     ...mapGetters('config',['numDaysAllowedInDraftStatus']),
 
+    isSagaInProgress() {
+      return this.request.sagaInProgress;
+    },
     status() {
       return this.request.penRequestStatusCode;
     },

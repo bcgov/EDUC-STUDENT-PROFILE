@@ -7,6 +7,7 @@ const log = require('./logger');
 const lodash = require('lodash');
 const HttpStatus = require('http-status-codes');
 const jsonwebtoken = require('jsonwebtoken');
+const redisUtil = require('../util/redis/redis-utils');
 const localDateTime = require('@js-joda/core').LocalDateTime;
 const { ServiceError, ConflictStateError } = require('./error');
 const { setPenRequestReplicateStatus } = require('./penRequest');
@@ -60,13 +61,16 @@ async function getStudent(token, studentID, sexCodes) {
 
 async function getLatestRequest(token, digitalID, requestType, setReplicateStatus) {
   let request = null;
+  let sagaInProgress = false;
   const url = config.get(`${requestType}:apiEndpoint`);
   try {
     let data = await getData(token, `${url}/?digitalID=${digitalID}`);
     request = lodash.maxBy(data, 'statusUpdateDate') || null;
     if(request) {
+      sagaInProgress = await redisUtil.isSagaInProgressForDigitalID(request.digitalID);
       request.digitalID = null;
       request = setReplicateStatus(request);
+      request.sagaInProgress = sagaInProgress;
     }
   } catch(e) {
     if(!e.status || e.status !== HttpStatus.NOT_FOUND) {

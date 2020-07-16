@@ -2,10 +2,10 @@
 
 const passport = require('passport');
 const express = require('express');
-const { getCodes, submitRequest, getComments, postComment, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, deleteDocument, downloadFile, uploadFile } = require('../components/request');
+const { getCodes, submitRequest, getComments, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, deleteDocument, downloadFile, uploadFile } = require('../components/request');
 const { forwardGetReq } = require('../components/utils');
 const config = require('../config/index');
-const { verifyPenRequestStatus, createPenRequestCommentReq } = require('../components/penRequest');
+const { verifyPenRequestStatus, postComment } = require('../components/penRequest');
 
 const router = express.Router();
 
@@ -53,7 +53,7 @@ router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt'
 
 router.get('/requests/:id/comments', passport.authenticate('jwt', { session: false }), [verifyPenRequest, getComments(requestType)]);
 
-router.post('/requests/:id/comments', passport.authenticate('jwt', { session: false }), [verifyPenRequest, postComment(requestType, createPenRequestCommentReq)]);
+router.post('/requests/:id/comments', passport.authenticate('jwt', { session: false }), [verifyPenRequest, postComment]);
 
 router.post('/requests/:id/verification-email', passport.authenticate('jwt', { session: false }), [verifyPenRequest, resendVerificationEmail(requestType)]);
 
