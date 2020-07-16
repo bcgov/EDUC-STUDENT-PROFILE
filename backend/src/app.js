@@ -28,7 +28,9 @@ const penRequestRouter = require('./routes/penRequest');
 const configRouter = require('./routes/config');
 const promMid = require('express-prometheus-middleware');
 const actuator = require('express-actuator');
-
+const messageSubscriber = require('./messaging/message-subscriber');
+messageSubscriber.init();
+messageSubscriber.callbacks();
 //initialize app
 const app = express();
 app.set('trust proxy', 1);

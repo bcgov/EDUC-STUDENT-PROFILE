@@ -78,6 +78,11 @@ nconf.defaults({
     expectedDraftRequests: process.env.EXPECTED_DRAFT_REQUESTS,
     numDaysAllowedInReturnStatusBeforeEmail:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL,
     numDaysAllowedInReturnStatusBeforeAbandoned:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED
+  },
+  profileSagaAPIURL: process.env.PROFILE_REQUEST_SAGA_API_URL,
+  messaging:{
+    natsUrl:process.env.NATS_URL,
+    natsCluster:process.env.NATS_CLUSTER
   }
 });
 module.exports = nconf;

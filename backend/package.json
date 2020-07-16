@@ -52,6 +52,7 @@
     "moment-timezone": "0.5.28",
     "morgan": "^1.9.1",
     "nconf": "^0.10.0",
+    "node-nats-streaming": "^0.3.2",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-openidconnect-kc-idp": "^0.0.7",
@@ -59,6 +60,7 @@
     "querystring": "0.2.0",
     "redlock": "^4.1.0",
     "strip-ansi": "^6.0.0",
+    "uuidv4": "^6.1.1",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.5.0"
   },
