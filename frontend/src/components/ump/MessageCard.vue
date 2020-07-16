@@ -91,7 +91,7 @@
     <p class="mb-2">You can log back into UpdateMyPENInfo at any time to see your PEN and current student information.</p>
   </v-alert>
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.ABANDONED">
-    <p class="mb-2"><strong>The email associated with your Update PEN Info Request was not verified within {{numDaysAllowedInDraftStatus}} days and your request was therefore cancelled.  Please fill out the form again and verify your email to submit a new request.</strong></p>
+    <p class="mb-2"><strong>Your Update PEN Info Request was not actioned within {{numDaysAllowedInDraftStatus}} days and was therefore cancelled. Please fill out the form again and verify your email to submit a new request.</strong></p>
   </v-alert>
 </template>
 
