@@ -19,7 +19,7 @@ const scheduler = require('./schedulers/student-profile-scheduler');
 const JWTStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const OidcStrategy = require('passport-openidconnect-kc-idp').Strategy;
-
+const noCache = require('nocache');
 const apiRouter = express.Router();
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
@@ -37,7 +37,7 @@ app.set('trust proxy', 1);
 //sets security measures (headers, etc)
 app.use(cors());
 app.use(helmet());
-app.use(helmet.noCache());
+app.use(noCache());
 const options = {
   basePath: '/api', // It will set /management/info instead of /info
   infoGitMode: 'simple', // the amount of git information you want to expose, 'simple' or 'full'
