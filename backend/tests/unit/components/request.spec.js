@@ -10,6 +10,11 @@ const {  __RewireAPI__: rewireRequest} =  require('../../../src/components/reque
 const { ServiceError, ApiError, ConflictStateError } = require('../../../src/components/error');
 const { mockRequest, mockResponse } = require('../helpers'); 
 const { setStudentRequestReplicateStatus, verifyStudentRequestStatus } = require('../../../src/components/studentRequest');
+const redis = require('redis-mock');
+jest.mock('../../../src/util/redis/redis-client');
+const redisClient = require('../../../src/util/redis/redis-client');
+jest.mock('../../../src/util/redis/redis-utils');
+const redisUtil = require('../../../src/util/redis/redis-utils');
 
 describe('verifyRequest', () => {
   const requestID = 'RequestID';
@@ -30,10 +35,14 @@ describe('verifyRequest', () => {
   let res;
   let next;
 
-  jest.spyOn(utils, 'getSessionUser'); 
+  jest.spyOn(utils, 'getSessionUser');
+  jest.spyOn(redisClient, 'getRedisClient');
+  jest.spyOn(redisUtil, 'isSagaInProgressForDigitalID');
 
   beforeEach(() => {
     utils.getSessionUser.mockReturnValue(userInfo);
+    redisClient.getRedisClient.mockReturnValue(redis);
+    redisUtil.isSagaInProgressForDigitalID.mockReturnValue(false);
     req = mockRequest(null, session, params);
     res = mockResponse();
     next = jest.fn();
