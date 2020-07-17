@@ -36,25 +36,32 @@
         </v-row>
       </template>
     </RequestCard>
-    <v-card-actions class="justify-end pr-2">
-      <v-btn
-        color="#003366"
-        class="white--text align-self-center"
-        id="previous-step"
-        @click="previousStep"
-      >
-        Back
-      </v-btn>
-      <v-btn
-        color="#003366"
-        class="white--text align-self-center"
-        id="next-step"
-        @click="submitRequest"
-        :loading="submitting"
-      >
-        {{ emailChanged ? 'Next' : 'Submit' }}
-      </v-btn>
-    </v-card-actions>
+    <v-row justify="space-between">
+      <v-col cols="1" sm="2" class="d-flex justify-left align-self-center py-0 px-0 pl-7">
+          <router-link to="home">Cancel</router-link>
+      </v-col>
+      <v-col cols="11" sm="2" class="d-flex justify-end align-self-center py-0 px-0 pr-6">
+        <v-card-actions class="justify-end pr-2">
+          <v-btn
+            color="#003366"
+            class="white--text align-self-center"
+            id="previous-step"
+            @click="previousStep"
+          >
+            Back
+          </v-btn>
+          <v-btn
+            color="#003366"
+            class="white--text align-self-center"
+            id="next-step"
+            @click="submitRequest"
+            :loading="submitting"
+          >
+            {{ emailChanged ? 'Next' : 'Submit' }}
+          </v-btn>
+        </v-card-actions>
+      </v-col>
+    </v-row>
   </div>
 </template>
 

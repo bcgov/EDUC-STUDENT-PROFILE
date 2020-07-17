@@ -20,7 +20,10 @@
           </v-chip>
         </template>
         <v-list dark color="#003366">
-          <v-list-item style="min-height: 1vh" id="logout_button" :href='authRoutes.LOGOUT'>
+          <v-list-item style="min-height: 4vh" id="home_button" :href='authRoutes.LOGIN'>
+            <v-list-item-title>Home</v-list-item-title>
+          </v-list-item>
+          <v-list-item style="min-height: 4vh" id="logout_button" :href='authRoutes.LOGOUT'>
             <v-list-item-title>Logout</v-list-item-title>
           </v-list-item>
         </v-list>
