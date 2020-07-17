@@ -37,7 +37,7 @@
     <v-row>
       <slot name="request" v-if="status !== requestStatuses.ABANDONED"></slot>
     </v-row>
-    <v-row justify="end">
+    <v-row justify="end" class="py-1">
       <v-col cols="12" sm="2" class="d-flex justify-end align-self-center py-0 px-0 pr-4 pt-3">
         <v-btn
           color="#003366"
