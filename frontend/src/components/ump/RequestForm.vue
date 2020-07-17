@@ -275,7 +275,7 @@
             </v-card>
           </v-col>
         </v-row>
-        <v-row justify="space-between">
+        <v-row justify="space-between" class="pt-2">
           <v-col cols="1" sm="2" class="d-flex justify-left align-self-center py-0 px-0 pl-4">
              <router-link to="home">Cancel</router-link>
           </v-col>
