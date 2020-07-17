@@ -37,6 +37,18 @@
     <v-row>
       <slot name="request" v-if="status !== requestStatuses.ABANDONED"></slot>
     </v-row>
+    <v-row justify="end">
+      <v-col cols="12" sm="2" class="d-flex justify-end align-self-center py-0 px-0 pr-4 pt-3">
+        <v-btn
+          color="#003366"
+          class="white--text align-self-center"
+          id="Home"
+          to="home"
+        >
+          Home
+        </v-btn>
+      </v-col> 
+    </v-row>
   </v-card>
 </template>
 

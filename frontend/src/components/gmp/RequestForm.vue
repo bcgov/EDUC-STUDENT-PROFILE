@@ -341,8 +341,11 @@
             </v-card>
           </v-col>
         </v-row>
-        <v-row class="justify-end">
-          <v-col cols="12" sm="2" class="align-self-center py-0 px-0">
+        <v-row justify="space-between">
+          <v-col cols="1" sm="2" class="d-flex justify-left align-self-center py-0 px-0 pl-4">
+              <router-link to="home">Cancel</router-link>
+          </v-col>
+          <v-col cols="11" sm="2" class="d-flex justify-end align-self-center py-0 px-0 pr-3">
             <v-card-actions class="justify-end">
               <v-btn
                 color="#003366"
