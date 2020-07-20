@@ -28,7 +28,7 @@ app.set('port', port);
 // };
 
 const server = http.createServer(app);
-
+const STAN = require('./messaging/message-subscriber');
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -93,6 +93,19 @@ function onListening() {
   log.info('Listening on ' + bind);
 }
 
+process.on('SIGINT',() => {
+  STAN.close();
+  server.close(() => {
+    log.info('process terminated');
+  });
+});
+
+process.on('SIGTERM', () => {
+  STAN.close();
+  server.close(() => {
+    log.info('process terminated');
+  });
+});
 //exports are purely for testing
 module.exports = {
   normalizePort,
