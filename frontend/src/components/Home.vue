@@ -39,7 +39,7 @@
             <li>
               If you are currently attending a K-12 school, please request your PEN by contacting the main office at your school
               <ul>
-                <li><a href="http://www.bced.gov.bc.ca/apps/imcl/imclWeb/Home.do" target="_blank">Find your school's contact information</a></li>
+                <li><a href="http://www.bced.gov.bc.ca/apps/imcl/imclWeb/Home.do" rel="noopener noreferrer" target="_blank">Find your school's contact information</a></li>
               </ul>
             </li>
           </ul>
@@ -59,7 +59,7 @@
             <li>
               If you are currently attending a K-12 school, please request these changes by contacting the main office at your school
               <ul>
-                <li><a href="http://www.bced.gov.bc.ca/apps/imcl/imclWeb/Home.do" target="_blank">Find your school's contact information</a></li>
+                <li><a href="http://www.bced.gov.bc.ca/apps/imcl/imclWeb/Home.do" rel="noopener noreferrer" target="_blank">Find your school's contact information</a></li>
               </ul>
             </li>
             <li>
