@@ -45,6 +45,12 @@ const STAN = {
     connection.on('reconnect', () => {
       log.info('STAN reconnect');
     });
+  },
+  close(){
+    if(connection){
+      connection.close();
+      log.info('STAN Closed');
+    }
   }
 
 };
