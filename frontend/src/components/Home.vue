@@ -34,7 +34,7 @@
           </p>
           <ul style="text-align:left; list-style-position: outside;" :class="{'px-16': $vuetify.breakpoint.lgOnly }">
             <li>
-              Former students can send a request via an online form to find and return your PEN
+              Former students can send a request via an online form to receive your PEN
             </li>
             <li>
               If you are currently attending a K-12 school, please request your PEN by contacting the main office at your school
@@ -54,7 +54,7 @@
           </p>
           <ul style="text-align:left; list-style-position: outside;" :class="{'px-16': $vuetify.breakpoint.lgAndUp }">
             <li>
-              Former students can update their personal information associated with their PEN so that transcripts show current name
+              Former students can update their personal information associated with their PEN so that transcripts show current legal name
             </li>
             <li>
               If you are currently attending a K-12 school, please request these changes by contacting the main office at your school
