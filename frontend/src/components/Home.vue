@@ -23,7 +23,7 @@
     </article>
   </v-container>
 
-  <v-container fluid v-else :class="{'min-height-xs': $vuetify.breakpoint.smAndDown, 'min-height-md': $vuetify.breakpoint.mdOnly  }">
+  <v-container fluid v-else :class="{'min-height-xs': $vuetify.breakpoint.smAndDown, 'min-height-md': $vuetify.breakpoint.mdAndUp, 'min-height-lg': $vuetify.breakpoint.lgAndUp  }">
     <v-row justify=center>
       <v-col cols="12" lg="6" class="px-8">
         <v-card :class="{'px-16': $vuetify.breakpoint.lgAndUp }" class="px-4 py-4" style="height: 100%;">
@@ -101,10 +101,13 @@ export default {
     height: 100%;
   }
   .min-height-xs{
-    min-height: 48em;
+    min-height: 52em;
   }
   .min-height-md{
-    min-height: 24em;
+    min-height: 45em;
+  }
+  .min-height-lg{
+    min-height: 35em;
   }
 </style>
 
