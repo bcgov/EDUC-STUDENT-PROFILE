@@ -45,6 +45,26 @@
     </article>
   </v-container>
 
+  <v-container fluid class="full-height" v-else-if="isAuthenticated && hasInflightGMPRequest">
+    <article id="request-display-container" class="top-banner full-height">
+        <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
+          <v-col class="pt-1 pt-sm-3" xs="10" sm="8" md="6" lg="5" xl="3">
+            <v-card class="student-request-card">
+              <v-card-text>
+                <p class="ma-0"><strong>You have a PEN request in progress. Please wait for it to be completed before requesting updates to you PEN information.</strong></p>
+              </v-card-text>
+              <v-card-actions>
+                <v-row align="center" justify="center">
+                  <v-btn id="home-button" @click="$router.push('home')" class="mb-2" dark color="#003366">Home</v-btn>
+                </v-row>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+    </article>
+  </v-container>
+
+
   <v-container fluid class="full-height" v-else-if="isAuthenticated && !hasRequest">
     <!-- request form -->
     <article id="request-form-container" class="top-banner full-height">
@@ -73,8 +93,9 @@ import RequestDisplay from '../RequestDisplay';
 import ModalJourney from '../ModalJourney';
 import MessageCard from './MessageCard';
 import RequestCard from './RequestCard';
-import { StudentRequestStatuses } from '@/utils/constants';
+import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
 import { mapGetters, mapMutations } from 'vuex';
+import { pick, values } from 'lodash';
 export default {
   name: 'home',
   components: {
@@ -87,6 +108,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'userInfo', 'isLoading']),
+    ...mapGetters('penRequest', {penRequest: 'request'}),
     ...mapGetters('studentRequest', ['request']),
     ...mapGetters(['student']),
     hasStudentRecord() {
@@ -97,6 +119,9 @@ export default {
     },
     requestTitle() {
       return this.request && this.request.studentRequestStatusCode === StudentRequestStatuses.RETURNED ? 'Provide More Info for UpdateMyPENInfo Request' : 'UpdateMyPENInfo Request Status';
+    },
+    hasInflightGMPRequest() {
+      return this.penRequest && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === this.penRequest.penRequestStatusCode);
     },
     newRequestText() {
       return 'Create a new Request';
@@ -135,6 +160,9 @@ export default {
   }
   .bottomContainer{
     padding-bottom: 30px
+  }
+  .student-request-card{
+    background: #F2E8D5;
   }
 </style>
 
