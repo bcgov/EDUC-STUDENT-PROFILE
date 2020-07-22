@@ -50,7 +50,7 @@
           <v-col class="pt-1 pt-sm-3" xs="10" sm="8" md="6" lg="5" xl="3">
             <v-card class="student-request-card">
               <v-card-text>
-                <p v-if="hasInflightStudentRequest" class="ma-0"><strong>You have an UpdateMyPEN request in progress using PEN number {{studentRequest.recordedPen}}.</strong></p>
+                <p v-if="hasInflightStudentRequest" class="ma-0"><strong>You have an UpdateMyPEN request in progress.</strong></p>
                 <p v-else class="ma-0"><strong>Hi {{student.legalFirstName || ''}}, you have been provided your PEN and don't need to request it again. Your PEN is {{student.pen}}.</strong></p>
               </v-card-text>
               <v-card-actions>
