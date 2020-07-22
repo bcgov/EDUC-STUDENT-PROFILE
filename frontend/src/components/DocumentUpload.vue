@@ -37,6 +37,7 @@
         dismissible
         v-model="alert"
         :class="alertType"
+        class="mb-3"
       >
          {{ alertMessage }}
       </v-alert>
@@ -148,6 +149,7 @@ export default {
         this.fileInputError = 'Required';
       } else {
         this.fileInputError = [];
+        this.alert = false;
       }
     },
     validate() {
@@ -156,12 +158,17 @@ export default {
     submitRequest() {
       if(this.dataReady){
         try {
-          this.active = true;
-          const reader = new FileReader(); 
-          reader.onload = this.uploadFile;
-          reader.onabort = this.handleFileReadErr;
-          reader.onerror = this.handleFileReadErr;
-          reader.readAsBinaryString(this.file);
+          if(this.file.name && this.file.name.match('^[\\u0080-\\uFFFF\\w,\\s-_]+\\.[A-Za-z]{3}$')){
+            this.active = true;
+            const reader = new FileReader(); 
+            reader.onload = this.uploadFile;
+            reader.onabort = this.handleFileReadErr;
+            reader.onerror = this.handleFileReadErr;
+            reader.readAsBinaryString(this.file);
+          }else{
+            this.active = false;
+            this.setErrorAlert('Please remove spaces and special characters from file name and try uploading again.');
+          }
         } catch (e) {
           this.handleFileReadErr();
           throw e;
@@ -170,7 +177,7 @@ export default {
     },
     handleFileReadErr() {
       this.active = false;
-      this.setErrorAlert('Sorry, an unexpected error seems to have occured. You can upload files later.');
+      this.setErrorAlert('Sorry, an unexpected error seems to have occured. Try uploading your files later.');
     },
     uploadFile(env) {
       let document = {
