@@ -23,6 +23,7 @@
       <v-row>
         <v-col cols="12" class="declaration py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
           <v-checkbox
+            id="declarationCheckbox"
             v-model="declared"
             color="green"
             class="mt-0"
@@ -56,6 +57,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
+                id="editLegalFirstNameCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editLegalFirstName"
                 label="Edit"
@@ -81,6 +83,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
+                id="editLegalMiddleNamesCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editLegalMiddleNames"
                 label="Edit"
@@ -106,6 +109,7 @@
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
+                id="editLegalLastNameCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editLegalLastName"
                 label="Edit"
@@ -131,6 +135,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
+                id="editBirthdateCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editBirthdate"
                 label="Edit"
@@ -178,6 +183,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
+                id="editGenderLabelCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editGenderLabel"
                 label="Edit"
@@ -210,6 +216,7 @@
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
+                id="editEmail"
                 class="pt-0 pr-2 mt-0"
                 v-model="editEmail"
                 label="Edit"
