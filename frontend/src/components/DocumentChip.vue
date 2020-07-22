@@ -70,7 +70,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
           <v-btn color="#003366" @click.stop="deleteDocument()" class="white--text" id="delete-document" :loading="deleting" v-if="!undeletable">Delete</v-btn>
-          <v-btn color="#003366" @click="menu = false" class="white--text">Cancel</v-btn>
+          <v-btn id="documentUploadCancel" color="#003366" @click="menu = false" class="white--text">Cancel</v-btn>
         </v-card-actions>
     </v-card>
   </v-menu>
