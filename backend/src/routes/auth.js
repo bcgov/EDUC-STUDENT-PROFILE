@@ -16,7 +16,11 @@ router.get('/', (_req, res) => {
   res.status(200).json({
     endpoints: [
       '/callback_bcsc',
+      '/callback_bcsc_gmp',
+      '/callback_bcsc_ump',
       '/callback_bceid',
+      '/callback_bceid_gmp',
+      '/callback_bceid_ump',
       '/login',
       '/logout',
       '/refresh',
@@ -25,7 +29,7 @@ router.get('/', (_req, res) => {
   });
 });
 
-//provides a callback location for the auth service
+//provides callback locations for the auth service
 router.get('/callback_bcsc',
   passport.authenticate('oidcBcsc', {
     failureRedirect: 'error'
@@ -35,12 +39,49 @@ router.get('/callback_bcsc',
   }
 );
 
+router.get('/callback_bcsc_gmp',
+  passport.authenticate('oidcBcscGMP', {
+    failureRedirect: 'error'
+  }),
+  (_req, res) => {
+    res.redirect(config.get('server:frontend') + '/gmp');
+  }
+);
+
+router.get('/callback_bcsc_ump',
+  passport.authenticate('oidcBcscUMP', {
+    failureRedirect: 'error'
+  }),
+  (_req, res) => {
+    res.redirect(config.get('server:frontend') + '/ump');
+  }
+);
+
+
 router.get('/callback_bceid',
   passport.authenticate('oidcBceid', {
     failureRedirect: 'error'
   }),
   (_req, res) => {
     res.redirect(config.get('server:frontend'));
+  }
+);
+
+router.get('/callback_bceid_gmp',
+  passport.authenticate('oidcBceidGMP', {
+    failureRedirect: 'error'
+  }),
+  (_req, res) => {
+    res.redirect(config.get('server:frontend') + '/gmp');
+  }
+);
+
+router.get('/callback_bceid_ump',
+  passport.authenticate('oidcBceidUMP', {
+    failureRedirect: 'error'
+  }),
+  (_req, res) => {
+    res.redirect(config.get('server:frontend') + '/ump');
   }
 );
 
@@ -54,7 +95,23 @@ router.get('/login_bcsc', passport.authenticate('oidcBcsc', {
   failureRedirect: 'error'
 }));
 
+router.get('/login_bcsc_gmp', passport.authenticate('oidcBcscGMP', {
+  failureRedirect: 'error'
+}));
+
+router.get('/login_bcsc_ump', passport.authenticate('oidcBcscUMP', {
+  failureRedirect: 'error'
+}));
+
 router.get('/login_bceid', passport.authenticate('oidcBceid', {
+  failureRedirect: 'error'
+}));
+
+router.get('/login_bceid_gmp', passport.authenticate('oidcBceidGMP', {
+  failureRedirect: 'error'
+}));
+
+router.get('/login_bceid_ump', passport.authenticate('oidcBceidUMP', {
   failureRedirect: 'error'
 }));
 
@@ -85,8 +142,16 @@ router.get('/logout', async (req, res) => {
         res.redirect(config.get('server:frontend') + '/login-error');
       } else if (req.query && req.query.loginBcsc) {
         res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc');
+      } else if (req.query && req.query.loginBcscGMP) {
+        res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc_gmp');
+      } else if (req.query && req.query.loginBcscUMP) {
+        res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc_ump');
       } else if (req.query && req.query.loginBceid) {
         res.redirect(config.get('server:frontend') + '/api/auth/login_bceid');
+      } else if (req.query && req.query.loginBceidGMP) {
+        res.redirect(config.get('server:frontend') + '/api/auth/login_bceid_gmp');
+      } else if (req.query && req.query.loginBceidUMP) {
+        res.redirect(config.get('server:frontend') + '/api/auth/login_bceid_ump');
       } else {
         res.redirect(config.get('server:frontend') + '/logout');
       }
