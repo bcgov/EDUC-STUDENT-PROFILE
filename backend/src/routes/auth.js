@@ -16,7 +16,11 @@ router.get('/', (_req, res) => {
   res.status(200).json({
     endpoints: [
       '/callback_bcsc',
+      '/callback_bcsc_gmp',
+      '/callback_bcsc_ump',
       '/callback_bceid',
+      '/callback_bceid_gmp',
+      '/callback_bceid_ump',
       '/login',
       '/logout',
       '/refresh',
@@ -25,38 +29,41 @@ router.get('/', (_req, res) => {
   });
 });
 
-//provides a callback location for the auth service
-router.get('/callback_bcsc',
-  passport.authenticate('oidcBcsc', {
-    failureRedirect: 'error'
-  }),
-  (_req, res) => {
-    res.redirect(config.get('server:frontend'));
-  }
-);
+function addOIDCRouterGet(strategyName, callbackURI, redirectURL) {
+    router.get(callbackURI,
+      passport.authenticate(strategyName, {
+        failureRedirect: 'error'
+      }),
+      (_req, res) => {
+        res.redirect(redirectURL);
+      }
+    );
+}
 
-router.get('/callback_bceid',
-  passport.authenticate('oidcBceid', {
-    failureRedirect: 'error'
-  }),
-  (_req, res) => {
-    res.redirect(config.get('server:frontend'));
-  }
-);
+addOIDCRouterGet('oidcBcsc', '/callback_bcsc', config.get('server:frontend'));
+addOIDCRouterGet('oidcBcscGMP', '/callback_bcsc_gmp', config.get('server:frontend') + '/gmp');
+addOIDCRouterGet('oidcBcscUMP', '/callback_bcsc_ump', config.get('server:frontend') + '/ump');
+addOIDCRouterGet('oidcBceid', '/callback_bceid', config.get('server:frontend'));
+addOIDCRouterGet('oidcBceidGMP', '/callback_bceid_gmp', config.get('server:frontend') + '/gmp');
+addOIDCRouterGet('oidcBceidUMP', '/callback_bceid_ump', config.get('server:frontend') + '/ump');
 
 //a prettier way to handle errors
 router.get('/error', (_req, res) => {
   res.redirect(config.get('server:frontend') + '/login-error');
 });
 
-//redirects to the SSO login screen
-router.get('/login_bcsc', passport.authenticate('oidcBcsc', {
-  failureRedirect: 'error'
-}));
+function addBaseRouterGet(strategyName, callbackURI) {
+    router.get(callbackURI, passport.authenticate(strategyName, {
+      failureRedirect: 'error'
+    }));
+}
 
-router.get('/login_bceid', passport.authenticate('oidcBceid', {
-  failureRedirect: 'error'
-}));
+addBaseRouterGet('oidcBcsc', '/login_bcsc');
+addBaseRouterGet('oidcBcscGMP', '/login_bcsc_gmp');
+addBaseRouterGet('oidcBcscUMP', '/login_bcsc_ump');
+addBaseRouterGet('oidcBceid', '/login_bceid');
+addBaseRouterGet('oidcBceidGMP', '/login_bceid_gmp');
+addBaseRouterGet('oidcBceidUMP', '/login_bceid_ump');
 
 //removes tokens and destroys session
 router.get('/logout', async (req, res) => {
@@ -85,8 +92,16 @@ router.get('/logout', async (req, res) => {
         res.redirect(config.get('server:frontend') + '/login-error');
       } else if (req.query && req.query.loginBcsc) {
         res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc');
+      } else if (req.query && req.query.loginBcscGMP) {
+        res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc_gmp');
+      } else if (req.query && req.query.loginBcscUMP) {
+        res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc_ump');
       } else if (req.query && req.query.loginBceid) {
         res.redirect(config.get('server:frontend') + '/api/auth/login_bceid');
+      } else if (req.query && req.query.loginBceidGMP) {
+        res.redirect(config.get('server:frontend') + '/api/auth/login_bceid_gmp');
+      } else if (req.query && req.query.loginBceidUMP) {
+        res.redirect(config.get('server:frontend') + '/api/auth/login_bceid_ump');
       } else {
         res.redirect(config.get('server:frontend') + '/logout');
       }
