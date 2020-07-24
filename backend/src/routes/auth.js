@@ -30,14 +30,14 @@ router.get('/', (_req, res) => {
 });
 
 function addRouterGet(strategyName, callbackURI, redirectURL) {
-	router.get(callbackURI,
-	  passport.authenticate(strategyName, {
-	    failureRedirect: 'error'
-	  }),
-	  (_req, res) => {
-	    res.redirect(redirectURL);
-	  }
-	);
+    router.get(callbackURI,
+      passport.authenticate(strategyName, {
+        failureRedirect: 'error'
+      }),
+      (_req, res) => {
+        res.redirect(redirectURL);
+      }
+    );
 }
 
 addRouterGet('oidcBcsc', '/callback_bcsc', config.get('server:frontend'));
