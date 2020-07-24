@@ -29,61 +29,23 @@ router.get('/', (_req, res) => {
   });
 });
 
-//provides callback locations for the auth service
-router.get('/callback_bcsc',
-  passport.authenticate('oidcBcsc', {
-    failureRedirect: 'error'
-  }),
-  (_req, res) => {
-    res.redirect(config.get('server:frontend'));
-  }
-);
+function addRouterGet(strategyName, callbackURI, redirectURL) {
+	router.get(callbackURI,
+	  passport.authenticate(strategyName, {
+	    failureRedirect: 'error'
+	  }),
+	  (_req, res) => {
+	    res.redirect(redirectURL);
+	  }
+	);
+}
 
-router.get('/callback_bcsc_gmp',
-  passport.authenticate('oidcBcscGMP', {
-    failureRedirect: 'error'
-  }),
-  (_req, res) => {
-    res.redirect(config.get('server:frontend') + '/gmp');
-  }
-);
-
-router.get('/callback_bcsc_ump',
-  passport.authenticate('oidcBcscUMP', {
-    failureRedirect: 'error'
-  }),
-  (_req, res) => {
-    res.redirect(config.get('server:frontend') + '/ump');
-  }
-);
-
-
-router.get('/callback_bceid',
-  passport.authenticate('oidcBceid', {
-    failureRedirect: 'error'
-  }),
-  (_req, res) => {
-    res.redirect(config.get('server:frontend'));
-  }
-);
-
-router.get('/callback_bceid_gmp',
-  passport.authenticate('oidcBceidGMP', {
-    failureRedirect: 'error'
-  }),
-  (_req, res) => {
-    res.redirect(config.get('server:frontend') + '/gmp');
-  }
-);
-
-router.get('/callback_bceid_ump',
-  passport.authenticate('oidcBceidUMP', {
-    failureRedirect: 'error'
-  }),
-  (_req, res) => {
-    res.redirect(config.get('server:frontend') + '/ump');
-  }
-);
+addRouterGet('oidcBcsc', '/callback_bcsc', config.get('server:frontend'));
+addRouterGet('oidcBcscGMP', '/callback_bcsc_gmp', config.get('server:frontend') + '/gmp');
+addRouterGet('oidcBcscUMP', '/callback_bcsc_ump', config.get('server:frontend') + '/ump');
+addRouterGet('oidcBceid', '/callback_bceid', config.get('server:frontend'));
+addRouterGet('oidcBceidGMP', '/callback_bceid_gmp', config.get('server:frontend') + '/gmp');
+addRouterGet('oidcBceidUMP', '/callback_bceid_ump', config.get('server:frontend') + '/ump');
 
 //a prettier way to handle errors
 router.get('/error', (_req, res) => {

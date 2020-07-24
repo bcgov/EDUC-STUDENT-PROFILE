@@ -94,146 +94,40 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) {
+	passport.use(strategyName, new OidcStrategy({
+    issuer: discovery.issuer,
+    authorizationURL: discovery.authorization_endpoint,
+    tokenURL: discovery.token_endpoint,
+    userInfoURL: discovery.userinfo_endpoint,
+    clientID: config.get('oidc:clientId'),
+    clientSecret: config.get('oidc:clientSecret'),
+    callbackURL: callbackURI,
+    scope: discovery.scopes_supported,
+    kc_idp_hint: kc_idp_hint
+  }, (_issuer, _sub, profile, accessToken, refreshToken, done) => {
+    if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
+      (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
+      return done('No access token', null);
+    }
+
+    //set access and refresh tokens
+    profile.jwtFrontend = auth.generateUiToken();
+    profile.jwt = accessToken;
+    profile.refreshToken = refreshToken;
+    return done(null, profile);
+  }));
+}
+
 //initialize our authentication strategy
 utils.getOidcDiscovery().then(discovery => {
   //OIDC Strategy is used for authorization
-  passport.use('oidcBcsc', new OidcStrategy({
-    issuer: discovery.issuer,
-    authorizationURL: discovery.authorization_endpoint,
-    tokenURL: discovery.token_endpoint,
-    userInfoURL: discovery.userinfo_endpoint,
-    clientID: config.get('oidc:clientId'),
-    clientSecret: config.get('oidc:clientSecret'),
-    callbackURL: config.get('server:frontend') + '/api/auth/callback_bcsc',
-    scope: discovery.scopes_supported,
-    kc_idp_hint: 'keycloak_bcdevexchange_bcsc'
-  }, (_issuer, _sub, profile, accessToken, refreshToken, done) => {
-    if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
-      (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
-      return done('No access token', null);
-    }
-
-    //set access and refresh tokens
-    profile.jwtFrontend = auth.generateUiToken();
-    profile.jwt = accessToken;
-    profile.refreshToken = refreshToken;
-    return done(null, profile);
-  }));
-
-  passport.use('oidcBcscGMP', new OidcStrategy({
-    issuer: discovery.issuer,
-    authorizationURL: discovery.authorization_endpoint,
-    tokenURL: discovery.token_endpoint,
-    userInfoURL: discovery.userinfo_endpoint,
-    clientID: config.get('oidc:clientId'),
-    clientSecret: config.get('oidc:clientSecret'),
-    callbackURL: config.get('server:frontend') + '/api/auth/callback_bcsc_gmp',
-    scope: discovery.scopes_supported,
-    kc_idp_hint: 'keycloak_bcdevexchange_bcsc'
-  }, (_issuer, _sub, profile, accessToken, refreshToken, done) => {
-    if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
-      (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
-      return done('No access token', null);
-    }
-
-    //set access and refresh tokens
-    profile.jwtFrontend = auth.generateUiToken();
-    profile.jwt = accessToken;
-    profile.refreshToken = refreshToken;
-    return done(null, profile);
-  }));
-
-  passport.use('oidcBcscUMP', new OidcStrategy({
-    issuer: discovery.issuer,
-    authorizationURL: discovery.authorization_endpoint,
-    tokenURL: discovery.token_endpoint,
-    userInfoURL: discovery.userinfo_endpoint,
-    clientID: config.get('oidc:clientId'),
-    clientSecret: config.get('oidc:clientSecret'),
-    callbackURL: config.get('server:frontend') + '/api/auth/callback_bcsc_ump',
-    scope: discovery.scopes_supported,
-    kc_idp_hint: 'keycloak_bcdevexchange_bcsc'
-  }, (_issuer, _sub, profile, accessToken, refreshToken, done) => {
-    if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
-      (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
-      return done('No access token', null);
-    }
-
-    //set access and refresh tokens
-    profile.jwtFrontend = auth.generateUiToken();
-    profile.jwt = accessToken;
-    profile.refreshToken = refreshToken;
-    return done(null, profile);
-  }));
-
-  passport.use('oidcBceid', new OidcStrategy({
-    issuer: discovery.issuer,
-    authorizationURL: discovery.authorization_endpoint,
-    tokenURL: discovery.token_endpoint,
-    userInfoURL: discovery.userinfo_endpoint,
-    clientID: config.get('oidc:clientId'),
-    clientSecret: config.get('oidc:clientSecret'),
-    callbackURL: config.get('server:frontend') + '/api/auth/callback_bceid',
-    scope: discovery.scopes_supported,
-    kc_idp_hint: 'keycloak_bcdevexchange_bceid'
-  }, (_issuer, _sub, profile, accessToken, refreshToken, done) => {
-    if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
-      (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
-      return done('No access token', null);
-    }
-
-    //set access and refresh tokens
-    profile.jwtFrontend = auth.generateUiToken();
-    profile.jwt = accessToken;
-    profile.refreshToken = refreshToken;
-    return done(null, profile);
-  }));
-
-  passport.use('oidcBceidGMP', new OidcStrategy({
-    issuer: discovery.issuer,
-    authorizationURL: discovery.authorization_endpoint,
-    tokenURL: discovery.token_endpoint,
-    userInfoURL: discovery.userinfo_endpoint,
-    clientID: config.get('oidc:clientId'),
-    clientSecret: config.get('oidc:clientSecret'),
-    callbackURL: config.get('server:frontend') + '/api/auth/callback_bceid_gmp',
-    scope: discovery.scopes_supported,
-    kc_idp_hint: 'keycloak_bcdevexchange_bceid'
-  }, (_issuer, _sub, profile, accessToken, refreshToken, done) => {
-    if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
-      (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
-      return done('No access token', null);
-    }
-
-    //set access and refresh tokens
-    profile.jwtFrontend = auth.generateUiToken();
-    profile.jwt = accessToken;
-    profile.refreshToken = refreshToken;
-    return done(null, profile);
-  }));
-
-  passport.use('oidcBceidUMP', new OidcStrategy({
-    issuer: discovery.issuer,
-    authorizationURL: discovery.authorization_endpoint,
-    tokenURL: discovery.token_endpoint,
-    userInfoURL: discovery.userinfo_endpoint,
-    clientID: config.get('oidc:clientId'),
-    clientSecret: config.get('oidc:clientSecret'),
-    callbackURL: config.get('server:frontend') + '/api/auth/callback_bceid_ump',
-    scope: discovery.scopes_supported,
-    kc_idp_hint: 'keycloak_bcdevexchange_bceid'
-  }, (_issuer, _sub, profile, accessToken, refreshToken, done) => {
-    if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
-      (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
-      return done('No access token', null);
-    }
-
-    //set access and refresh tokens
-    profile.jwtFrontend = auth.generateUiToken();
-    profile.jwt = accessToken;
-    profile.refreshToken = refreshToken;
-    return done(null, profile);
-  }));
+  addLoginPassportUse(discovery, 'oidcBcsc', config.get('server:frontend') + '/api/auth/callback_bcsc', 'keycloak_bcdevexchange_bcsc');
+  addLoginPassportUse(discovery, 'oidcBcscGMP', config.get('server:frontend') + '/api/auth/callback_bcsc_gmp', 'keycloak_bcdevexchange_bcsc');
+  addLoginPassportUse(discovery, 'oidcBcscUMP', config.get('server:frontend') + '/api/auth/callback_bcsc_ump', 'keycloak_bcdevexchange_bcsc');
+  addLoginPassportUse(discovery, 'oidcBceid', config.get('server:frontend') + '/api/auth/callback_bceid', 'keycloak_bcdevexchange_bceid');
+  addLoginPassportUse(discovery, 'oidcBceidGMP', config.get('server:frontend') + '/api/auth/callback_bceid_gmp', 'keycloak_bcdevexchange_bceid');
+  addLoginPassportUse(discovery, 'oidcBceidUMP', config.get('server:frontend') + '/api/auth/callback_bceid_ump', 'keycloak_bcdevexchange_bceid');
 
   //JWT strategy is used for authorization
   passport.use('jwt', new JWTStrategy({
