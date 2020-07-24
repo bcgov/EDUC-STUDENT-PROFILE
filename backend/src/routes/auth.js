@@ -29,7 +29,7 @@ router.get('/', (_req, res) => {
   });
 });
 
-function addRouterGet(strategyName, callbackURI, redirectURL) {
+function addOIDCRouterGet(strategyName, callbackURI, redirectURL) {
     router.get(callbackURI,
       passport.authenticate(strategyName, {
         failureRedirect: 'error'
@@ -40,42 +40,30 @@ function addRouterGet(strategyName, callbackURI, redirectURL) {
     );
 }
 
-addRouterGet('oidcBcsc', '/callback_bcsc', config.get('server:frontend'));
-addRouterGet('oidcBcscGMP', '/callback_bcsc_gmp', config.get('server:frontend') + '/gmp');
-addRouterGet('oidcBcscUMP', '/callback_bcsc_ump', config.get('server:frontend') + '/ump');
-addRouterGet('oidcBceid', '/callback_bceid', config.get('server:frontend'));
-addRouterGet('oidcBceidGMP', '/callback_bceid_gmp', config.get('server:frontend') + '/gmp');
-addRouterGet('oidcBceidUMP', '/callback_bceid_ump', config.get('server:frontend') + '/ump');
+addOIDCRouterGet('oidcBcsc', '/callback_bcsc', config.get('server:frontend'));
+addOIDCRouterGet('oidcBcscGMP', '/callback_bcsc_gmp', config.get('server:frontend') + '/gmp');
+addOIDCRouterGet('oidcBcscUMP', '/callback_bcsc_ump', config.get('server:frontend') + '/ump');
+addOIDCRouterGet('oidcBceid', '/callback_bceid', config.get('server:frontend'));
+addOIDCRouterGet('oidcBceidGMP', '/callback_bceid_gmp', config.get('server:frontend') + '/gmp');
+addOIDCRouterGet('oidcBceidUMP', '/callback_bceid_ump', config.get('server:frontend') + '/ump');
 
 //a prettier way to handle errors
 router.get('/error', (_req, res) => {
   res.redirect(config.get('server:frontend') + '/login-error');
 });
 
-//redirects to the SSO login screen
-router.get('/login_bcsc', passport.authenticate('oidcBcsc', {
-  failureRedirect: 'error'
-}));
+function addBaseRouterGet(strategyName, callbackURI) {
+    router.get(callbackURI, passport.authenticate(strategyName, {
+      failureRedirect: 'error'
+    }));
+}
 
-router.get('/login_bcsc_gmp', passport.authenticate('oidcBcscGMP', {
-  failureRedirect: 'error'
-}));
-
-router.get('/login_bcsc_ump', passport.authenticate('oidcBcscUMP', {
-  failureRedirect: 'error'
-}));
-
-router.get('/login_bceid', passport.authenticate('oidcBceid', {
-  failureRedirect: 'error'
-}));
-
-router.get('/login_bceid_gmp', passport.authenticate('oidcBceidGMP', {
-  failureRedirect: 'error'
-}));
-
-router.get('/login_bceid_ump', passport.authenticate('oidcBceidUMP', {
-  failureRedirect: 'error'
-}));
+addBaseRouterGet('oidcBcsc', '/login_bcsc');
+addBaseRouterGet('oidcBcscGMP', '/login_bcsc_gmp');
+addBaseRouterGet('oidcBcscUMP', '/login_bcsc_ump');
+addBaseRouterGet('oidcBceid', '/login_bceid');
+addBaseRouterGet('oidcBceidGMP', '/login_bceid_gmp');
+addBaseRouterGet('oidcBceidUMP', '/login_bceid_ump');
 
 //removes tokens and destroys session
 router.get('/logout', async (req, res) => {
