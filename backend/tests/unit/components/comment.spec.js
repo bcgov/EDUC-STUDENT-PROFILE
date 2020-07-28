@@ -9,7 +9,7 @@ jest.mock('../../../src/components/auth');
 
 const changeRequest = require('../../../src/components/request');
 const { mockRequest, mockResponse } = require('../helpers'); 
-const { createStudentRequestCommentReq } = require('../../../src/components/studentRequest');
+const { createStudentRequestCommentPayload, createStudentRequestCommentEvent } = require('../../../src/components/studentRequest');
 
 describe('postComment', () => {
   const localDateTime = '2020-01-01T12:00:00';
@@ -29,8 +29,16 @@ describe('postComment', () => {
       studentRequestStatusCode: utils.RequestStatuses.RETURNED,
     }
   };
+  const sessionUser = {
+    jwt: 'token',
+    _json: {
+      displayName: 'Firstname Lastname',
+      accountType: 'BCEID',
+      digitalIdentityID: 'ac337def-794b-169f-8170-653e2f7c0011'
+    }
+  };
 
-  const postComment = changeRequest.postComment(requestType, createStudentRequestCommentReq);
+  const postComment = changeRequest.postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent);
 
   let req;
   let res;
@@ -42,6 +50,7 @@ describe('postComment', () => {
   beforeEach(() => {
     LocalDateTime.now.mockReturnValue(localDateTime);
     utils.getAccessToken.mockReturnValue('token');
+    utils.getSessionUser.mockReturnValue(sessionUser);
     utils.postData.mockResolvedValue(postRes);
     req = mockRequest(comment, session, params);
     res = mockResponse();
@@ -51,27 +60,19 @@ describe('postComment', () => {
     jest.clearAllMocks();
   });
 
-  it('should return response data', async () => {
+  it('should return saga id', async () => {
     await postComment(req, res);
 
-    const commentRes = {
-      content: postRes.commentContent,
-      participantId: '1',
-      myself: true,
-      timestamp: postRes.commentTimestamp
-    };
-
     const postReq =  {
-      studentRequestID: params.id,
-      staffMemberIDIRGUID: null,
-      staffMemberName: null,
+      studentProfileRequestID: 'requestId',
+      studentProfileRequestStatusCode: 'SUBSREV',
       commentContent: comment.content,
       commentTimestamp: localDateTime
     };
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
-    expect(res.json).toHaveBeenCalledWith(commentRes);
-    expect(spy).toHaveBeenCalledWith('token', postReq, `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`);
+    //expect(res.json).toHaveBeenCalledWith(commentRes);
+    expect(spy).toHaveBeenCalledWith('token', postReq, config.get('profileSagaAPIURL') + config.get(`${requestType}:commentSagaEndpoint`));
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
@@ -124,9 +125,9 @@ describe('getComments', () => {
     _json: {
       displayName: 'Firstname Lastname',
       accountType: 'BCEID',
+      digitalIdentityID: 'ac337def-794b-169f-8170-653e2f7c0011'
     }
   };
-
   const getComments = changeRequest.getComments('studentRequest');
 
   let req;
