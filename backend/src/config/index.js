@@ -42,10 +42,12 @@ nconf.defaults({
   studentRequest: {
     apiEndpoint: process.env.STUDENT_PROFILE_API_ENDPOINT,
     replicateTime: process.env.STUDENT_PROFILE_REPLICATE_TIME || 8,
+    commentSagaEndpoint: '/student-profile-comment-saga'
   },
   penRequest: {
     apiEndpoint: process.env.PEN_REQUEST_API_ENDPOINT,
     replicateTime: process.env.PEN_REQUEST_REPLICATE_TIME || 8,
+    commentSagaEndpoint: '/pen-request-comment-saga'
   },
   tokenGenerate: {
     privateKey: process.env.UI_PRIVATE_KEY,
