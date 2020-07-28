@@ -1,106 +1,104 @@
 <template>
   <div class="comments">
-    <!-- <div> -->
-      <div class="reply px-1">
-        <v-col class="pa-2">
-        <v-textarea
-          type="text"
-          rows=3
-          solo
-          flat
-          auto-grow
-          v-model.trim="reply" 
-          class="reply--text" 
-          :placeholder="`${(unsubmittedComment && unsubmittedComment.content) || 'Enter text here. Attach document(s). Click Done'}`"
-          maxlength="4000"
-          required
-          :disabled="partialSubmitted || submitted"
-        />
-        <v-row>
-          <v-col class="d-flex align-start flex-wrap py-0">
-            <DocumentChip
-              v-for="document in unsubmittedDocuments"
-              :document="document"
-              :disabled="partialSubmitted || submitted"
-              :key="document.documentID"
-            ></DocumentChip>
-            <v-dialog  
-              max-width="30rem" 
-              max-height="50rem"
-              v-model="dialog"
-              xl="2" lg="2" md="2" xs="2" sm="2"
-            >
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  rounded
-                  :disabled="showConfirm || partialSubmitted || submitted"
-                  class="ma-1 white--text order-first"
-                  color="#0C7CBA"
-                  v-on="on"
-                >
-                  <v-icon left>fa-paperclip</v-icon>
-                  Upload
-                </v-btn>
-              </template>
-              <DocumentUpload 
-                @close:form="() => dialog = false"
-              ></DocumentUpload>
-            </v-dialog>
-          </v-col>
-          <v-col class="d-flex flex-grow-0 justify-end py-0">
-            <v-btn 
-              rounded
-              :disabled="replyEmpty || showConfirm || submitted"
-              color="#0C7CBA"
-              class="ma-1 white--text" 
-              @click="showConfirm=true"
-            >
-              Done
-            </v-btn>
-          </v-col>
-        </v-row>
+    <div class="reply px-1">
+      <v-col class="pa-2">
+      <v-textarea
+        type="text"
+        rows=3
+        solo
+        flat
+        auto-grow
+        v-model.trim="reply"
+        class="reply--text"
+        :placeholder="`${(unsubmittedComment && unsubmittedComment.content) || 'Enter text here. Attach document(s). Click Done'}`"
+        maxlength="4000"
+        required
+        :disabled="partialSubmitted || submitted || isSagaInProgress"
+      />
+      <v-row>
+        <v-col class="d-flex align-start flex-wrap py-0">
+          <DocumentChip
+            v-for="document in unsubmittedDocuments"
+            :document="document"
+            :disabled="partialSubmitted || submitted || isSagaInProgress"
+            :key="document.documentID"
+          ></DocumentChip>
+          <v-dialog
+            max-width="30rem"
+            max-height="50rem"
+            v-model="dialog"
+            xl="2" lg="2" md="2" xs="2" sm="2"
+          >
+            <template v-slot:activator="{ on }">
+              <v-btn
+                rounded
+                :disabled="showConfirm || partialSubmitted || submitted || isSagaInProgress"
+                class="ma-1 white--text order-first"
+                color="#0C7CBA"
+                v-on="on"
+              >
+                <v-icon left>fa-paperclip</v-icon>
+                Upload
+              </v-btn>
+            </template>
+            <DocumentUpload
+              @close:form="() => dialog = false"
+            ></DocumentUpload>
+          </v-dialog>
         </v-col>
-      </div>
-      <v-alert
-        dense
-        outlined
-        dismissible
-        v-model="alert"
-        :class="alertType"
-        @input="dismissAlert"
-      >
-         {{ alertMessage }}
-      </v-alert>
-      <v-card
-        :class="`slider ${showConfirm ? 'open' : 'closed'}`"
-        color="#FFECA9"
-      >
-        <div class="pa-2 d-flex flex-wrap">
-          <span class="mx-1 mx-sm-3 align-self-center">
-            <strong>Are you sure you are done?</strong>
-          </span>
-          <div class="d-flex flex-nowrap">
-            <v-btn
-              rounded
-              color="#0C7CBA"
-              class="ma-1 white--text"
-              @click="reenter"
-            >
-              No
-            </v-btn>
-            <v-btn
-              rounded
-              color="#0C7CBA"
-              class="ma-1 white--text"
-              :loading="submitting"
-              @click="submitComment"
-            >
-              Yes, Submit
-            </v-btn>
-          </div>
+        <v-col class="d-flex flex-grow-0 justify-end py-0">
+          <v-btn
+            rounded
+            :disabled="replyEmpty || showConfirm || submitted || isSagaInProgress"
+            color="#0C7CBA"
+            class="ma-1 white--text"
+            @click="showConfirm=true"
+          >
+            Done
+          </v-btn>
+        </v-col>
+      </v-row>
+      </v-col>
+    </div>
+    <v-alert
+      dense
+      outlined
+      dismissible
+      v-model="alert"
+      :class="alertType"
+      @input="dismissAlert"
+    >
+       {{ alertMessage }}
+    </v-alert>
+    <v-card
+      :class="`slider ${showConfirm ? 'open' : 'closed'}`"
+      color="#FFECA9"
+    >
+      <div class="pa-2 d-flex flex-wrap">
+        <span class="mx-1 mx-sm-3 align-self-center">
+          <strong>Are you sure you are done?</strong>
+        </span>
+        <div class="d-flex flex-nowrap">
+          <v-btn
+            rounded
+            color="#0C7CBA"
+            class="ma-1 white--text"
+            @click="reenter"
+          >
+            No
+          </v-btn>
+          <v-btn
+            rounded
+            color="#0C7CBA"
+            class="ma-1 white--text"
+            :loading="submitting"
+            @click="submitComment"
+          >
+            Yes, Submit
+          </v-btn>
         </div>
-      </v-card>
-    <!-- </div> -->
+      </div>
+    </v-card>
   </div>
 </template>
 
@@ -165,6 +163,9 @@ export default {
     },
     hasUnsubmittedDocuments() {
       return this.unsubmittedDocuments.length > 0;
+    },
+    isSagaInProgress() {
+      return this.$store.state[`${this.requestType}`].request.sagaInProgress;
     }
   },
   methods: {
@@ -207,7 +208,7 @@ export default {
       if(!this.replyEmpty) {
         this.alert = false;
         this.submitting = true;
-        if(this.requestType ==='penRequest'){
+        if(this.requestType ==='penRequest' || (this.requestType==='studentRequest' && !this.partialSubmitted)){
           const messageToSend = {
             content: this.reply,
             myself: true,
@@ -221,25 +222,10 @@ export default {
           }).finally(() => {
             this.submitting = false;
           });
-        }else {
-          if(!this.partialSubmitted) {
-            const messageToSend = {
-              content: this.reply,
-              myself: true,
-              participantId: 1
-            };
-            this.postComment({ requestID: this.requestID, comment: messageToSend }).then(() => {
-              return this.updateRequestStatus();
-            }).catch(() => {
-              this.setErrorAlert();
-            }).finally(() => {
-              this.submitting = false;
-            });
-          } else {
-            this.updateRequestStatus().finally(() => {
-              this.submitting = false;
-            });
-          }
+        } else {
+          this.updateRequestStatus().finally(() => {
+            this.submitting = false;
+          });
         }
 
       }

@@ -324,35 +324,34 @@ function submitRequest(requestType, verifyRequestStatus) {
   };
 }
 
-function postComment(requestType, createCommentReq) {
+function postComment(requestType, createCommentPayload, createCommentEvent) {
   return async function postCommentHandler(req, res) {
     try{
+      const userInfo = getSessionUser(req);
+      if(!userInfo._json || !userInfo._json.digitalIdentityID){
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No session data'
+        });
+      }
       const accessToken = getAccessToken(req);
       if(!accessToken) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
           message: 'No access token'
         });
       }
-
       if(!req || !req.session || !req.session[requestType] || req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
         return res.status(HttpStatus.CONFLICT).json({
           message: `Post ${requestType} comment not allowed`
         });
       }
+      const url = config.get('profileSagaAPIURL') + config.get(`${requestType}:commentSagaEndpoint`);
+      const payload = createCommentPayload(req.params.id, req.body.content);
+      const sagaId = await postData(accessToken, payload, url);
+      const event = createCommentEvent(sagaId, req.params.id, userInfo._json.digitalIdentityID);
 
-      const endpoint = config.get(`${requestType}:apiEndpoint`);
-      const url = `${endpoint}/${req.params.id}/comments`;
-      const comment = createCommentReq(req.params.id, req.body.content);
-
-      const data = await postData(accessToken, comment, url);
-
-      const message = {
-        content: data.commentContent,
-        participantId: '1',
-        myself: true,
-        timestamp: data.commentTimestamp
-      };
-      return res.status(HttpStatus.OK).json(message);
+      log.info('going to store event object in redis for complete pen request :: ', event);
+      await redisUtil.createProfileRequestSagaRecordInRedis(event);
+      return res.status(HttpStatus.OK).json();
     } catch(e) {
       log.error('postComment Error', e.stack);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

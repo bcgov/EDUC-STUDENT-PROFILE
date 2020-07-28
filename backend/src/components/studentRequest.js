@@ -23,24 +23,35 @@ function verifyStudentRequestStatus(request) {
     request.studentRequestStatusCode !== StudentRequestStatuses.COMPLETED;
 }
 
-function createStudentRequestCommentReq(requestID, commentContent) {
-  return {
-    studentRequestID: requestID,
-    staffMemberIDIRGUID: null,
-    staffMemberName: null,
-    commentContent: commentContent,
-    commentTimestamp: localDateTime.now().toString()
-  };
-}
-
 const StudentRequestStatuses = Object.freeze({
   ...RequestStatuses,
   COMPLETED: 'COMPLETED'
 });
 
+function createStudentRequestCommentPayload(requestID, commentContent) {
+  return {
+    studentProfileRequestID: requestID,
+    commentContent: commentContent,
+    commentTimestamp: localDateTime.now().toString().substr(0, 19),
+    studentProfileRequestStatusCode: RequestStatuses.SUBSREV
+  };
+}
+
+function createStudentRequestCommentEvent(sagaID, requestID, digitalID) {
+  return {
+    sagaId: sagaID,
+    studentProfileRequestStatusCode: requestID,
+    digitalID: digitalID,
+    appType: 'UMP',
+    sagaStatus: 'INITIATED',
+    initiateTime: localDateTime.now().toString()
+  };
+}
+
 module.exports = {
   setStudentRequestReplicateStatus,
   verifyStudentRequestStatus,
-  createStudentRequestCommentReq,
+  createStudentRequestCommentPayload,
+  createStudentRequestCommentEvent,
   StudentRequestStatuses
 };
