@@ -1,7 +1,7 @@
 'use strict';
 const log = require('../../components/logger');
 const redisUtil = require('../../util/redis/redis-utils');
-const SagaTopics = ['PEN_REQUEST_COMMENTS_SAGA_TOPIC'];
+const SagaTopics = ['PEN_REQUEST_COMMENTS_SAGA_TOPIC','STUDENT_PROFILE_COMMENTS_SAGA_TOPIC'];
 
 function subscribeSagaMessages(stan, opts, topic, handleMessage) {
   const sagaSubscription = stan.subscribe(topic, 'student-profile-pen-req-saga-queue-group', opts);
