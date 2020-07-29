@@ -35,6 +35,32 @@ function verifyRequest(requestType) {
     next();
   };
 }
+function verifyPostCommentRequest(requestType) {
+  return function getRequestHandler(req, res, next) {
+    const userInfo = getSessionUser(req);
+    if(!userInfo._json || !userInfo._json.digitalIdentityID){
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        message: 'No session data'
+      });
+    }
+    const accessToken = getAccessToken(req);
+    if(!accessToken) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        message: 'No access token'
+      });
+    }
+    const requestID = req.params.id;
+    if(!req || !req.session || !req.session[requestType] || req.session[requestType][`${requestType}ID`] !== requestID || req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
+      return res.status(HttpStatus.CONFLICT).json({
+        message: `Post ${requestType} comment not allowed`
+      });
+    }
+    req.userInfo = userInfo;
+    req.accessToken = accessToken;
+
+    next();
+  };
+}
 
 async function getDigitalIdData(token, digitalID) {
   try {
@@ -327,29 +353,14 @@ function submitRequest(requestType, verifyRequestStatus) {
 function postComment(requestType, createCommentPayload, createCommentEvent) {
   return async function postCommentHandler(req, res) {
     try{
-      const userInfo = getSessionUser(req);
-      if(!userInfo._json || !userInfo._json.digitalIdentityID){
-        return res.status(HttpStatus.UNAUTHORIZED).json({
-          message: 'No session data'
-        });
-      }
-      const accessToken = getAccessToken(req);
-      if(!accessToken) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({
-          message: 'No access token'
-        });
-      }
-      if(!req || !req.session || !req.session[requestType] || req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
-        return res.status(HttpStatus.CONFLICT).json({
-          message: `Post ${requestType} comment not allowed`
-        });
-      }
+      const userInfo = req.userInfo;
+      const accessToken = req.accessToken;
       const url = config.get('profileSagaAPIURL') + config.get(`${requestType}:commentSagaEndpoint`);
       const payload = createCommentPayload(req.params.id, req.body.content);
       const sagaId = await postData(accessToken, payload, url);
       const event = createCommentEvent(sagaId, req.params.id, userInfo._json.digitalIdentityID);
 
-      log.info('going to store event object in redis for complete pen request :: ', event);
+      log.info(`going to store event object in redis for ${requestType} comment saga :: `, event);
       await redisUtil.createProfileRequestSagaRecordInRedis(event);
       return res.status(HttpStatus.OK).json();
     } catch(e) {
@@ -706,6 +717,7 @@ module.exports = {
   setRequestAsSubsrev,
   resendVerificationEmail,
   verifyRequest,
+  verifyPostCommentRequest,
   deleteDocument,
   downloadFile,
   uploadFile
