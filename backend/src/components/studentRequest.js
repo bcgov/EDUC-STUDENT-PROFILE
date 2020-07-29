@@ -40,7 +40,7 @@ function createStudentRequestCommentPayload(requestID, commentContent) {
 function createStudentRequestCommentEvent(sagaID, requestID, digitalID) {
   return {
     sagaId: sagaID,
-    studentProfileRequestStatusCode: requestID,
+    studentProfileRequestID: requestID,
     digitalID: digitalID,
     appType: 'UMP',
     sagaStatus: 'INITIATED',

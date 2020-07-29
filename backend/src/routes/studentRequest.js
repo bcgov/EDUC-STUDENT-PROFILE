@@ -2,7 +2,7 @@
 
 const passport = require('passport');
 const express = require('express');
-const { getCodes, postComment, submitRequest, getComments, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, deleteDocument, downloadFile, uploadFile } = require('../components/request');
+const { getCodes, postComment, submitRequest, getComments, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, verifyPostCommentRequest, deleteDocument, downloadFile, uploadFile } = require('../components/request');
 const { forwardGetReq } = require('../components/utils');
 const config = require('../config/index');
 const { verifyStudentRequestStatus, createStudentRequestCommentPayload, createStudentRequestCommentEvent } = require('../components/studentRequest');
@@ -53,7 +53,7 @@ router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt'
 
 router.get('/requests/:id/comments', passport.authenticate('jwt', { session: false }), [verifyStudentRequest, getComments(requestType)]);
 
-router.post('/requests/:id/comments', passport.authenticate('jwt', { session: false }), [verifyStudentRequest, postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent)]);
+router.post('/requests/:id/comments', passport.authenticate('jwt', { session: false }), [verifyPostCommentRequest(requestType), postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent)]);
 
 router.post('/requests/:id/verification-email', passport.authenticate('jwt', { session: false }), [verifyStudentRequest, resendVerificationEmail(requestType)]);
 
