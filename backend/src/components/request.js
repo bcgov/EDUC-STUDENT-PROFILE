@@ -360,7 +360,7 @@ function postComment(requestType, createCommentPayload, createCommentEvent) {
       const sagaId = await postData(accessToken, payload, url);
       const event = createCommentEvent(sagaId, req.params.id, userInfo._json.digitalIdentityID);
 
-      log.info('going to store event object in redis for comment saga :: ', event);
+      log.info(`going to store event object in redis for ${requestType} comment saga :: `, event);
       await redisUtil.createProfileRequestSagaRecordInRedis(event);
       return res.status(HttpStatus.OK).json();
     } catch(e) {
