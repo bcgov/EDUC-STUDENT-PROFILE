@@ -5,11 +5,80 @@ jest.mock('@js-joda/core');
 const LocalDateTime = require('@js-joda/core').LocalDateTime;
 jest.mock('../../../src/components/utils');
 const utils = require('../../../src/components/utils');
+const redisUtil = require('../../../src/util/redis/redis-utils');
 jest.mock('../../../src/components/auth');
 
 const changeRequest = require('../../../src/components/request');
 const { mockRequest, mockResponse } = require('../helpers'); 
 const { createStudentRequestCommentPayload, createStudentRequestCommentEvent } = require('../../../src/components/studentRequest');
+
+describe('verifyPostComment', () => {
+
+  const params = {
+    id: 'requestId',
+  };
+  const requestType = 'studentRequest';
+  const session = {
+    [requestType]: {
+      studentRequestStatusCode: utils.RequestStatuses.RETURNED,
+    }
+  };
+  const sessionUser = {
+    jwt: 'token',
+    _json: {
+      displayName: 'Firstname Lastname',
+      accountType: 'BCEID',
+      digitalIdentityID: 'ac337def-794b-169f-8170-653e2f7c0011'
+    }
+  };
+
+  const verifyPostCommentRequest = changeRequest.verifyPostCommentRequest(requestType);
+
+  let req;
+  let res;
+
+  jest.spyOn(utils, 'getAccessToken');
+
+  beforeEach(() => {
+    utils.getAccessToken.mockReturnValue('token');
+    utils.getSessionUser.mockReturnValue(sessionUser);
+    req = mockRequest(session, params);
+    res = mockResponse();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+  it('should return UNAUTHORIZED if no session', async () => {
+    utils.getAccessToken.mockReturnValue(null);
+
+    await verifyPostCommentRequest(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
+  });
+
+  it('should return CONFLICT if no request in the session', async () => {
+    const session = {
+      request: null,
+    };
+    req = mockRequest(session, params);
+
+    await verifyPostCommentRequest(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
+  });
+
+  it('should return CONFLICT if request is not RETURNED', async () => {
+    const session = {
+      studentRequestStatusCode: utils.RequestStatuses.INITREV,
+    };
+    req = mockRequest(session, params);
+
+    await verifyPostCommentRequest(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
+  });
+});
 
 describe('postComment', () => {
   const localDateTime = '2020-01-01T12:00:00';
@@ -45,14 +114,16 @@ describe('postComment', () => {
 
   jest.spyOn(LocalDateTime, 'now');
   jest.spyOn(utils, 'getAccessToken');
+  jest.spyOn(redisUtil, 'createProfileRequestSagaRecordInRedis');
   const spy = jest.spyOn(utils, 'postData');
 
   beforeEach(() => {
     LocalDateTime.now.mockReturnValue(localDateTime);
-    utils.getAccessToken.mockReturnValue('token');
-    utils.getSessionUser.mockReturnValue(sessionUser);
     utils.postData.mockResolvedValue(postRes);
+    redisUtil.createProfileRequestSagaRecordInRedis.mockResolvedValue(null);
     req = mockRequest(comment, session, params);
+    req.userInfo = sessionUser;
+    req.accessToken = 'token';
     res = mockResponse();
   });
 
@@ -75,38 +146,16 @@ describe('postComment', () => {
     expect(spy).toHaveBeenCalledWith('token', postReq, config.get('profileSagaAPIURL') + config.get(`${requestType}:commentSagaEndpoint`));
   });
 
-  it('should return UNAUTHORIZED if no session', async () => {
-    utils.getAccessToken.mockReturnValue(null);
-
-    await postComment(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
-  });
-
-  it('should return CONFLICT if no request in the session', async () => {
-    const session = {
-      request: null,
-    };
-    req = mockRequest(comment, session, params);
-
-    await postComment(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
-  });
-
-  it('should return CONFLICT if request is not RETURNED', async () => {
-    const session = {
-      studentRequestStatusCode: utils.RequestStatuses.INITREV,
-    };
-    req = mockRequest(comment, session, params);
-
-    await postComment(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
-  });
-
   it('should return INTERNAL_SERVER_ERROR if postData is failed', async () => {
     utils.postData.mockRejectedValue(new Error('test error'));
+
+    await postComment(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+  });
+
+  it('should return INTERNAL_SERVER_ERROR if createProfileRequestSagaRecordInRedis is failed', async () => {
+    redisUtil.createProfileRequestSagaRecordInRedis.mockRejectedValue(new Error('test error'));
 
     await postComment(req, res);
 
