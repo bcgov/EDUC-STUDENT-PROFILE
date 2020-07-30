@@ -22,6 +22,7 @@ async function handleProfileRequestSagaMessage(msg) {
   if('COMPLETED' === event.sagaStatus || 'FORCE_STOPPED' === event.sagaStatus){
     await redisUtil.removeProfileRequestSagaRecordFromRedis(event);
   }
+  msg.ack(); // manual acknowledgement that message was received and processed successfully.
 }
 
 
@@ -37,6 +38,8 @@ const ProfileRequestSagaMessageHandler = {
    */
   subscribe(stan) {
     const opts = stan.subscriptionOptions().setStartAt(0);
+    opts.setManualAckMode(true);
+    opts.setAckWait(30000); // 30 seconds
     opts.setDurableName('student-profile-node-consumer');
     SagaTopics.forEach((topic) => {
       subscribeSagaMessages(stan, opts, topic, handleProfileRequestSagaMessage);
