@@ -36,6 +36,7 @@ const redisUtil = {
               log.info(`going to delete this event record as it is completed or force stopped. SAGA ID :: ${eventArrayElement.sagaId} AND STATUS :: ${event.sagaStatus}`);
               recordFoundFromRedis = true;
               await this.removeSagaRecordFromRedis(event.sagaId, eventArrayElement);
+              log.info(`Event record deleted from REDIS. SAGA ID :: ${eventArrayElement.sagaId} AND STATUS :: ${event.sagaStatus}`);
               break;
             }
           }
