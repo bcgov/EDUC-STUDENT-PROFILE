@@ -45,7 +45,7 @@
     <p class="mb-1"><strong>Your PEN request is complete. Your PEN is:</strong></p>
     <p class="mb-2 pen"><strong>{{student.pen}}</strong></p>
     <p class="mb-2 comment" v-if="request.completeComment && request.completeComment.length > 0">{{request.completeComment}}</p>
-    <p class="mb-2">Below is the key information the Ministry of Education has on file for you. If any of this information is not current, please contact <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.</p>
+    <p class="mb-2">Below is the key information the Ministry of Education has on file for you. If any of this information is not current, please proceed to <a href="/ump">Update My PEN Info page</a>.</p>
     <v-container class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
       <v-row no-gutters class="py-0 px-2">
         <v-col xl="4" lg="4" md="4" sm="4">
