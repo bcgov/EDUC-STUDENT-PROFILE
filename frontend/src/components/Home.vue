@@ -29,7 +29,7 @@
         <v-card :class="{'px-16': $vuetify.breakpoint.lgAndUp }" class="px-4 py-4" style="height: 100%;">
           <p style="text-align:center">
             <router-link to="gmp">
-              <img alt="Find PEN" src="@/assets/images/icon-find-pen.svg" style="display:block; float:initial; margin:auto" title="Find PEN">Find your Personal Education<br>Number (PEN)
+              <img id="gmpLink" alt="Find PEN" src="@/assets/images/icon-find-pen.svg" style="display:block; float:initial; margin:auto" title="Find PEN">Find your Personal Education<br>Number (PEN)
             </router-link>
           </p>
           <ul style="text-align:left; list-style-position: outside;" :class="{'px-16': $vuetify.breakpoint.lgOnly }">
@@ -49,7 +49,7 @@
         <v-card :class="{'px-16': $vuetify.breakpoint.lgAndUp }" class="px-4 py-4" style="height: 100%;">
           <p style="text-align:center">
             <router-link to="ump">
-              <img alt="Update My PEN" src="@/assets/images/updatemypen.svg" style="display:block; float:initial; margin:auto" title="Update My PEN">Update your PEN information
+              <img id="umpLink" alt="Update My PEN" src="@/assets/images/updatemypen.svg" style="display:block; float:initial; margin:auto" title="Update My PEN">Update your PEN information
             </router-link>
           </p>
           <ul style="text-align:left; list-style-position: outside;" :class="{'px-16': $vuetify.breakpoint.lgAndUp }">
