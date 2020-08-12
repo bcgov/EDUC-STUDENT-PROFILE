@@ -325,11 +325,10 @@
 import { mapGetters, mapMutations, mapState } from 'vuex';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, pick } from 'lodash';
-//import { mapFields } from 'vuex-map-fields';
 
 import { createHelpers } from 'vuex-map-fields';
 
-// `fooModule` is the name of the Vuex module.
+// `ump` is the name of the Vuex module.
 const { mapFields } = createHelpers({
   getterType: 'ump/getField',
   mutationType: 'ump/updateField',
