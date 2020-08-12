@@ -70,7 +70,7 @@
     <article id="request-form-container" class="top-banner full-height">
         <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
           <v-col xs="10" sm="10" md="10" lg="10" xl="10">
-            <RequestStepper></RequestStepper>
+            <router-view></router-view>
           </v-col>
         </v-row>
     </article>

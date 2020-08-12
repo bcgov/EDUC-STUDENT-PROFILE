@@ -322,7 +322,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, pick } from 'lodash';
 
@@ -342,9 +342,6 @@ export default {
       alert: false,
       alertMessage: null,
 
-      declared: false,
-      acceptance: false,
-
       request: {
         legalLastName: null,
         legalFirstName: null,
@@ -353,22 +350,88 @@ export default {
         genderCode: null,
         email: null,
       },
-      
-      editLegalLastName: false,
-      editLegalFirstName: false,
-      editLegalMiddleNames: false,
-      editBirthdate: false,
-      editGenderLabel: false,
-      editEmail: false,
       enableDisableForm: {
         disabled: true
       },
     };
   },
+  mounted() {
+    this.request.legalLastName = this.editLegalLastName ? this.updateData.legalLastName : this.recordedData.legalLastName;
+    this.request.legalFirstName = this.editLegalFirstName ? this.updateData.legalFirstName : this.recordedData.legalFirstName;
+    this.request.legalMiddleNames = this.editLegalMiddleNames ? this.updateData.legalMiddleNames : this.recordedData.legalMiddleNames;
+    this.request.dob = this.editBirthdate ? this.updateData.dob : this.recordedData.dob;
+    this.request.genderLabel = this.editGenderLabel ? this.updateData.genderLabel : this.recordedData.genderLabel;
+    this.request.email = this.editEmail ? this.updateData.email : this.recordedData.email;
+
+  },
   computed: {
     ...mapGetters('studentRequest', ['genders', 'genderInfo']),
     ...mapGetters(['student']),
-    ...mapGetters('ump', ['recordedData']),
+    ...mapState('ump', ['recordedData', 'updateData']),
+    declared: {
+      get() {
+        return this.$store.state['ump'].declared;
+      },
+      set(val) {
+        return this.$store.state['ump'].declared = val;
+      }
+    },
+    acceptance: {
+      get() {
+        return this.$store.state['ump'].acceptance;
+      },
+      set(val) {
+        return this.$store.state['ump'].acceptance = val;
+      }
+    },
+    editLegalLastName: {
+      get() {
+        return this.$store.state['ump'].editLegalLastName;
+      },
+      set(val) {
+        return this.$store.state['ump'].editLegalLastName = val;
+      }
+    },
+    editLegalFirstName: {
+      get() {
+        return this.$store.state['ump'].editLegalFirstName;
+      },
+      set(val) {
+        return this.$store.state['ump'].editLegalFirstName = val;
+      }
+    },
+    editLegalMiddleNames: {
+      get() {
+        return this.$store.state['ump'].editLegalMiddleNames;
+      },
+      set(val) {
+        return this.$store.state['ump'].editLegalMiddleNames = val;
+      }
+    },
+    editBirthdate: {
+      get() {
+        return this.$store.state['ump'].editBirthdate;
+      },
+      set(val) {
+        return this.$store.state['ump'].editBirthdate = val;
+      }
+    },
+    editGenderLabel: {
+      get() {
+        return this.$store.state['ump'].editGenderLabel;
+      },
+      set(val) {
+        return this.$store.state['ump'].editGenderLabel = val;
+      }
+    },
+    editEmail: {
+      get() {
+        return this.$store.state['ump'].editEmail;
+      },
+      set(val) {
+        return this.$store.state['ump'].editEmail = val;
+      }
+    },
     hasStudentRecord() {
       return !!this.student;
     },
