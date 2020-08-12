@@ -325,6 +325,15 @@
 import { mapGetters, mapMutations, mapState } from 'vuex';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, pick } from 'lodash';
+//import { mapFields } from 'vuex-map-fields';
+
+import { createHelpers } from 'vuex-map-fields';
+
+// `fooModule` is the name of the Vuex module.
+const { mapFields } = createHelpers({
+  getterType: 'ump/getField',
+  mutationType: 'ump/updateField',
+});
 
 export default {
   name: 'requestForm',
@@ -368,70 +377,16 @@ export default {
     ...mapGetters('studentRequest', ['genders', 'genderInfo']),
     ...mapGetters(['student']),
     ...mapState('ump', ['recordedData', 'updateData']),
-    declared: {
-      get() {
-        return this.$store.state['ump'].declared;
-      },
-      set(val) {
-        return this.$store.state['ump'].declared = val;
-      }
-    },
-    acceptance: {
-      get() {
-        return this.$store.state['ump'].acceptance;
-      },
-      set(val) {
-        return this.$store.state['ump'].acceptance = val;
-      }
-    },
-    editLegalLastName: {
-      get() {
-        return this.$store.state['ump'].editLegalLastName;
-      },
-      set(val) {
-        return this.$store.state['ump'].editLegalLastName = val;
-      }
-    },
-    editLegalFirstName: {
-      get() {
-        return this.$store.state['ump'].editLegalFirstName;
-      },
-      set(val) {
-        return this.$store.state['ump'].editLegalFirstName = val;
-      }
-    },
-    editLegalMiddleNames: {
-      get() {
-        return this.$store.state['ump'].editLegalMiddleNames;
-      },
-      set(val) {
-        return this.$store.state['ump'].editLegalMiddleNames = val;
-      }
-    },
-    editBirthdate: {
-      get() {
-        return this.$store.state['ump'].editBirthdate;
-      },
-      set(val) {
-        return this.$store.state['ump'].editBirthdate = val;
-      }
-    },
-    editGenderLabel: {
-      get() {
-        return this.$store.state['ump'].editGenderLabel;
-      },
-      set(val) {
-        return this.$store.state['ump'].editGenderLabel = val;
-      }
-    },
-    editEmail: {
-      get() {
-        return this.$store.state['ump'].editEmail;
-      },
-      set(val) {
-        return this.$store.state['ump'].editEmail = val;
-      }
-    },
+    ...mapFields([
+      'isEditable.editLegalLastName',
+      'isEditable.editLegalFirstName',
+      'isEditable.editLegalMiddleNames',
+      'isEditable.editBirthdate',
+      'isEditable.editGenderLabel',
+      'isEditable.editEmail',
+      'declared',
+      'acceptance'
+    ]),
     hasStudentRecord() {
       return !!this.student;
     },
@@ -516,7 +471,7 @@ export default {
           this.request.genderCode = code[0].genderCode;
         }
 
-        if(isEqual(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), 
+        if(isEqual(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']),
           pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']))) {
           this.setNoChangeErrorDialog();
         } else {

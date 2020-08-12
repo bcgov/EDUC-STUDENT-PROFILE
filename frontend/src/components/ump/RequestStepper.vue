@@ -25,17 +25,8 @@
       </v-stepper-header>
 
       <v-stepper-items>
-        <v-stepper-content step="1" class="px-0">
-          <router-view v-if="stepCount===1" @next="nextStep" @back="previousStep"></router-view>
-        </v-stepper-content>
-        <v-stepper-content step="2" class="px-0">
-          <router-view v-if="stepCount===2" @next="nextStep" @back="previousStep"></router-view>
-        </v-stepper-content>
-        <v-stepper-content step="3" class="px-0">
-          <router-view v-if="stepCount===3" @next="nextStep" @back="previousStep"></router-view>
-        </v-stepper-content>
-        <v-stepper-content step="4" class="px-0">
-          <router-view v-if="stepCount===4" @next="nextStep" @back="previousStep"></router-view>
+        <v-stepper-content v-for="index in 4" :step="index" :key="index" class="px-0">
+          <router-view v-if="stepCount===index" @next="nextStep" @back="previousStep"></router-view>
         </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
