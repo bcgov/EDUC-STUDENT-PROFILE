@@ -1,17 +1,20 @@
 import Vuex from 'vuex';
-import Vuetify from 'vuetify';
 import { createLocalVue, shallowMount } from '@vue/test-utils';
-import { getField, updateField } from 'vuex-map-fields';
-import RequestForm from '@/components/ump/RequestForm.vue';
+import { createHelpers, getField, updateField } from 'vuex-map-fields';
 
 const localVue = createLocalVue();
 
 localVue.use(Vuex);
-localVue.use(Vuetify);
+
+const { mapFields } = createHelpers({
+  getterType: 'ump/getField',
+  mutationType: 'ump/updateField',
+});
 
 describe('Component initialized with namespaced Vuex module.', () => {
   let store;
   let wrapper;
+  let Component;
 
   const actions = {
     postRequest: jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(false)
@@ -24,35 +27,19 @@ describe('Component initialized with namespaced Vuex module.', () => {
     {label:'Unknown', genderCode:'U'},
   ];
 
-  const recordedData = {
-    pen: '123456',
-    legalFirstName: 'Jimmy',
-    legalMiddleNames: 'Wayne',
-    legalLastName: 'Duke',
-    genderCode: 'M',
-    dob: '1989-06-04',
-    email: 'james@test.com'
-  };
-
-  let student = {
-    pen: '123456',
-    legalFirstName: 'James',
-    legalMiddleNames: 'Wayne',
-    legalLastName: 'Duke',
-    sexCode: 'M',
-    sexLabel: 'Male',
-    genderCode: 'M',
-    dob: '1989-06-04'
-  };
-
   beforeEach(() => {
+    Component = {
+      template: '<input id="editLegalLastName" v-model="editLegalLastName">',
+      computed: {
+        ...mapFields([
+          'isEditable.editLegalLastName',
+        ]),
+      },
+    };
+
     store = new Vuex.Store({
       modules: {
-        root: {
-          getters: {
-            student: jest.fn().mockReturnValue(student)
-          }
-        },
+
         studentRequest: {
           namespaced: true,
           actions,
@@ -66,15 +53,6 @@ describe('Component initialized with namespaced Vuex module.', () => {
             isEditable: {
               editLegalLastName: false
             },
-            recordedData,
-            updateData: {
-              legalLastName: null,
-              legalFirstName: null,
-              legalMiddleNames: null,
-              dob: null,
-              genderCode: null,
-              email: null,
-            }
           },
           getters: {
             getField,
@@ -86,10 +64,23 @@ describe('Component initialized with namespaced Vuex module.', () => {
       },
     });
 
-    wrapper = shallowMount(RequestForm, { localVue, store });
+    wrapper = shallowMount(Component, { localVue, store });
   });
 
   test('It should render the component.', () => {
     expect(wrapper.exists()).toBe(true);
+  });
+
+  test('It should update field values when the store is updated.', () => {
+    store.state.ump.isEditable.editLegalLastName = true;
+
+    expect(wrapper.element.value).toBe('true');
+  });
+
+  test('It should update the store when the field values are updated.', () => {
+    wrapper.element.value = true;
+    wrapper.trigger('input');
+
+    expect(store.state.ump.isEditable.editLegalLastName).toBe('true');
   });
 });

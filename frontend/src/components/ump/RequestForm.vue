@@ -322,9 +322,17 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapState } from 'vuex';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, pick } from 'lodash';
+
+import { createHelpers } from 'vuex-map-fields';
+
+// `ump` is the name of the Vuex module.
+const { mapFields } = createHelpers({
+  getterType: 'ump/getField',
+  mutationType: 'ump/updateField',
+});
 
 export default {
   name: 'requestForm',
@@ -342,9 +350,6 @@ export default {
       alert: false,
       alertMessage: null,
 
-      declared: false,
-      acceptance: false,
-
       request: {
         legalLastName: null,
         legalFirstName: null,
@@ -353,22 +358,34 @@ export default {
         genderCode: null,
         email: null,
       },
-      
-      editLegalLastName: false,
-      editLegalFirstName: false,
-      editLegalMiddleNames: false,
-      editBirthdate: false,
-      editGenderLabel: false,
-      editEmail: false,
       enableDisableForm: {
         disabled: true
       },
     };
   },
+  mounted() {
+    this.request.legalLastName = this.editLegalLastName ? this.updateData.legalLastName : this.recordedData.legalLastName;
+    this.request.legalFirstName = this.editLegalFirstName ? this.updateData.legalFirstName : this.recordedData.legalFirstName;
+    this.request.legalMiddleNames = this.editLegalMiddleNames ? this.updateData.legalMiddleNames : this.recordedData.legalMiddleNames;
+    this.request.dob = this.editBirthdate ? this.updateData.dob : this.recordedData.dob;
+    this.request.genderLabel = this.editGenderLabel ? this.updateData.genderLabel : this.recordedData.genderLabel;
+    this.request.email = this.editEmail ? this.updateData.email : this.recordedData.email;
+
+  },
   computed: {
     ...mapGetters('studentRequest', ['genders', 'genderInfo']),
     ...mapGetters(['student']),
-    ...mapGetters('ump', ['recordedData']),
+    ...mapState('ump', ['recordedData', 'updateData']),
+    ...mapFields([
+      'isEditable.editLegalLastName',
+      'isEditable.editLegalFirstName',
+      'isEditable.editLegalMiddleNames',
+      'isEditable.editBirthdate',
+      'isEditable.editGenderLabel',
+      'isEditable.editEmail',
+      'declared',
+      'acceptance'
+    ]),
     hasStudentRecord() {
       return !!this.student;
     },
@@ -453,7 +470,7 @@ export default {
           this.request.genderCode = code[0].genderCode;
         }
 
-        if(isEqual(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), 
+        if(isEqual(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']),
           pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']))) {
           this.setNoChangeErrorDialog();
         } else {

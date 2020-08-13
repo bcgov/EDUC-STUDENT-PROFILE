@@ -16,6 +16,14 @@ import LoginError from '@/components/LoginError.vue';
 import RouterView from '@/components/RouterView.vue';
 import Ump from '@/components/ump/Ump.vue';
 import Gmp from '@/components/gmp/Gmp.vue';
+import CurrentInfo from './components/ump/CurrentInfo';
+import RequestForm from './components/ump/RequestForm';
+import RequestSummary from './components/ump/RequestSummary';
+import RequestSubmission from './components/ump/RequestSubmission';
+import authStore from './store/modules/auth';
+import store from './store/index';
+import {pick, values} from 'lodash';
+import { PenRequestStatuses } from '@/utils/constants';
 
 Vue.prototype.moment = moment;
 
@@ -38,12 +46,45 @@ const router = new VueRouter({
         {
           path: '',
           name: 'ump',
-          component: Ump
+          component: Ump,
+          beforeEnter: (to, from, next) => {
+            const hasInflightGMPRequest = !store.getters['penRequest/request'] && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === store.getters['penRequest/request']);
+            if(authStore.state.isAuthenticated && !store.getters['studentRequest/request'] && !hasInflightGMPRequest) {
+              store.commit('setRequestType','studentRequest');
+              next('ump/request');
+            } else {
+              next();
+            }
+          },
         },
         {
           path: 'request',
-          name: 'student-request',
-          component: StudentRequestPage
+          component: StudentRequestPage,
+          children: [
+            {
+              path: '',
+              name: 'step1',
+              component: CurrentInfo,
+              beforeEnter: checkRequestExists
+            },
+            {
+              path: 'requestForm',
+              name: 'step2',
+              component: RequestForm,
+              beforeEnter: checkRequestExists
+            },
+            {
+              path: 'requestSummary',
+              name: 'step3',
+              component: RequestSummary,
+              beforeEnter: checkRequestExists
+            },
+            {
+              path: 'requestSubmission',
+              name: 'step4',
+              component: RequestSubmission
+            }
+          ]
         },
         {
           path: 'verification/:status',
@@ -100,5 +141,14 @@ const router = new VueRouter({
     }
   ]
 });
+
+function checkRequestExists(to, from, next) {
+  if(authStore.state.isAuthenticated && !store.getters['studentRequest/request']) {
+    store.commit('setRequestType','studentRequest');
+    next();
+  } else {
+    next('/ump');
+  }
+}
 
 export default router;
