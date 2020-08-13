@@ -25,46 +25,18 @@
       </v-stepper-header>
 
       <v-stepper-items>
-        <v-stepper-content step="1" class="px-0">
-          <CurrentInfo
-            @next="nextStep"
-          >
-          </CurrentInfo>
-        </v-stepper-content>
-        <v-stepper-content step="2" class="px-0">
-          <RequestForm
-            @next="nextStep"
-            @back="previousStep"
-          ></RequestForm>
-        </v-stepper-content>
-        <v-stepper-content step="3" class="px-0">
-          <RequestSummary
-            @next="nextStep"
-            @back="previousStep"
-          ></RequestSummary>
-        </v-stepper-content>
-        <v-stepper-content step="4" class="px-0">
-          <RequestSubmission></RequestSubmission>
+        <v-stepper-content v-for="index in 4" :step="index" :key="index" class="px-0">
+          <router-view v-if="stepCount===index" @next="nextStep" @back="previousStep"></router-view>
         </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import CurrentInfo from './CurrentInfo';
-import RequestForm from './RequestForm';
-import RequestSummary from './RequestSummary';
-import RequestSubmission from './RequestSubmission';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'requestStepper',
-  components: {
-    CurrentInfo,
-    RequestForm,
-    RequestSummary,
-    RequestSubmission,
-  },
   data() {
     return {
       steps: 3,
@@ -77,6 +49,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['userInfo']),
     ...mapGetters('ump', ['recordedData', 'updateData']),
+    ...mapState('studentRequest', ['request']),
     dataReady() {
       return !!this.userInfo;
     },
@@ -89,8 +62,29 @@ export default {
         this.steps = 3;
       }
     },
+    $route: {
+      handler() {
+        switch (this.$route.name) {
+        case 'step1':
+          this.stepCount = 1;
+          break;
+        case 'step2':
+          this.stepCount = 2;
+          break;
+        case 'step3':
+          this.stepCount = 3;
+          break;
+        case 'step4':
+          this.stepCount = 4;
+        }
+        window.scrollTo(0,0);
+      }
+    }
   },
   methods: {
+    goToRoute(name) {
+      this.$router.push({ name: name });
+    },
     setDialog(message) {
       this.dialogMessage = message;
       this.dialog = true;
@@ -100,10 +94,12 @@ export default {
     },
     nextStep() {
       this.stepCount++;
+      this.goToRoute('step'+this.stepCount);
       window.scrollTo(0,0);
     },
     previousStep() {
       this.stepCount--;
+      this.goToRoute('step'+this.stepCount);
       window.scrollTo(0,0);
     }
   }
