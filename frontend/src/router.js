@@ -23,7 +23,7 @@ import RequestSubmission from './components/ump/RequestSubmission';
 import authStore from './store/modules/auth';
 import store from './store/index';
 import {pick, values} from 'lodash';
-import { PenRequestStatuses } from '@/utils/constants';
+import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
 
 Vue.prototype.moment = moment;
 
@@ -143,7 +143,7 @@ const router = new VueRouter({
 });
 
 function checkRequestExists(to, from, next) {
-  if(authStore.state.isAuthenticated && !store.getters['studentRequest/request']) {
+  if(authStore.state.isAuthenticated && (!store.getters['studentRequest/request'] || store.getters['studentRequest/request'].studentRequestStatusCode === StudentRequestStatuses.COMPLETED)) { //fuck this code9
     store.commit('setRequestType','studentRequest');
     next();
   } else {
