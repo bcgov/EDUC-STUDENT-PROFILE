@@ -204,7 +204,6 @@ export default {
     }
   },
   async getConfig(configName) {
-    console.log('called getNumDaysAllowedInDraftStatus.');
     try {
       const queryParams = {
         params: {
