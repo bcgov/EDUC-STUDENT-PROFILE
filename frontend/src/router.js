@@ -143,7 +143,7 @@ const router = new VueRouter({
 });
 
 function checkRequestExists(to, from, next) {
-  if(authStore.state.isAuthenticated && (!store.getters['studentRequest/request'] || store.getters['studentRequest/request'].studentRequestStatusCode === StudentRequestStatuses.COMPLETED)) { //fuck this code9
+  if(authStore.state.isAuthenticated && (!store.getters['studentRequest/request'] || store.getters['studentRequest/request'].studentRequestStatusCode === StudentRequestStatuses.COMPLETED)) {
     store.commit('setRequestType','studentRequest');
     next();
   } else {
