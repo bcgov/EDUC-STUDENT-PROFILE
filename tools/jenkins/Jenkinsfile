@@ -64,7 +64,7 @@ pipeline{
         }
       }
     }
-    stage('Build'){
+    /*stage('Build'){
       steps{
         script {
           openshift.withCluster(){
@@ -136,7 +136,7 @@ pipeline{
           echo 'Build stage failed'
         }
       }
-    }
+    }*/
 	stage('Promote and configure DEV') {
       steps{
         script{
@@ -152,7 +152,7 @@ pipeline{
         }
       }
     }
-    stage('e2e tests'){
+    /*stage('e2e tests'){
       steps {
         script {
           withCredentials([string(credentialsId: 'c2mvws-tools-github-actions-token', variable: 'TOKEN')]) {
@@ -161,6 +161,6 @@ pipeline{
           }
         }
       }
-    }
+    }*/
   }
 }
