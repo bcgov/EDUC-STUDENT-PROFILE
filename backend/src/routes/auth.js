@@ -30,14 +30,14 @@ router.get('/', (_req, res) => {
 });
 
 function addOIDCRouterGet(strategyName, callbackURI, redirectURL) {
-    router.get(callbackURI,
-      passport.authenticate(strategyName, {
-        failureRedirect: 'error'
-      }),
-      (_req, res) => {
-        res.redirect(redirectURL);
-      }
-    );
+  router.get(callbackURI,
+    passport.authenticate(strategyName, {
+      failureRedirect: 'error'
+    }),
+    (_req, res) => {
+      res.redirect(redirectURL);
+    }
+  );
 }
 
 addOIDCRouterGet('oidcBcsc', '/callback_bcsc', config.get('server:frontend'));
@@ -53,9 +53,9 @@ router.get('/error', (_req, res) => {
 });
 
 function addBaseRouterGet(strategyName, callbackURI) {
-    router.get(callbackURI, passport.authenticate(strategyName, {
-      failureRedirect: 'error'
-    }));
+  router.get(callbackURI, passport.authenticate(strategyName, {
+    failureRedirect: 'error'
+  }));
 }
 
 addBaseRouterGet('oidcBcsc', '/login_bcsc');
@@ -128,16 +128,23 @@ router.post('/refresh', [
   if(!req || !req.user || !req.user.refreshToken){
     res.status(401).json(UnauthorizedRsp);
   } else {
-    const result = await auth.renew(req.user.refreshToken);
-    if (result && result.jwt && result.refreshToken) {
-      req.user.jwt = result.jwt;
-      req.user.refreshToken = result.refreshToken;
-      const responseJson = {
-        jwtFrontend: auth.generateUiToken()
-      };
-      res.status(200).json(responseJson);
+    if (auth.isTokenExpired(req.user.jwt)) {
+      const result = await auth.renew(req.user.refreshToken);
+      if (result && result.jwt && result.refreshToken) {
+        req.user.jwt = result.jwt;
+        req.user.refreshToken = result.refreshToken;
+        const responseJson = {
+          jwtFrontend: auth.generateUiToken()
+        };
+        res.status(200).json(responseJson);
+      } else {
+        res.status(401).json(UnauthorizedRsp);
+      }
     }else {
-      res.status(401).json(UnauthorizedRsp);
+      const responseJson = {
+        jwtFrontend: req.user.jwtFrontend
+      };
+      return res.status(200).json(responseJson);
     }
   }
 });
