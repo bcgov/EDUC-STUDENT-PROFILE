@@ -32,10 +32,9 @@
               <img id="gmpLink" alt="Find PEN" src="@/assets/images/icon-find-pen.svg" style="display:block; float:initial; margin:auto" title="Find PEN">Find your Personal Education<br>Number (PEN)
             </router-link>
           </p>
+          <p class="my-1">Former students can send a request via an online form to receive their PEN
+          </p>
           <ul style="text-align:left; list-style-position: outside;" :class="{'px-16': $vuetify.breakpoint.lgOnly }">
-            <li>
-              Former students can send a request via an online form to receive their PEN
-            </li>
             <li>
               If you are currently attending a K-12 school, please request your PEN by contacting the main office at your school
               <ul>
@@ -52,10 +51,9 @@
               <img id="umpLink" alt="Update My PEN" src="@/assets/images/updatemypen.svg" style="display:block; float:initial; margin:auto" title="Update My PEN">Update your PEN information
             </router-link>
           </p>
+          <p class="my-1">Former students can update their personal information associated with their PEN so that transcripts display current legal name
+          </p>
           <ul style="text-align:left; list-style-position: outside;" :class="{'px-16': $vuetify.breakpoint.lgAndUp }">
-            <li>
-              Former students can update their personal information associated with their PEN so that transcripts display current legal name
-            </li>
             <li>
               If you are currently attending a K-12 school, please request these changes by contacting the main office at your school
               <ul>
