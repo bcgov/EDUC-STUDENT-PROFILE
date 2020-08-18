@@ -24,6 +24,8 @@ import authStore from './store/modules/auth';
 import store from './store/index';
 import {pick, values} from 'lodash';
 import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
+import Login from '@/components/Login.vue';
+import BackendSessionExpired from '@/components/BackendSessionExpired';
 
 Vue.prototype.moment = moment;
 
@@ -37,16 +39,26 @@ const router = new VueRouter({
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: Home,
+      meta: {
+        requiresAuth: true
+      },
+
     },
     {
       path: '/ump',
       component: RouterView,
+      meta: {
+        requiresAuth: true
+      },
       children: [
         {
           path: '',
           name: 'ump',
           component: Ump,
+          meta: {
+            requiresAuth: true
+          },
           beforeEnter: (to, from, next) => {
             const hasInflightGMPRequest = !store.getters['penRequest/request'] && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === store.getters['penRequest/request']);
             if(authStore.state.isAuthenticated && !store.getters['studentRequest/request'] && !hasInflightGMPRequest) {
@@ -60,29 +72,44 @@ const router = new VueRouter({
         {
           path: 'request',
           component: StudentRequestPage,
+          meta: {
+            requiresAuth: true
+          },
           children: [
             {
               path: '',
               name: 'step1',
               component: CurrentInfo,
-              beforeEnter: checkRequestExists
+              beforeEnter: checkRequestExists,
+              meta: {
+                requiresAuth: true
+              },
             },
             {
               path: 'requestForm',
               name: 'step2',
               component: RequestForm,
-              beforeEnter: checkRequestExists
+              beforeEnter: checkRequestExists,
+              meta: {
+                requiresAuth: true
+              },
             },
             {
               path: 'requestSummary',
               name: 'step3',
               component: RequestSummary,
-              beforeEnter: checkRequestExists
+              beforeEnter: checkRequestExists,
+              meta: {
+                requiresAuth: true
+              },
             },
             {
               path: 'requestSubmission',
               name: 'step4',
-              component: RequestSubmission
+              component: RequestSubmission,
+              meta: {
+                requiresAuth: true
+              },
             }
           ]
         },
@@ -96,21 +123,31 @@ const router = new VueRouter({
     {
       path: '/gmp',
       component: RouterView,
+
       children: [
         {
           path: '',
           name: 'gmp',
-          component: Gmp
+          component: Gmp,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: 'request',
           name: 'pen-request',
-          component: PenRequestPage
+          component: PenRequestPage,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: 'verification/:status',
           name: 'pen-request-verification',
-          component: PenRequestVerification
+          component: PenRequestVerification,
+          meta: {
+            requiresAuth: true
+          },
         },
       ]
     },
@@ -135,10 +172,24 @@ const router = new VueRouter({
       component: LoginError
     },
     {
+      path: '/login',
+      name: 'login',
+      component: Login
+    },
+    {
       path: '*',
       name: 'notfound',
-      redirect: '/'
+      redirect: '/',
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/token-expired',
+      name: 'backend-session-expired',
+      component: BackendSessionExpired
     }
+
   ]
 });
 
@@ -150,5 +201,24 @@ function checkRequestExists(to, from, next) {
     next('/ump');
   }
 }
-
+router.beforeEach((to, _from, next) => {
+  if (to.meta.requiresAuth && authStore.state.isAuthenticated) {
+    store.dispatch('auth/getJwtToken').then(() => {
+      if (!authStore.state.isAuthenticated) {
+        next('/token-expired');
+      } else {
+        store.dispatch('auth/getUserInfo').then(() => {
+          next();
+        }).catch(() => {
+          next('error');
+        });
+      }
+    }).catch(() => {
+      next('/token-expired');
+    });
+  }
+  else{
+    next();
+  }
+});
 export default router;

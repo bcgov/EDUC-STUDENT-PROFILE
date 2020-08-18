@@ -86,25 +86,27 @@ router.get('/logout', async (req, res) => {
     } else {
       req.logout();
       req.session.destroy();
+      let retUrl;
       if (req.query && req.query.sessionExpired) {
-        res.redirect(config.get('server:frontend') + '/session-expired');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/session-expired');
       } else if (req.query && req.query.loginError) {
-        res.redirect(config.get('server:frontend') + '/login-error');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/login-error');
       } else if (req.query && req.query.loginBcsc) {
-        res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc');
       } else if (req.query && req.query.loginBcscGMP) {
-        res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc_gmp');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_gmp');
       } else if (req.query && req.query.loginBcscUMP) {
-        res.redirect(config.get('server:frontend') + '/api/auth/login_bcsc_ump');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_ump');
       } else if (req.query && req.query.loginBceid) {
-        res.redirect(config.get('server:frontend') + '/api/auth/login_bceid');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid');
       } else if (req.query && req.query.loginBceidGMP) {
-        res.redirect(config.get('server:frontend') + '/api/auth/login_bceid_gmp');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_gmp');
       } else if (req.query && req.query.loginBceidUMP) {
-        res.redirect(config.get('server:frontend') + '/api/auth/login_bceid_ump');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_ump');
       } else {
-        res.redirect(config.get('server:frontend') + '/logout');
+        retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/logout');
       }
+      res.redirect(config.get('siteMinder_logout_endpoint')+ retUrl);
     }
   }
 });
