@@ -23,7 +23,7 @@ import RequestSubmission from './components/ump/RequestSubmission';
 import authStore from './store/modules/auth';
 import store from './store/index';
 import {pick, values} from 'lodash';
-import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
+import { PenRequestStatuses } from '@/utils/constants';
 import Login from '@/components/Login.vue';
 import BackendSessionExpired from '@/components/BackendSessionExpired';
 
@@ -194,7 +194,7 @@ const router = new VueRouter({
 });
 
 function checkRequestExists(to, from, next) {
-  if(authStore.state.isAuthenticated && (!store.getters['studentRequest/request'] || store.getters['studentRequest/request'].studentRequestStatusCode === StudentRequestStatuses.COMPLETED)) {
+  if(authStore.state.isAuthenticated && (!store.getters['studentRequest/request'] || ['COMPLETED', 'ABANDONED', 'REJECTED'].includes(store.getters['studentRequest/request'].studentRequestStatusCode))) {
     store.commit('setRequestType','studentRequest');
     next();
   } else {
