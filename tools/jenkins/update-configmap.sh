@@ -9,13 +9,12 @@ SOAM_KC_REALM_ID="master"
 KCADM_FILE_BIN_FOLDER="/tmp/keycloak-9.0.3/bin"
 SOAM_KC=$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca
 siteMinderLogoutUrl=""
+SERVER_FRONTEND="https://student-profile-${PEN_NAMESPACE}-${envValue}.pathfinder.gov.bc.ca"
 if [ "$envValue" != "prod" ]
 then
-  SERVER_FRONTEND="https://student-profile-${PEN_NAMESPACE}-${envValue}.pathfinder.gov.bc.ca"
   siteMinderLogoutUrl="https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
 else
-  SERVER_FRONTEND="https://getmypen.gov.bc.ca"
-  siteMinderLogoutUrl="https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
+  siteMinderLogoutUrl="https://logon7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
 fi
 NATS_CLUSTER=educ_nats_cluster
 NATS_URL="nats://nats.${COMMON_NAMESPACE}-${envValue}.svc.cluster.local:4222"
