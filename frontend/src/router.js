@@ -60,7 +60,7 @@ const router = new VueRouter({
             requiresAuth: true
           },
           beforeEnter: (to, from, next) => {
-            const hasInflightGMPRequest = !store.getters['penRequest/request'] && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === store.getters['penRequest/request']);
+            const hasInflightGMPRequest = store.getters['penRequest/request'] && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === store.getters['penRequest/request']);
             if(authStore.state.isAuthenticated && !store.getters['studentRequest/request'] && !hasInflightGMPRequest) {
               store.commit('setRequestType','studentRequest');
               next('ump/request');
