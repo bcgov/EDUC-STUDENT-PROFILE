@@ -45,7 +45,7 @@
     "sass": "^1.26.1",
     "sass-loader": "^7.1.0",
     "testcafe": "1.6.0",
-    "vue": "^2.6.11",
+    "vue": "^2.6.12",
     "vue-clipboard2": "^0.3.1",
     "vue-meta": "^2.4.0",
     "vue-quick-chat": "^1.0.9",
@@ -55,7 +55,7 @@
     "vuex-map-fields": "^1.4.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.6",
+    "@babel/core": "^7.11.4",
     "@vue/cli": "^3.12.1",
     "@vue/cli-plugin-babel": "^3.12.1",
     "@vue/cli-plugin-eslint": "^3.12.1",
@@ -71,13 +71,13 @@
     "jest": "^24.8.0",
     "jest-sonar-reporter": "^2.0.0",
     "jest-transform-stub": "^2.0.0",
-    "lodash": "^4.17.15",
-    "stylus": "^0.54.5",
+    "lodash": "^4.17.20",
+    "stylus": "^0.54.8",
     "stylus-loader": "^3.0.1",
     "vue-cli-plugin-vuetify": "^0.6.3",
-    "vue-jest": "^3.0.5",
-    "vue-template-compiler": "^2.6.11",
-    "vuetify-loader": "^1.4.3"
+    "vue-jest": "^3.0.6",
+    "vue-template-compiler": "^2.6.12",
+    "vuetify-loader": "^1.6.0"
   },
   "browserslist": [
     "> 1%",
