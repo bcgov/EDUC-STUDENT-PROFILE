@@ -27,7 +27,7 @@
 	<v-row justify=center :class="{'px-16': $vuetify.breakpoint.xlAndUp, 'mx-16': $vuetify.breakpoint.xl }">
       <v-col cols="10" xl="8" lg="8" md="10" sm="10" xs="10" :class="{'px-16': $vuetify.breakpoint.xl }">
           <p >If you are currently attending a K-12 school, please request your PEN or update your personal information by contacting the main office at your school
-             <ul style="list-style-position: outside;">
+             <ul class="pl-8" style="list-style-position: outside;">
                <li><a href="http://www.bced.gov.bc.ca/apps/imcl/imclWeb/Home.do" rel="noopener noreferrer" target="_blank">Find your school's contact information</a></li>
              </ul>
           </p>
