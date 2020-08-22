@@ -128,6 +128,15 @@ export default {
   created() {
     this.setRequestType('studentRequest');
   },
+  watch: {
+    isLoading(val) {
+      if(!val) {
+        if(!this.hasRequest && !this.hasInflightGMPRequest) {
+          this.$router.push({ name: 'step1' });
+        }
+      }
+    }
+  },
   methods: {
     ...mapMutations(['setRequestType']),
     canCreateRequest(status) {
