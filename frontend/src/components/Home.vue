@@ -94,7 +94,7 @@ export default {
     height: 100%;
   }
   .min-height-xs{
-    min-height: 52em;
+    min-height: 56em;
   }
   .min-height-md{
     min-height: 45em;
