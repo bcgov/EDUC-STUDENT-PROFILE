@@ -17,6 +17,10 @@
         to  {path} {path}/ /?_url={uri}
     }
 
+    www.{$HOST_ROUTE} {
+        redir {$HOST_ROUTE}
+    }
+
     gzip {
         level 7
     }
