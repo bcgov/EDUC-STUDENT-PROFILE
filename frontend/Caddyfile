@@ -17,8 +17,16 @@
         to  {path} {path}/ /?_url={uri}
     }
 
-    www.{$HOST_ROUTE} {
-        redir {$HOST_ROUTE}{uri}
+    www.dev.getmypen.gov.bc.ca {
+        redir dev.getmypen.gov.bc.ca{uri}
+    }
+
+    www.test.getmypen.gov.bc.ca {
+        redir test.getmypen.gov.bc.ca{uri}
+    }
+
+    www.getmypen.gov.bc.ca {
+        redir getmypen.gov.bc.ca{uri}
     }
 
     gzip {
