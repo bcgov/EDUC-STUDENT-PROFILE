@@ -18,7 +18,7 @@
     }
 
     www.{$HOST_ROUTE} {
-        redir {$HOST_ROUTE}
+        redir {$HOST_ROUTE}{uri}
     }
 
     gzip {
