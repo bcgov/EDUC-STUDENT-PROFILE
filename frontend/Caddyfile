@@ -1,8 +1,8 @@
 *:2015 {
     root /var/www/html
 
-    redir {host} {
-        if {host} is www.{host}
+    redir {$HOST_ROUTE} {
+        if {host} is www.{$HOST_ROUTE}
     }
 
     header / {
