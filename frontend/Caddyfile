@@ -1,6 +1,8 @@
 *:2015 {
     root /var/www/html
 
+    redir {$HOST_ROUTE}{uri}
+
     header / {
         X-Frame-Options "SAMEORIGIN"
         X-XSS-Protection "1;mode=block"
@@ -25,8 +27,5 @@
     proxy /api {$HOST_ROUTE}
 
     errors stdout
-}
-www.{$HOST_ROUTE} {
-    redir {$HOST_ROUTE}{uri}
 }
     
