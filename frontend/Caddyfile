@@ -1,7 +1,8 @@
+www.{$HOST_ROUTE} {
+    redir {$HOST_ROUTE}{uri}
+}
 *:2015 {
     root /var/www/html
-
-    redir {$HOST_ROUTE}{uri}
 
     header / {
         X-Frame-Options "SAMEORIGIN"
