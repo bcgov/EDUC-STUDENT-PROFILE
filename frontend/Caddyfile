@@ -24,10 +24,7 @@
     gzip {
         level 7
     }
-    log {
-        output stdout
-        level DEBUG
-    }
+    log stdout
 
     proxy /api {$HOST_ROUTE}
 
