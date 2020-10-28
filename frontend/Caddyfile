@@ -1,7 +1,7 @@
 *:2015 {
     root /var/www/html
 
-    redir {$HOST_ROUTE} {
+    redir https://{$HOST_ROUTE} {
         if {host} is www.{$HOST_ROUTE}
     }
 
