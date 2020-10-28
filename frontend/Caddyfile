@@ -27,6 +27,7 @@
 
     log {
         output stdout
+        format console
         level DEBUG
     }
 
