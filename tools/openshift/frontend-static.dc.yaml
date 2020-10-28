@@ -123,6 +123,29 @@
         name: "${APP_NAME}-frontend-${JOB_NAME}"
         weight: 100
       wildcardPolicy: None
+  - apiVersion: v1
+    kind: Route
+    metadata:
+      annotations:
+        openshift.io/host.generated: 'true'
+      labels:
+        app: "${APP_NAME}-${JOB_NAME}"
+      name: "${APP_NAME}-frontend-${JOB_NAME}"
+    spec:
+      host: "www.${HOST_ROUTE}"
+      port:
+        targetPort: 2015-tcp
+      tls:
+        caCertificate: "${CA_CERT}"
+        certificate: "${CERTIFICATE}"
+        insecureEdgeTerminationPolicy: Redirect
+        key: "${PRIVATE_KEY}"
+        termination: edge
+      to:
+        kind: Service
+        name: "${APP_NAME}-frontend-${JOB_NAME}"
+        weight: 100
+      wildcardPolicy: None
   - apiVersion: autoscaling/v2beta1
     kind: HorizontalPodAutoscaler
     metadata:
