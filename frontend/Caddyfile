@@ -25,11 +25,7 @@
         level 7
     }
 
-    log {
-        output stdout
-        format console
-        level DEBUG
-    }
+    log stdout
 
     proxy /api {$HOST_ROUTE}
 
