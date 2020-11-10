@@ -92,7 +92,7 @@ pipeline{
                           openshift.apply(bcFrontend).narrow('bc').startBuild('-w').logs('-f')
                           openshift.tag("${REPO_NAME}-frontend:latest", "${REPO_NAME}-frontend:${JOB_NAME}")
 
-                          def bcFrontendStatic = openshift.process('-f', 'tools/openshift/frontend-static.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "NAMESPACE=${TOOLS}")
+                          def bcFrontendStatic = openshift.process('-f', 'https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/master/tools/openshift/frontend-static.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "NAMESPACE=${TOOLS}")
                           openshift.apply(bcFrontendStatic).narrow('bc').startBuild('-w').logs('-f')
                           openshift.tag("${REPO_NAME}-frontend-static:latest", "${REPO_NAME}-frontend-static:${JOB_NAME}")
                         } catch(e) {
