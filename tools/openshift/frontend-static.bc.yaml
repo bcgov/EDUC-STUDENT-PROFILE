@@ -21,10 +21,10 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: image-registry.openshift-image-registry.svc:5000/bcgov/s2i-caddy:v1-stable
+        openshift.io/imported-from: image-registry.openshift-image-registry.svc:5000/8878b4-tools/s2i-caddy:v1-stable
       from:
         kind: DockerImage
-        name: image-registry.openshift-image-registry.svc:5000/bcgov/s2i-caddy:v1-stable
+        name: image-registry.openshift-image-registry.svc:5000/8878b4-tools/s2i-caddy:v1-stable
       generation:
       importPolicy: {}
       name: v1-stable
