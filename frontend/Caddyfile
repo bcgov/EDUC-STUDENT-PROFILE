@@ -16,11 +16,13 @@
         Feature-Policy "fullscreen 'self'; camera 'none'; microphone 'none'"
     }
 
-    @local {
-        not path ^\/0.0.0.0
+    @filter {
+        not path_regexp ^\/0.0.0.0
+        file {
+            try_files {path} {path}/ /?url={uri}
+        }
     }
-
-    rewrite @local {path} {path}/ /?_url={uri}
+    rewrite @try_files {http.matchers.file.relative}
 
     gzip {
         level 7
