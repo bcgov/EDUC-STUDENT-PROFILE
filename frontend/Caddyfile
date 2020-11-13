@@ -16,7 +16,7 @@
         Feature-Policy "fullscreen 'self'; camera 'none'; microphone 'none'"
     }
 
-    @filter {
+    @try_files {
         not path_regexp ^\/0.0.0.0
         file {
             try_files {path} {path}/ /?url={uri}
