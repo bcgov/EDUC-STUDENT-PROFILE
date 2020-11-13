@@ -1,5 +1,5 @@
 *:2015 {
-    auto_https disable_redirects
+    auto_https off
 
     root * /var/www/html
 
