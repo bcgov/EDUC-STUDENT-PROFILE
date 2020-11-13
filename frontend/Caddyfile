@@ -24,13 +24,11 @@
     }
     rewrite @try_files {http.matchers.file.relative}
 
-    encode gzip {
-        level 7
-    }
+    encode gzip
 
     log stdout
 
-    proxy /api {$HOST_ROUTE}
+    reverse_proxy /api {$HOST_ROUTE}
 
     errors stdout
 }
