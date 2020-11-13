@@ -1,5 +1,5 @@
 *:2015 {
-    root * /var/www/html
+    root /var/www/html
 
     redir https://{$HOST_ROUTE}{path} {
         if {host} is www.{$HOST_ROUTE}
@@ -16,19 +16,18 @@
         Feature-Policy "fullscreen 'self'; camera 'none'; microphone 'none'"
     }
 
-    @try_files {
-        not path_regexp ^\/0.0.0.0
-        file {
-            try_files {path} {path}/ /?url={uri}
-        }
+    rewrite {
+        if  {path} not_match ^\/0.0.0.0
+        to  {path} {path}/ /?_url={uri}
     }
-    rewrite @try_files {http.matchers.file.relative}
 
-    encode gzip
+    gzip {
+        level 7
+    }
 
     log stdout
 
-    reverse_proxy /api {$HOST_ROUTE}
+    proxy /api {$HOST_ROUTE}
 
     errors stdout
 }
