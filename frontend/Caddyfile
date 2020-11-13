@@ -1,3 +1,7 @@
+{
+    auto_https off
+}
+
 *:2015 {
     root * /var/www/html
 
