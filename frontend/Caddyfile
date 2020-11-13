@@ -1,4 +1,6 @@
 *:2015 {
+    auto_https disable_redirects
+
     root * /var/www/html
 
     redir https://{$HOST_ROUTE}{path} {
