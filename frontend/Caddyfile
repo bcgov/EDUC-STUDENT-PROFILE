@@ -17,7 +17,7 @@
     }
 
     @local {
-        not {path} ^\/0.0.0.0
+        not path ^\/0.0.0.0
     }
 
     rewrite @local {path} {path}/ /?_url={uri}
