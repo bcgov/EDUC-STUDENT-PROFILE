@@ -1,0 +1,152 @@
+{
+  "apps": {
+    "http": {
+      "servers": {
+        "srv0": {
+          "listen": [
+            ":2015"
+          ],
+          "routes": [
+            {
+              "match": [
+                {
+                  "host": [
+                    "*"
+                  ]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "subroute",
+                  "routes": [
+                    {
+                      "handle": [
+                        {
+                          "handler": "vars",
+                          "root": "/var/www/html"
+                        }
+                      ]
+                    },
+                    {
+                      "handle": [
+                        {
+                          "handler": "headers",
+                          "response": {
+                            "set": {
+                              "Cache-Control": [
+                                "no-store, no-cache, must-revalidate, proxy-revalidate"
+                              ],
+                              "Content-Security-Policy": [
+                                "default-src 'self' https://spt.apps.gov.bc.ca; script-src 'self' https://www2.gov.bc.ca ;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://fonts.googleapis.com http://www.w3.org https://spm.gov.bc.ca"
+                              ],
+                              "Feature-Policy": [
+                                "fullscreen 'self'; camera 'none'; microphone 'none'"
+                              ],
+                              "Referrer-Policy": [
+                                "same-origin"
+                              ],
+                              "Strict-Transport-Security": [
+                                "max-age=31536000"
+                              ],
+                              "X-Content-Type-Options": [
+                                "nosniff"
+                              ],
+                              "X-Frame-Options": [
+                                "SAMEORIGIN"
+                              ],
+                              "X-Xss-Protection": [
+                                "1;mode=block"
+                              ]
+                            }
+                          }
+                        }
+                      ],
+                      "match": [
+                        {
+                          "path": [
+                            "/"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "handle": [
+                        {
+                          "handler": "static_response",
+                          "headers": {
+                            "Location": [
+                              "https://{http.request.uri.path}"
+                            ]
+                          },
+                          "status_code": 302
+                        }
+                      ]
+                    },
+                    {
+                      "group": "group0",
+                      "handle": [
+                        {
+                          "handler": "rewrite",
+                          "uri": "{http.matchers.file.relative}"
+                        }
+                      ],
+                      "match": [
+                        {
+                          "file": {
+                            "try_files": [
+                              "{http.request.uri.path}",
+                              "{http.request.uri.path}/",
+                              "/?url={http.request.uri}"
+                            ]
+                          },
+                          "not": [
+                            {
+                              "path_regexp": {
+                                "pattern": "^\\/0.0.0.0"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "handle": [
+                        {
+                          "encodings": {
+                            "gzip": {}
+                          },
+                          "handler": "encode"
+                        }
+                      ]
+                    },
+                    {
+                      "handle": [
+                        {
+                          "handler": "reverse_proxy"
+                        }
+                      ],
+                      "match": [
+                        {
+                          "path": [
+                            "/api"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "terminal": true
+            }
+          ],
+          "tls_connection_policies": [
+            {}
+          ],
+          "automatic_https": {
+            "disable": true
+          }
+        }
+      }
+    }
+  }
+}

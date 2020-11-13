@@ -73,7 +73,7 @@ objects:
       dockerfile: |-
         FROM image-registry.openshift-image-registry.svc:5000/8878b4-tools/s2i-caddy:v2-stable
         COPY /tmp/src/dist /var/www/html
-        COPY /tmp/src/Caddyfile /etc/Caddyfile
+        COPY /tmp/src/caddyfile.json /etc/caddyfile.json
         CMD /tmp/scripts/run
       images:
       - as:
