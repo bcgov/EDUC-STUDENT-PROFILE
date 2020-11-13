@@ -24,7 +24,7 @@
     }
     rewrite @try_files {http.matchers.file.relative}
 
-    gzip {
+    encode gzip {
         level 7
     }
 
