@@ -30,6 +30,6 @@
 
     reverse_proxy /api {$HOST_ROUTE}
 
-    errors stdout
+    handle_errors stdout
 }
     
