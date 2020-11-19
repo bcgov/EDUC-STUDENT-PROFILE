@@ -98,6 +98,14 @@ else
     journey_builder_url="https://www2.gov.bc.ca/gov/content?id=74E29C67215B4988ABCD778F453A3129"
 fi
 
+if [ "$envValue" = "tools" ]
+then
+  HOST_ROUTE="dev.getmypen.gov.bc.ca"
+elif [ "$envValue" = "dev" ]
+  HOST_ROUTE="test.getmypen.gov.bc.ca"
+fi
+
+
 snowplow="
 // <!-- Snowplow starts plowing - Standalone vE.2.14.0 -->
 ;(function(p,l,o,w,i,n,g){if(!p[i]){p.GlobalSnowplowNamespace=p.GlobalSnowplowNamespace||[];
