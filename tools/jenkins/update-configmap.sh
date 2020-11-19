@@ -102,6 +102,7 @@ if [ "$envValue" = "tools" ]
 then
   HOST_ROUTE="dev.getmypen.gov.bc.ca"
 elif [ "$envValue" = "dev" ]
+then
   HOST_ROUTE="test.getmypen.gov.bc.ca"
 fi
 
