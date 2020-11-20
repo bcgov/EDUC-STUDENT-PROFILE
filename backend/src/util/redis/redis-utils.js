@@ -4,6 +4,7 @@ const log = require('../../components/logger');
 const profileRequestSagaEventKey = 'PROFILE_REQUEST_SAGA_EVENTS';
 const safeStringify = require('fast-safe-stringify');
 const RedLock = require('redlock');
+const {LocalDateTime} = require('@js-joda/core');
 let redLock;
 const redisUtil = {
   /**
@@ -15,6 +16,9 @@ const redisUtil = {
     try {
       const redisClient = Redis.getRedisClient();
       if (redisClient) {
+        if (event) {
+          event.createDateTime = LocalDateTime.now().toString(); // store the timestamp so that it can be checked through scheduler.
+        }
         await this.addElementToSagaRecordInRedis(event.sagaId, event);
       } else {
         log.error('Redis client is not available, this should not have happened');
