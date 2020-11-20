@@ -28,7 +28,7 @@ app.set('port', port);
 // };
 
 const server = http.createServer(app);
-const STAN = require('./messaging/message-subscriber');
+const NATS = require('./messaging/message-subscriber');
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -40,14 +40,14 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 function normalizePort(val) {
-  const port = parseInt(val, 10);
+  const portNum = parseInt(val, 10);
 
-  if (isNaN(port)) {
+  if (isNaN(portNum)) {
     // named pipe
     return val;
   }
 
-  if (port >= 0) {
+  if (portNum >= 0) {
     // port number
     return port;
   }
@@ -94,14 +94,14 @@ function onListening() {
 }
 
 process.on('SIGINT',() => {
-  STAN.close();
+  NATS.close();
   server.close(() => {
     log.info('process terminated');
   });
 });
 
 process.on('SIGTERM', () => {
-  STAN.close();
+  NATS.close();
   server.close(() => {
     log.info('process terminated');
   });

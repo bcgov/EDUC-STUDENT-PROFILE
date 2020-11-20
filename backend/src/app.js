@@ -95,7 +95,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) {
-	passport.use(strategyName, new OidcStrategy({
+  passport.use(strategyName, new OidcStrategy({
     issuer: discovery.issuer,
     authorizationURL: discovery.authorization_endpoint,
     tokenURL: discovery.token_endpoint,
