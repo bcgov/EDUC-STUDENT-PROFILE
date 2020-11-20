@@ -7,8 +7,18 @@ function isFollowUpVisit({jwtToken}) {
   return !!jwtToken;
 }
 
+function isExpiredToken(jwtToken) {
+  const now = Date.now().valueOf() / 1000;
+  const jwtPayload = jwtToken.split('.')[1];
+  const payload = JSON.parse(window.atob(jwtPayload));
+  return payload.exp <= now;
+}
 
-async function refreshToken({getters, commit}) {
+async function refreshToken({getters, commit, dispatch}) {
+  if (isExpiredToken(getters.jwtToken)) {
+    dispatch('logout');
+    return;
+  }
 
   const response = await AuthService.refreshAuthToken(getters.jwtToken);
   if (response.jwtFrontend) {
@@ -21,7 +31,7 @@ async function refreshToken({getters, commit}) {
 
 async function getInitialToken({commit}) {
   const response = await AuthService.getAuthToken();
-  
+
   if (response.jwtFrontend) {
     commit('setJwtToken', response.jwtFrontend);
     ApiService.setAuthHeader(response.jwtFrontend);
