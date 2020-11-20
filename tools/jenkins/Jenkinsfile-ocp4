@@ -4,13 +4,13 @@ pipeline{
     DEBUG_OUTPUT = 'false'
 
     extJSHelper = '';
-    NAMESPACE='c2mvws'
-    COMMON_NAMESPACE='mvubjx'
+    NAMESPACE='8878b4'
+    COMMON_NAMESPACE='75e61b'
     STAGING_ENV = 'Dev'
-    TOOLS = 'c2mvws-tools'
-    DEV = 'c2mvws-dev'
-    TEST = 'c2mvws-test'
-    PROD = 'c2mvws-prod'
+    TOOLS = '8878b4-tools'
+    DEV = '8878b4-dev'
+    TEST = '8878b4-test'
+    PROD = '8878b4-prod'
     REPO_NAME = 'educ-student-profile'
     TESTS_REPO_NAME = 'educ-pen-reg-automation'
     OWNER = 'bcgov'
@@ -20,7 +20,7 @@ pipeline{
     TARGET_ENVIRONMENT = "${NAMESPACE}-${TARGET_ENV}"
 
     APP_NAME = 'student-profile'
-    APP_DOMAIN = 'pathfinder.gov.bc.ca'
+    APP_DOMAIN = 'apps.silver.devops.gov.bc.ca'
 
     SOURCE_REPO_RAW = 'https://github.com/${OWNER}/${REPO_NAME}/master'
     SOURCE_REPO_REF = 'master'
@@ -42,8 +42,8 @@ pipeline{
     MAX_CPU_BE = "100m"
     MIN_MEM_BE = "200Mi"
     MAX_MEM_BE = "250Mi"
-    DC_URL_FRONTEND = "https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/master/tools/openshift/frontend-static.dc.yaml"
-    DC_URL_BACKEND = "https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/master/tools/openshift/backend.dc.yaml"
+    DC_URL_FRONTEND = "https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/master/tools/openshift/frontend-static.dc.ocp4.yaml"
+    DC_URL_BACKEND = "https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/master/tools/openshift/backend.dc.ocp4.yaml"
     CA_CERT = "";
     CERT = "";
     PRIV_KEY = "";
@@ -75,7 +75,7 @@ pipeline{
                       Backend: {
                         try{
                           echo "Building backend..."
-                          def bcBackend = openshift.process('-f', 'tools/openshift/backend.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
+                          def bcBackend = openshift.process('-f', 'https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/master/tools/openshift/backend.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
                           openshift.apply(bcBackend).narrow('bc').startBuild('-w').logs('-f')
 
                           openshift.tag("${REPO_NAME}-backend:latest", "${REPO_NAME}-backend:${JOB_NAME}")
@@ -87,12 +87,12 @@ pipeline{
                       Frontend: {
                         try {
                           echo "Building frontend..."
-                          def bcFrontend = openshift.process('-f', 'tools/openshift/frontend.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
+                          def bcFrontend = openshift.process('-f', 'https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/master/tools/openshift/frontend.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "SOURCE_REPO_URL=${SOURCE_REPO_URL}", "SOURCE_REPO_REF=${SOURCE_REPO_REF}")
 
                           openshift.apply(bcFrontend).narrow('bc').startBuild('-w').logs('-f')
                           openshift.tag("${REPO_NAME}-frontend:latest", "${REPO_NAME}-frontend:${JOB_NAME}")
 
-                          def bcFrontendStatic = openshift.process('-f', 'tools/openshift/frontend-static.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "NAMESPACE=${TOOLS}")
+                          def bcFrontendStatic = openshift.process('-f', 'https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/master/tools/openshift/frontend-static.bc.yaml', "REPO_NAME=${REPO_NAME}", "JOB_NAME=${JOB_NAME}", "NAMESPACE=${TOOLS}")
                           openshift.apply(bcFrontendStatic).narrow('bc').startBuild('-w').logs('-f')
                           openshift.tag("${REPO_NAME}-frontend-static:latest", "${REPO_NAME}-frontend-static:${JOB_NAME}")
                         } catch(e) {
@@ -161,7 +161,7 @@ pipeline{
     stage('e2e tests'){
       steps {
         script {
-          withCredentials([string(credentialsId: 'c2mvws-tools-github-actions-token', variable: 'TOKEN')]) {
+          withCredentials([string(credentialsId: '8878b4-tools-github-actions-token', variable: 'TOKEN')]) {
             extJSHelper.triggerWorkflow(TOKEN, 'smoke-test-student-profile-dev-environment')
             extJSHelper.waitForWorkflowRunComplete(TOKEN)
           }

@@ -7,13 +7,16 @@ APP_NAME_UPPER=${APP_NAME^^}
 TZVALUE="America/Vancouver"
 SOAM_KC_REALM_ID="master"
 KCADM_FILE_BIN_FOLDER="/tmp/keycloak-9.0.3/bin"
-SOAM_KC=$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca
+SOAM_KC=soam-$envValue.apps.silver.devops.gov.bc.ca
 siteMinderLogoutUrl=""
-SERVER_FRONTEND="https://student-profile-${PEN_NAMESPACE}-${envValue}.pathfinder.gov.bc.ca"
+HOST_ROUTE="${envValue}.getmypen.gov.bc.ca"
+SERVER_FRONTEND="https://${envValue}.getmypen.gov.bc.ca"
 if [ "$envValue" != "prod" ]
 then
   siteMinderLogoutUrl="https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
 else
+  SERVER_FRONTEND="https://getmypen.gov.bc.ca"
+  HOST_ROUTE="getmypen.gov.bc.ca"
   siteMinderLogoutUrl="https://logon7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
 fi
 NATS_CLUSTER=educ_nats_cluster
@@ -79,7 +82,7 @@ echo Removing key files
 rm tempPenBackendkey
 rm tempPenBackendkey.pub
 echo Creating config map $APP_NAME-backend-config-map
-oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map --from-literal=TZ=$TZVALUE --from-literal=UI_PRIVATE_KEY="$UI_PRIVATE_KEY_VAL" --from-literal=UI_PUBLIC_KEY="$UI_PUBLIC_KEY_VAL" --from-literal=SOAM_CLIENT_ID=$APP_NAME-soam --from-literal=SOAM_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=SERVER_FRONTEND="$SERVER_FRONTEND" --from-literal=ISSUER=PEN_Retrieval_Application --from-literal=STUDENT_PROFILE_API_ENDPOINT=https://student-profile-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=SOAM_PUBLIC_KEY="$soamFullPublicKey" --from-literal=SOAM_DISCOVERY=https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/.well-known/openid-configuration --from-literal=SOAM_URL=https://$SOAM_KC --from-literal=STUDENT_API_ENDPOINT=https://student-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=DIGITALID_API_ENDPOINT=https://digitalid-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=STUDENT_PROFILE_CLIENT_ID=student-profile-soam --from-literal=STUDENT_PROFILE_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=STUDENT_PROFILE_EMAIL_API_ENDPOINT=https://student-profile-email-api-$PEN_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=STUDENT_PROFILE_EMAIL_SECRET_KEY="$JWT_SECRET_KEY" --from-literal=SITEMINDER_LOGOUT_ENDPOINT="$siteMinderLogoutUrl" --from-literal=STUDENT_DEMOG_API_ENDPOINT=https://pen-demographics-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=LOG_LEVEL=info --from-literal=REDIS_HOST=redis --from-literal=REDIS_PORT=6379 --from-literal=TOKEN_TTL_MINUTES=1440 --from-literal=SCHEDULER_CRON_PROFILE_REQUEST_DRAFT="0 0 0 * * *" --from-literal=NUM_DAYS_ALLOWED_IN_DRAFT_STATUS=7 --from-literal=EXPECTED_DRAFT_REQUESTS=200  --from-literal=NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL=5 --from-literal=NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED=7  --from-literal=PEN_REQUEST_API_ENDPOINT=https://pen-request-api-$COMMON_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=NATS_URL="$NATS_URL" --from-literal=NATS_CLUSTER="$NATS_CLUSTER" --from-literal=PROFILE_REQUEST_SAGA_API_URL=https://student-profile-saga-api-$PEN_NAMESPACE-$envValue.pathfinder.gov.bc.ca --dry-run -o yaml | oc apply -f -
+oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map --from-literal=TZ=$TZVALUE --from-literal=UI_PRIVATE_KEY="$UI_PRIVATE_KEY_VAL" --from-literal=UI_PUBLIC_KEY="$UI_PUBLIC_KEY_VAL" --from-literal=SOAM_CLIENT_ID=$APP_NAME-soam --from-literal=SOAM_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=SERVER_FRONTEND="$SERVER_FRONTEND" --from-literal=ISSUER=PEN_Retrieval_Application --from-literal=STUDENT_PROFILE_API_ENDPOINT=https://student-profile-api-$COMMON_NAMESPACE-$envValue.apps.silver.devops.gov.bc.ca --from-literal=SOAM_PUBLIC_KEY="$soamFullPublicKey" --from-literal=SOAM_DISCOVERY=https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/.well-known/openid-configuration --from-literal=SOAM_URL=https://$SOAM_KC --from-literal=STUDENT_API_ENDPOINT=https://student-api-$COMMON_NAMESPACE-$envValue.apps.silver.devops.gov.bc.ca --from-literal=DIGITALID_API_ENDPOINT=https://digitalid-api-$COMMON_NAMESPACE-$envValue.apps.silver.devops.gov.bc.ca --from-literal=STUDENT_PROFILE_CLIENT_ID=student-profile-soam --from-literal=STUDENT_PROFILE_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=STUDENT_PROFILE_EMAIL_API_ENDPOINT=https://student-profile-email-api-$PEN_NAMESPACE-$envValue.apps.silver.devops.gov.bc.ca --from-literal=STUDENT_PROFILE_EMAIL_SECRET_KEY="$JWT_SECRET_KEY" --from-literal=SITEMINDER_LOGOUT_ENDPOINT="$siteMinderLogoutUrl" --from-literal=STUDENT_DEMOG_API_ENDPOINT=https://pen-demographics-api-$COMMON_NAMESPACE-$envValue.apps.silver.devops.gov.bc.ca --from-literal=LOG_LEVEL=info --from-literal=REDIS_HOST=redis --from-literal=REDIS_PORT=6379 --from-literal=TOKEN_TTL_MINUTES=1440 --from-literal=SCHEDULER_CRON_PROFILE_REQUEST_DRAFT="0 0 0 * * *" --from-literal=NUM_DAYS_ALLOWED_IN_DRAFT_STATUS=7 --from-literal=EXPECTED_DRAFT_REQUESTS=200  --from-literal=NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL=5 --from-literal=NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED=7  --from-literal=PEN_REQUEST_API_ENDPOINT=https://pen-request-api-$COMMON_NAMESPACE-$envValue.apps.silver.devops.gov.bc.ca --from-literal=NATS_URL="$NATS_URL" --from-literal=NATS_CLUSTER="$NATS_CLUSTER" --from-literal=PROFILE_REQUEST_SAGA_API_URL=https://student-profile-saga-api-$PEN_NAMESPACE-$envValue.apps.silver.devops.gov.bc.ca --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for $APP_NAME-backend-$SOAM_KC_REALM_ID application
 oc set env --from=configmap/$APP_NAME-backend-config-map dc/$APP_NAME-backend-$SOAM_KC_REALM_ID
@@ -94,6 +97,15 @@ else
     bceid_reg_url="https://www.bceid.ca/os/?7081&SkipTo=Basic#action"
     journey_builder_url="https://www2.gov.bc.ca/gov/content?id=74E29C67215B4988ABCD778F453A3129"
 fi
+
+if [ "$envValue" = "tools" ]
+then
+  HOST_ROUTE="dev.getmypen.gov.bc.ca"
+elif [ "$envValue" = "dev" ]
+then
+  HOST_ROUTE="test.getmypen.gov.bc.ca"
+fi
+
 
 snowplow="
 // <!-- Snowplow starts plowing - Standalone vE.2.14.0 -->
@@ -128,18 +140,15 @@ regConfig="var config = (function() {
 })();"
 
 echo Creating config map $APP_NAME-frontend-config-map
-oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map --from-literal=TZ=$TZVALUE --from-literal=HOST_ROUTE=$APP_NAME-$PEN_NAMESPACE-$envValue.pathfinder.gov.bc.ca --from-literal=config.js="$regConfig" --from-literal=snowplow.js="$snowplow"  --dry-run -o yaml | oc apply -f -
+oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map --from-literal=TZ=$TZVALUE --from-literal=HOST_ROUTE=$HOST_ROUTE --from-literal=config.js="$regConfig" --from-literal=snowplow.js="$snowplow"  --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for $APP_NAME-frontend-$SOAM_KC_REALM_ID application
 oc set env --from=configmap/$APP_NAME-frontend-config-map dc/$APP_NAME-frontend-$SOAM_KC_REALM_ID
 
 SPLUNK_TOKEN=$(oc -o json get configmaps ${APP_NAME}-${envValue}-setup-config | sed -n "s/.*\"SPLUNK_TOKEN_${APP_NAME_UPPER}\": \"\(.*\)\"/\1/p")
 
-SPLUNK_URL=""
-if [ "$envValue" != "prod" ]
-then
-  SPLUNK_URL="dev.splunk.educ.gov.bc.ca"
-  FLB_CONFIG="[SERVICE]
+SPLUNK_URL="gww.splunk.educ.gov.bc.ca"
+FLB_CONFIG="[SERVICE]
    Flush        1
    Daemon       Off
    Log_Level    debug
@@ -167,27 +176,6 @@ then
    Message_Key $APP_NAME
    Splunk_Token $SPLUNK_TOKEN
 "
-else
-  FLB_CONFIG="[SERVICE]
-   Flush        1
-   Daemon       Off
-   Log_Level    debug
-   HTTP_Server   On
-   HTTP_Listen   0.0.0.0
-   HTTP_Port     2020
-[INPUT]
-   Name   tail
-   Path   /mnt/log/*
-   Mem_Buf_Limit 20MB
-[FILTER]
-   Name record_modifier
-   Match *
-   Record hostname \${HOSTNAME}
-[OUTPUT]
-   Name   stdout
-   Match  *
-"
-fi
 
 echo Creating config map $APP_NAME-flb-sc-config-map
 oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-flb-sc-config-map --from-literal=fluent-bit.conf="$FLB_CONFIG"  --dry-run -o yaml | oc apply -f -

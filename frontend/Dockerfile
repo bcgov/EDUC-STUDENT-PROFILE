@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM docker.io/node:lts-alpine
 
 WORKDIR /opt/app-root/src
 

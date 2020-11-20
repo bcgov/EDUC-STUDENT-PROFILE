@@ -1,6 +1,10 @@
 *:2015 {
     root /var/www/html
 
+    redir https://{$HOST_ROUTE}{path} {
+        if {host} is www.{$HOST_ROUTE}
+    }
+
     header / {
         X-Frame-Options "SAMEORIGIN"
         X-XSS-Protection "1;mode=block"
@@ -20,10 +24,10 @@
     gzip {
         level 7
     }
+
     log stdout
 
     proxy /api {$HOST_ROUTE}
 
     errors stdout
 }
-    
