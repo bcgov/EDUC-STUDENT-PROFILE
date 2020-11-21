@@ -64,7 +64,7 @@ try {
     log.info('starting findAndRemoveStaleSagaRecord');
     const redLock = redisUtil.getRedLock();
     try {
-      await redLock.lock('locks:remove-stale-saga-record', 6000); // no need to release the lock as it will auto expire after 6000 ms.
+      await redLock.lock('locks:remove-stale-saga-record-student-profile', 6000); // no need to release the lock as it will auto expire after 6000 ms.
       const staleSagas = findStaleSagaRecords(await redisUtil.getProfileRequestSagaEvents());
       log.info(`found ${staleSagas.length} stale GMP or UMP saga records`);
 
@@ -72,7 +72,7 @@ try {
         await removeStaleSagas(staleSagas);
       }
     } catch (e) {
-      log.info(`locks:remove-stale-saga-record, check other pods. ${e}`);
+      log.info(`locks:remove-stale-saga-record-student-profile, check other pods. ${e}`);
     }
   });
   removeStaleSagaRecordFromRedis.start();
