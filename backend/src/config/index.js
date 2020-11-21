@@ -79,7 +79,9 @@ nconf.defaults({
     numDaysAllowedInDraftStatus:process.env.NUM_DAYS_ALLOWED_IN_DRAFT_STATUS,
     expectedDraftRequests: process.env.EXPECTED_DRAFT_REQUESTS,
     numDaysAllowedInReturnStatusBeforeEmail:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL,
-    numDaysAllowedInReturnStatusBeforeAbandoned:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED
+    numDaysAllowedInReturnStatusBeforeAbandoned:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED,
+    schedulerCronStaleSagaRecordRedis: process.env.SCHEDULER_CRON_STALE_SAGA_RECORD_REDIS,
+    minTimeBeforeSagaIsStaleInMinutes: process.env.MIN_TIME_BEFORE_SAGA_IS_STALE_IN_MINUTES
   },
   profileSagaAPIURL: process.env.PROFILE_REQUEST_SAGA_API_URL,
   messaging:{

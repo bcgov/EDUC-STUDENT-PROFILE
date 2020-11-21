@@ -135,8 +135,9 @@ router.post('/refresh', [
       if (result && result.jwt && result.refreshToken) {
         req.user.jwt = result.jwt;
         req.user.refreshToken = result.refreshToken;
+        req.user.jwtFrontend = auth.generateUiToken();
         const responseJson = {
-          jwtFrontend: auth.generateUiToken()
+          jwtFrontend: req.user.jwtFrontend
         };
         res.status(200).json(responseJson);
       } else {
