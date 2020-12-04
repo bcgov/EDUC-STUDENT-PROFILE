@@ -161,8 +161,7 @@ pipeline{
     stage('e2e tests'){
       steps {
         script {
-            sh( script: "oc project ${TOOLS}", returnStdout: true)
-            TOKEN = sh( script: "oc -n ${DEV} -o json get secret github-actions-token | sed -n 's/.*\"token\": \"\\(.*\\)\"/\\1/p' | base64 --decode", returnStdout: true);
+            TOKEN = sh( script: "oc -n ${TOOLS} -o json get secret github-actions-token | sed -n 's/.*\"token\": \"\\(.*\\)\"/\\1/p' | base64 --decode", returnStdout: true);
             extJSHelper.triggerWorkflow(TOKEN, 'smoke-test-student-profile-dev-environment')
             extJSHelper.waitForWorkflowRunComplete(TOKEN)
         }
