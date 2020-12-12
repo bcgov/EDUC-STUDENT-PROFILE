@@ -218,29 +218,6 @@ const RequestApps = Object.freeze({
   studentRequest: 'ump'
 });
 
-function computeSMRetUrl(req, token) {
-  let siteMinderRetUrl;
-  if (req.query && req.query.sessionExpired) {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/session-expired');
-  } else if (req.query && req.query.loginError) {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/login-error');
-  } else if (req.query && req.query.loginBcsc) {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc');
-  } else if (req.query && req.query.loginBcscGMP) {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_gmp');
-  } else if (req.query && req.query.loginBcscUMP) {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_ump');
-  } else if (req.query && req.query.loginBceid) {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid');
-  } else if (req.query && req.query.loginBceidGMP) {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_gmp');
-  } else if (req.query && req.query.loginBceidUMP) {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_ump');
-  } else {
-    siteMinderRetUrl = encodeURIComponent(config.get('logoutEndpoint') + '?id_token_hint=' + token + '&post_logout_redirect_uri=' + config.get('server:frontend') + '/logout');
-  }
-  return siteMinderRetUrl;
-}
 function generateJWTToken(jwtid, subject, issuer, algorithm, payload) {
 
   const tokenTTL = config.get('email:tokenTTL'); // this should be in minutes
@@ -272,7 +249,6 @@ const utils = {
   VerificationResults,
   EmailVerificationStatuses,
   RequestApps,
-  computeSMRetUrl,
   generateJWTToken
 };
 

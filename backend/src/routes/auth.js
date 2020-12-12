@@ -4,7 +4,6 @@ const config = require('../config/index');
 const passport = require('passport');
 const express = require('express');
 const auth = require('../components/auth');
-const { computeSMRetUrl } = require('../components/utils');
 const {
   body,
   validationResult
@@ -67,29 +66,29 @@ addBaseRouterGet('oidcBceidUMP', '/login_bceid_ump');
 
 //removes tokens and destroys session
 router.get('/logout', async (req, res) => {
-    req.logout();
-    req.session.destroy();
-    let retUrl;
-    if (req.query && req.query.sessionExpired) {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/session-expired');
-    } else if (req.query && req.query.loginError) {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/login-error');
-    } else if (req.query && req.query.loginBcsc) {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc');
-    } else if (req.query && req.query.loginBcscGMP) {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_gmp');
-    } else if (req.query && req.query.loginBcscUMP) {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_ump');
-    } else if (req.query && req.query.loginBceid) {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid');
-    } else if (req.query && req.query.loginBceidGMP) {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_gmp');
-    } else if (req.query && req.query.loginBceidUMP) {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_ump');
-    } else {
-      retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/logout');
-    }
-    res.redirect(config.get('siteMinder_logout_endpoint')+ retUrl);
+  req.logout();
+  req.session.destroy();
+  let retUrl;
+  if (req.query && req.query.sessionExpired) {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/session-expired');
+  } else if (req.query && req.query.loginError) {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/login-error');
+  } else if (req.query && req.query.loginBcsc) {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc');
+  } else if (req.query && req.query.loginBcscGMP) {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_gmp');
+  } else if (req.query && req.query.loginBcscUMP) {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_ump');
+  } else if (req.query && req.query.loginBceid) {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid');
+  } else if (req.query && req.query.loginBceidGMP) {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_gmp');
+  } else if (req.query && req.query.loginBceidUMP) {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_ump');
+  } else {
+    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/logout');
+  }
+  res.redirect(config.get('siteMinder_logout_endpoint')+ retUrl);
 });
 
 const UnauthorizedRsp = {
