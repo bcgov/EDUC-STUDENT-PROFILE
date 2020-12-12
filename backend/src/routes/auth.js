@@ -67,6 +67,7 @@ addBaseRouterGet('oidcBceidUMP', '/login_bceid_ump');
 
 //removes tokens and destroys session
 router.get('/logout', async (req, res) => {
+  res.redirect(config.get('siteMinder_logout_endpoint'));
   if (req && req.user && req.user.jwt) {
     const token = req.user.jwt;
     req.logout();
