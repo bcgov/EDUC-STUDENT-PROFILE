@@ -67,24 +67,22 @@ addBaseRouterGet('oidcBceidUMP', '/login_bceid_ump');
 
 //removes tokens and destroys session
 router.get('/logout', async (req, res) => {
-  res.redirect(config.get('siteMinder_logout_endpoint'));
-  if (req && req.user && req.user.jwt) {
-    const token = req.user.jwt;
-    req.logout();
-    req.session.destroy();
-    let siteMinderRetUrl = computeSMRetUrl(req, token);
-    const siteMinderLogoutUrl = config.get('siteMinder_logout_endpoint');
-    res.redirect(`${siteMinderLogoutUrl}${siteMinderRetUrl}`);
-
-  } else {
-    if (req.user) {
-      const refresh = await auth.renew(req.user.refreshToken);
-      req.logout();
-      req.session.destroy();
-      let siteMinderRetUrl = computeSMRetUrl(req, refresh.jwt);
-      const siteMinderLogoutUrl = config.get('siteMinder_logout_endpoint');
-      res.redirect(`${siteMinderLogoutUrl}${siteMinderRetUrl}`);
-    } else {
+  // if (req && req.user && req.user.jwt) {
+  //   const token = req.user.jwt;
+  //   req.logout();
+  //   req.session.destroy();
+  //   let siteMinderRetUrl = computeSMRetUrl(req, token);
+  //   const siteMinderLogoutUrl = config.get('siteMinder_logout_endpoint');
+  //   res.redirect(`${siteMinderLogoutUrl}${siteMinderRetUrl}`);
+  // } else {
+  //   if (req.user) {
+  //     const refresh = await auth.renew(req.user.refreshToken);
+  //     req.logout();
+  //     req.session.destroy();
+  //     let siteMinderRetUrl = computeSMRetUrl(req, refresh.jwt);
+  //     const siteMinderLogoutUrl = config.get('siteMinder_logout_endpoint');
+  //     res.redirect(`${siteMinderLogoutUrl}${siteMinderRetUrl}`);
+  //   } else {
       req.logout();
       req.session.destroy();
       let retUrl;
@@ -108,8 +106,8 @@ router.get('/logout', async (req, res) => {
         retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/logout');
       }
       res.redirect(config.get('siteMinder_logout_endpoint')+ retUrl);
-    }
-  }
+    // }
+  // }
 });
 
 const UnauthorizedRsp = {
