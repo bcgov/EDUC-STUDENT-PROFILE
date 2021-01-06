@@ -300,8 +300,9 @@ async function postRequest(accessToken, reqData, userInfo, requestType) {
       reqData.bcscAutoMatchOutcome = autoMatchResults.bcscAutoMatchOutcome;
       reqData.bcscAutoMatchDetails = autoMatchResults.bcscAutoMatchDetails;
     }
-
-    reqData.emailVerified = EmailVerificationStatuses.NOT_VERIFIED;
+    if(!reqData.emailVerified){
+      reqData.emailVerified = EmailVerificationStatuses.NOT_VERIFIED;
+    }
     reqData.digitalID = userInfo.digitalIdentityID;
     let resData = await postData(accessToken, reqData, url);
     resData.digitalID = null;

@@ -73,9 +73,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 import RequestCard from './RequestCard';
-import { pick, mapKeys } from 'lodash';
+import {mapKeys, pick} from 'lodash';
 
 export default {
   name: 'requestSummary',
@@ -114,7 +114,13 @@ export default {
     async submitRequest() {
       try {
         this.submitting = true;
-        const resData = await this.postRequest(this.createRequestData());
+        const data = this.createRequestData();
+        if (this.emailChanged) {
+          data.emailVerified = 'N';
+        } else {
+          data.emailVerified = 'Y';
+        }
+        const resData = await this.postRequest(data);
         if (resData) {
           if (this.emailChanged) {
             this.nextStep();
