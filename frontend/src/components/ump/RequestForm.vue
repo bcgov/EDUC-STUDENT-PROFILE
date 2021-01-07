@@ -324,7 +324,7 @@
 <script>
 import { mapGetters, mapMutations, mapState } from 'vuex';
 import { LocalDate } from '@js-joda/core';
-import { isEqual, pick } from 'lodash';
+import { isEqual, mapValues, pick } from 'lodash';
 
 import { createHelpers } from 'vuex-map-fields';
 
@@ -458,7 +458,7 @@ export default {
       this.$refs.form.validate();
     },
     setNoChangeErrorDialog() {
-      this.alertMessage = 'Please fill in fields that you want to update in the form.';
+      this.alertMessage = 'You must specify at least one change in order to submit a request.';
       this.alert = true;
       window.scrollTo(0,0);
     },
@@ -469,9 +469,8 @@ export default {
           const code = this.genders.filter(it => (it.label === this.request.genderLabel));
           this.request.genderCode = code[0].genderCode;
         }
-
-        if(isEqual(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']),
-          pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']))) {
+        if(isEqual(mapValues(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v=> v === null ? '' : v),
+          mapValues(pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v => v === null ? '' : v))) {
           this.setNoChangeErrorDialog();
         } else {
           this.setUpdateData(this.request);
