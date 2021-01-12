@@ -549,7 +549,7 @@ export default {
 </style>
 
 <style>
-.touppercase.v-text-field > .v-input__control > .v-input__slot > .v-text-field__slot input {
-  text-transform: uppercase
-}
+  .touppercase.v-text-field > .v-input__control > .v-input__slot > .v-text-field__slot input {
+    text-transform: uppercase
+  }
 </style>

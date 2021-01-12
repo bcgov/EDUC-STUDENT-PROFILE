@@ -167,4 +167,8 @@ h1 {
   }
 }
 
+.theme--light.v-btn.v-btn--disabled:not(.v-btn--text):not(.v-btn--outlined) {
+  background-color: rgba(0,0,0,.12)!important;
+}
+
 </style>
