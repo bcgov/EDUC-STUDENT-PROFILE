@@ -108,6 +108,16 @@ h1 {
   border-color: #eeaaad !important;
 }
 
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  margin-left: -12px !important;
+  margin-right: -12px !important;
+  margin-top: inherit !important;
+  margin-bottom: inherit !important;
+}
+
 @media screen and (max-width: 370px) {
 
   .v-toolbar__title{
