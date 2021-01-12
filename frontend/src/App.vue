@@ -112,10 +112,8 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   flex: 1 1 auto;
-  margin-left: -12px !important;
-  margin-right: -12px !important;
-  margin-top: inherit !important;
-  margin-bottom: inherit !important;
+  margin-top: auto !important;
+  margin-bottom: auto !important;
 }
 
 @media screen and (max-width: 370px) {
