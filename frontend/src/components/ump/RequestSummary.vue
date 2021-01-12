@@ -162,4 +162,19 @@ export default {
   }
 }
 
+
+
+</style>
+
+
+<style>
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  margin-left: inherit !important;
+  margin-right: inherit !important;
+  margin-top: inherit !important;
+  margin-bottom: inherit !important;
+}
 </style>

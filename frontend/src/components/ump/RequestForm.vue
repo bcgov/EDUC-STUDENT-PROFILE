@@ -123,7 +123,7 @@
                 v-model="request.legalLastName"
                 color="#003366"
                 outlined
-                :rules="charRules"
+                :rules="charRules && requiredRules(lastNameHint)"
                 class="touppercase"
                 :hint="legalLastNameHint"
                 :persistent-hint="!enableDisableForm.disabled && editLegalLastName"
@@ -347,6 +347,7 @@ export default {
       legalLastNameHint: 'As shown on current Government Photo ID. Note, If you have ONE name only – enter it into the Legal Last Name field and leave Legal First Name blank',
       emailHint: 'Valid Email Required',
       dobHint: 'Valid Birthdate Required',
+      lastNameHint: 'Valid Surname Required',
       menu: false,
       validForm: false,
       submitting: false,
