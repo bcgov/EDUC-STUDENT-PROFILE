@@ -50,6 +50,7 @@
               v-model="userPost.legalLastName"
               color="#003366"
               outlined
+              class="touppercase"
               :rules="requiredRules(legalLastNameHint)"
               :hint="legalLastNameHint"
               label="Legal Last Name"
@@ -68,6 +69,7 @@
               color="#003366"
               hint="As shown on current Government Photo ID. Note, If you have ONE name only – enter it into the Legal Last Name field and leave Legal First Name blank"
               outlined
+              class="touppercase"
               label="Legal First Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -84,6 +86,7 @@
               color="#003366"
               hint="As shown on current Government Photo ID"
               outlined
+              class="touppercase"
               label="Legal Middle Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -98,6 +101,7 @@
               v-model="userPost.usualLastName"
               color="#003366"
               outlined
+              class="touppercase"
               hint="Only if different from Legal Last Name"
               label="Usual Last Name (optional)"
               :disabled="enableDisableForm.disabled"
@@ -113,6 +117,7 @@
               v-model="userPost.usualFirstName"
               color="#003366"
               outlined
+              class="touppercase"
               hint="Only if different from Legal First Name"
               label="Usual First Name(s) (optional)"
               :disabled="enableDisableForm.disabled"
@@ -128,6 +133,7 @@
               v-model="userPost.usualMiddleName"
               color="#003366"
               outlined
+              class="touppercase"
               hint="Only if different from Legal Middle Name"
               label="Usual Middle Name(s) (optional)"
               :disabled="enableDisableForm.disabled"
@@ -142,6 +148,7 @@
               id='maidenName'
               v-model="userPost.maidenName"
               color="#003366"
+              class="touppercase"
               hint="List all previous Last names used separated with spaces"
               outlined
               label="Maiden Name (if applicable)"
@@ -159,6 +166,7 @@
               color="#003366"
               hint="List all previous names used separated with spaces"
               outlined
+              class="touppercase"
               label="Past Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -243,6 +251,7 @@
               :rules="emailRules"
               color="#003366"
               :hint="emailHint"
+              class="touppercase"
               outlined
               label="E-mail Address"
               :disabled="enableDisableForm.disabled"
@@ -259,6 +268,7 @@
               color="#003366"
               hint="Last BC K-12 school or Post Secondary Institute attended"
               outlined
+              class="touppercase"
               label="Last B.C. School Attended (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -274,6 +284,7 @@
               color="#003366"
               hint="School Issued Local ID"
               outlined
+              class="touppercase"
               label="School Student ID Number (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -289,6 +300,7 @@
               color="#003366"
               hint="Current BC K-12 school or Post Secondary Institute"
               outlined
+              class="touppercase"
               label="Current B.C. School Attending (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -642,4 +654,10 @@ export default {
       margin-bottom: 7rem;
     }
   }
+</style>
+
+<style>
+.touppercase.v-text-field > .v-input__control > .v-input__slot > .v-text-field__slot input {
+  text-transform: uppercase
+}
 </style>

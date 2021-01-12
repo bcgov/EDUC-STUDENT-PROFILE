@@ -44,6 +44,7 @@
               :rules="requiredRules(firstNameHint)"
               color="#003366"
               outlined
+              class="touppercase"
               :hint="firstNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
@@ -59,6 +60,7 @@
               :rules="charRules"
               color="#003366"
               outlined
+              class="touppercase"
               :hint="middleNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
@@ -74,6 +76,7 @@
               :rules="requiredRules(lastNameHint)"
               color="#003366"
               outlined
+              class="touppercase"
               :hint="lastNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
@@ -162,6 +165,7 @@
               v-model="recordedData.email"
               color="#003366"
               outlined
+              class="touppercase"
               hint="Recorded E-mail Address"
               persistent-hint
               readonly
@@ -346,5 +350,11 @@ export default {
     width: 0;
     margin: 0;
   }
-
 </style>
+
+<style>
+  .touppercase.v-text-field > .v-input__control > .v-input__slot > .v-text-field__slot input {
+    text-transform: uppercase
+  }
+</style>
+

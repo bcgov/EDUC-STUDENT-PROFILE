@@ -40,7 +40,7 @@
     </v-container>
 
     <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
-      <span>Check fields that need to be updated. Leave fields unchecked that do not require changes</span>
+      <span>Check fields that need to be changed and enter new information. Leave fields unchecked that do not require changes. At least one field in the Student Information section must be changed in order to submit a request.</span>
     </v-alert>
 
     <v-form autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -60,7 +60,7 @@
                 id="editLegalFirstNameCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editLegalFirstName"
-                label="Edit"
+                label="Change"
                 dense
                 :disabled="enableDisableForm.disabled"
               ></v-checkbox>
@@ -71,7 +71,8 @@
                 hint="As shown on current Government Photo ID"
                 :persistent-hint="!enableDisableForm.disabled && editLegalFirstName"
                 outlined
-                label="Current Legal First Name(s) (optional)"
+                class="touppercase"
+                label="Current Legal First Name(s)"
                 :disabled="enableDisableForm.disabled || !editLegalFirstName"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="25"
@@ -86,7 +87,7 @@
                 id="editLegalMiddleNamesCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editLegalMiddleNames"
-                label="Edit"
+                label="Change"
                 dense
                 :disabled="enableDisableForm.disabled"
               ></v-checkbox>
@@ -97,7 +98,8 @@
                 hint="As shown on current Government Photo ID"
                 :persistent-hint="!enableDisableForm.disabled && editLegalMiddleNames"
                 outlined
-                label="Current Legal Middle Name(s) (optional)"
+                class="touppercase"
+                label="Current Legal Middle Name(s)"
                 :disabled="enableDisableForm.disabled || !editLegalMiddleNames"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="25"
@@ -112,7 +114,7 @@
                 id="editLegalLastNameCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editLegalLastName"
-                label="Edit"
+                label="Change"
                 dense
                 :disabled="enableDisableForm.disabled"
               ></v-checkbox>
@@ -122,9 +124,10 @@
                 color="#003366"
                 outlined
                 :rules="charRules"
+                class="touppercase"
                 :hint="legalLastNameHint"
                 :persistent-hint="!enableDisableForm.disabled && editLegalLastName"
-                label="Current Legal Last Name (optional)"
+                label="Current Legal Last Name"
                 :disabled="enableDisableForm.disabled || !editLegalLastName"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="25"
@@ -138,7 +141,7 @@
                 id="editBirthdateCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editBirthdate"
-                label="Edit"
+                label="Change"
                 dense
                 :disabled="enableDisableForm.disabled"
               ></v-checkbox>
@@ -186,7 +189,7 @@
                 id="editGenderLabelCheckbox"
                 class="pt-0 pr-2 mt-0"
                 v-model="editGenderLabel"
-                label="Edit"
+                label="Change"
                 dense
                 :disabled="enableDisableForm.disabled"
               ></v-checkbox>
@@ -219,7 +222,7 @@
                 id="editEmail"
                 class="pt-0 pr-2 mt-0"
                 v-model="editEmail"
-                label="Edit"
+                label="Change"
                 dense
                 :disabled="enableDisableForm.disabled"
                 v-if="hasStudentRecord"
@@ -230,6 +233,7 @@
                 :rules="emailRules"
                 color="#003366"
                 :hint="emailHint"
+                class="touppercase"
                 outlined
                 label="E-mail Address"
                 :disabled="enableDisableForm.disabled || (!editEmail && hasStudentRecord)"
@@ -541,4 +545,10 @@ export default {
   .bottom_group {
     padding-bottom: 15px;
   }
+</style>
+
+<style>
+.touppercase.v-text-field > .v-input__control > .v-input__slot > .v-text-field__slot input {
+  text-transform: uppercase
+}
 </style>
