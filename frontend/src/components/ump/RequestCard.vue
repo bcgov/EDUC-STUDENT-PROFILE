@@ -5,7 +5,7 @@
     </v-card-subtitle>
     <v-container fluid class="pt-0 px-1">
       <slot name="hint"></slot>
-      <v-row no-gutters class="px-3">
+      <v-row no-gutters>
         <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-0">Name:</p>
         </v-col>
@@ -13,7 +13,7 @@
           <p class="ml-2 mb-0 names"><strong>{{fullName}}</strong></p>
         </v-col>
       </v-row>
-      <v-row no-gutters class="px-3">
+      <v-row no-gutters>
         <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-0">Birthdate:</p>
         </v-col>
@@ -21,7 +21,7 @@
           <p class="ml-2 mb-0"><strong>{{ request.dob ? moment(request.dob).format('MMMM D, YYYY'):'' }}</strong></p>
         </v-col>
       </v-row>
-      <v-row no-gutters class="px-3">
+      <v-row no-gutters>
         <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-3">Gender:</p>
         </v-col>
@@ -29,14 +29,14 @@
           <p class="ml-2 mb-3"><strong>{{ genderLabel }}</strong></p>
         </v-col>
       </v-row>
-      <v-row no-gutters class="px-3">
+      <v-row no-gutters>
         <p class="mb-0">
           <strong>
             Contact Information
           </strong>
         </p>
       </v-row>
-      <v-row no-gutters class="px-3">
+      <v-row no-gutters>
         <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-3">E-mail address:</p>
         </v-col>
