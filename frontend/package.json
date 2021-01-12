@@ -42,7 +42,7 @@
     "prom-client": "^11.5.3",
     "purgecss-webpack-plugin": "^1.6.0",
     "regenerator-runtime": "^0.13.3",
-    "sass": "^1.32.0",
+    "sass": "^1.32.4",
     "sass-loader": "^7.1.0",
     "testcafe": "1.6.0",
     "vue": "^2.6.12",
@@ -50,7 +50,7 @@
     "vue-meta": "^2.4.0",
     "vue-quick-chat": "^1.2.6",
     "vue-router": "^3.4.9",
-    "vuetify": "^2.4.0",
+    "vuetify": "^2.4.2",
     "vuex": "^3.6.0",
     "vuex-map-fields": "^1.4.1"
   },
