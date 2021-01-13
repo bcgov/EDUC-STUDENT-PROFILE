@@ -200,6 +200,7 @@
                 outlined
                 :items="genderLabels"
                 :hint="genderHint"
+                :rules="genderRules()"
                 :persistent-hint="!enableDisableForm.disabled && editGenderLabel"
                 label="Current Gender"
                 :disabled="enableDisableForm.disabled || !editGenderLabel"
@@ -344,6 +345,7 @@ export default {
     return {
       localDate:LocalDate,
       genderHint: 'As shown on current Government Photo ID',
+      genderRequiredHint: 'Valid Gender Required',
       legalLastNameHint: 'As shown on current Government Photo ID. Note, If you have ONE name only – enter it into the Legal Last Name field and leave Legal First Name blank',
       emailHint: 'Valid Email Required',
       dobHint: 'Valid Birthdate Required',
@@ -444,6 +446,12 @@ export default {
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,
+        ...this.charRules
+      ];
+    },
+    genderRules() {
+      return [
+        v => !this.editGenderLabel || !!(v && v.trim()) || this.request.genderCode === this.recordedData.genderCode || this.genderRequiredHint,
         ...this.charRules
       ];
     },
