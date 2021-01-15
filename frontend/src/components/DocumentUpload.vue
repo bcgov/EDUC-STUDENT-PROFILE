@@ -22,7 +22,6 @@
         :rules="fileRules"
         :accept="fileAccept"
         placeholder="Select your file"
-        label="File"
         :error-messages="fileInputError"
         @change="selectFile"
       ></v-file-input>
