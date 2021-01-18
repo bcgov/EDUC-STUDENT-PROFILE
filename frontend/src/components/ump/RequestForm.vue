@@ -451,7 +451,7 @@ export default {
     },
     genderRules() {
       return [
-        v => !this.editGenderLabel || !!(v && v.trim()) || this.request.genderCode === this.recordedData.genderCode || this.genderRequiredHint,
+        v => !this.editGenderLabel || !!(v && v.trim()) || this.request.genderLabel === this.recordedData.genderLabel || this.genderRequiredHint,
         ...this.charRules
       ];
     },
