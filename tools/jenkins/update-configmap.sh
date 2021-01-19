@@ -35,6 +35,9 @@ then
 elif [ "$envValue" = "dev" ]
 then
   SERVER_FRONTEND="https://test.getmypen.gov.bc.ca"
+elif [ "$envValue" = "test" ]
+then
+  SERVER_FRONTEND="https://uat.getmypen.gov.bc.ca"
 fi
 
 
@@ -98,7 +101,7 @@ oc set env --from=configmap/$APP_NAME-backend-config-map dc/$APP_NAME-backend-$S
 
 bceid_reg_url=""
 journey_builder_url=""
-if [ "$envValue" = "dev" ] || [ "$envValue" = "test"  ]
+if [ "$envValue" = "tools" ] || [ "$envValue" = "dev"  ] || [ "$envValue" = "test"  ]
 then
     bceid_reg_url="https://www.test.bceid.ca/os/?7081&SkipTo=Basic#action"
     journey_builder_url="https://www2.qa.gov.bc.ca/gov/content/education-training/k-12/support/pen"
@@ -113,6 +116,9 @@ then
 elif [ "$envValue" = "dev" ]
 then
   HOST_ROUTE="test.getmypen.gov.bc.ca"
+elif [ "$envValue" = "test" ]
+then
+  HOST_ROUTE="uat.getmypen.gov.bc.ca"
 fi
 
 
