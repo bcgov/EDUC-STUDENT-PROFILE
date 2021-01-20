@@ -41,7 +41,7 @@ then
 fi
 
 getStudentProfileServiceClientSecret(){
-    executorID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get clients/$studentProfileServiceClientID/client-secret -r $SOAM_KC_REALM_ID | grep -Po "(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}"
+    executorID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get clients/$studentProfileClientID/client-secret -r $SOAM_KC_REALM_ID | grep -Po "(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}"
 }
 
 getStudentProfileClientID(){
@@ -49,11 +49,13 @@ getStudentProfileClientID(){
 }
 studentProfileClientID=$(getStudentProfileClientID)
 
+echo Fetching client secret for student-profile-soam client
+studentProfileServiceClientSecret=$(getStudentProfileServiceClientSecret)
+
 echo Removing PEN Request client if exists
 $KCADM_FILE_BIN_FOLDER/kcadm.sh delete clients/$studentProfileClientID -r $SOAM_KC_REALM_ID
 
-echo Fetching client secret for student-profile-soam client
-studentProfileServiceClientSecret=$(getStudentProfileServiceClientSecret)
+
 
 echo Got this: $studentProfileServiceClientSecret
 
@@ -74,10 +76,6 @@ getPublicKey(){
 echo Fetching public key from SOAM
 soamFullPublicKey="-----BEGIN PUBLIC KEY----- $(getPublicKey) -----END PUBLIC KEY-----"
 
-getStudentProfileServiceClientID(){
-    executorID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get clients -r $SOAM_KC_REALM_ID --fields 'id,clientId' | grep -B2 '"clientId" : "student-profile-soam"' | grep -Po "(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}"
-}
-
 getOfflineAccessID(){
   offlineAccessScopeID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get client-scopes --fields 'id,name' | grep -B2 '"name" : "offline_access"' | grep -Po "(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}"
 }
@@ -88,7 +86,8 @@ JWT_SECRET_KEY=$(getSecret)
 
 echo
 echo Fetching client ID for student-profile-soam client
-studentProfileServiceClientID=$(getStudentProfileServiceClientID)
+studentProfileClientID=$(getStudentProfileClientID)
+
 echo Fetching client secret for student-profile-soam client
 studentProfileServiceClientSecret=$(getStudentProfileServiceClientSecret)
 echo
