@@ -61,7 +61,6 @@ export default {
 <style scoped>
 .container{
   padding: 0px;
-  padding-bottom: 50px;
 }
 .top-banner{
   background-color: aliceblue;
