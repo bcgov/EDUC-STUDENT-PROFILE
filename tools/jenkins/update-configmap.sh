@@ -94,7 +94,7 @@ echo
 echo getting scope id for offline access.
 offlineAccessID=$(getOfflineAccessID)
 
-$KCADM_FILE_BIN_FOLDER/kcadm.sh update clients/$studentProfileServiceClientID/default-client-scopes/$offlineAccessID
+$KCADM_FILE_BIN_FOLDER/kcadm.sh update clients/$studentProfileClientID/default-client-scopes/$offlineAccessID
 
 echo Generating private and public keys
 ssh-keygen -b 4096 -t rsa -f tempPenBackendkey -q -N ""
