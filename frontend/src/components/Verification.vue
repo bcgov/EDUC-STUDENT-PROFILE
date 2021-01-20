@@ -106,7 +106,7 @@ export default {
 
 <style scoped>
 .container{
-  padding: 0 0 50px;
+  padding: 0;
 }
 
 .full-height{

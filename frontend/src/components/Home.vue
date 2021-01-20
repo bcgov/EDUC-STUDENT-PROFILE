@@ -1,6 +1,6 @@
 <!--suppress ALL -->
 <template>
-  <v-container fluid v-if="!isAuthenticated && !isLoading">
+  <v-container fluid class="full-height" v-if="!isAuthenticated && !isLoading">
     <ModalJourney/>
     <!-- login article -->
     <article name="login-banner">
@@ -23,7 +23,7 @@
     </article>
   </v-container>
 
-  <v-container fluid v-else :class="{'min-height-xs': $vuetify.breakpoint.smAndDown, 'min-height-md': $vuetify.breakpoint.mdAndUp, 'min-height-lg': $vuetify.breakpoint.lgAndUp  }">
+  <v-container fluid v-else class="full-height">
 	<v-row justify=center :class="{'px-16': $vuetify.breakpoint.xlAndUp, 'mx-16': $vuetify.breakpoint.xl }">
       <v-col cols="10" xl="8" lg="8" md="10" sm="10" xs="10" :class="{'px-16': $vuetify.breakpoint.xl }">
           <p >If you are currently attending a K-12 school, please request your PEN or update your personal information by contacting the main office at your school
@@ -92,15 +92,6 @@ export default {
   }
   .full-height{
     height: 100%;
-  }
-  .min-height-xs{
-    min-height: 56em;
-  }
-  .min-height-md{
-    min-height: 45em;
-  }
-  .min-height-lg{
-    min-height: 35em;
   }
 </style>
 
