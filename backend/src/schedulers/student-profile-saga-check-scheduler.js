@@ -46,7 +46,7 @@ async function removeStaleSagas(staleSagas) {
             sagaId: sagaFromAPI.sagaId,
             sagaStatus: sagaFromAPI.status
           };
-          await redisUtil.removeSagaRecordFromRedis(event);
+          await redisUtil.removeProfileRequestSagaRecordFromRedis(event);
         } else {
           log.warn(`saga ${sagaFromAPI.sagaId} is not yet completed.`);
         }
