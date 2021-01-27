@@ -33,7 +33,7 @@ function findStaleSagaRecords(inProgressSagas) {
 async function removeStaleSagas(staleSagas) {
   let sagaRecordFromAPIPromises = [];
   try {
-    const data = await getApiCredentials(); // get the tokens first to make api calls.
+    const data = await getApiCredentials(config.get('oidc:clientId'), config.get('oidc:clientSecret')); // get the tokens first to make api calls.
     for (const saga of staleSagas) {
       sagaRecordFromAPIPromises.push(getData(data.accessToken, `${config.get('server:profileSagaAPIURL')}/${saga.sagaId}`));
     }
