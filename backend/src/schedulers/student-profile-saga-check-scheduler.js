@@ -61,12 +61,12 @@ async function removeStaleSagas(staleSagas) {
 
 try {
   const removeStaleSagaRecordFromRedis = new CronJob(schedulerCronStaleSagaRecordRedis, async () => {
-    log.info('starting findAndRemoveStaleSagaRecord');
+    log.debug('starting findAndRemoveStaleSagaRecord');
     const redLock = redisUtil.getRedLock();
     try {
       await redLock.lock('locks:remove-stale-saga-record-student-profile', 6000); // no need to release the lock as it will auto expire after 6000 ms.
       const staleSagas = findStaleSagaRecords(await redisUtil.getProfileRequestSagaEvents());
-      log.info(`found ${staleSagas.length} stale GMP or UMP saga records`);
+      log.debug(`found ${staleSagas.length} stale GMP or UMP saga records`);
 
       if (staleSagas.length > 0) {
         await removeStaleSagas(staleSagas);
