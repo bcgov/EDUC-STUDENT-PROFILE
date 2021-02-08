@@ -27,7 +27,6 @@ const studentRequestRouter = require('./routes/studentRequest');
 const penRequestRouter = require('./routes/penRequest');
 const configRouter = require('./routes/config');
 const promMid = require('express-prometheus-middleware');
-const actuator = require('express-actuator');
 const messageSubscriber = require('./messaging/message-subscriber');
 messageSubscriber.init();
 messageSubscriber.callbacks();
@@ -38,12 +37,6 @@ app.set('trust proxy', 1);
 app.use(cors());
 app.use(helmet());
 app.use(noCache());
-const options = {
-  basePath: '/api', // It will set /management/info instead of /info
-  infoGitMode: 'simple', // the amount of git information you want to expose, 'simple' or 'full'
-  customEndpoints: [] // array of extra endpoints
-};
-app.use(actuator(options));
 app.use(promMid({
   metricsPath: '/api/prometheus',
   collectDefaultMetrics: true,
@@ -62,7 +55,7 @@ const logStream = {
   }
 };
 
-app.use(morgan(config.get('server:morganFormat'), { 'stream': logStream }));
+
 
 
 const Redis = require('./util/redis/redis-client');
@@ -89,7 +82,7 @@ app.use(session({
   cookie: cookie,
   store: dbSession
 }));
-
+app.use(require('./routes/health-check').router);
 //initialize routing and session. Cookies are now only reachable via requests (not js)
 app.use(passport.initialize());
 app.use(passport.session());
@@ -173,7 +166,7 @@ apiRouter.get('/', (_req, res) => {
   });
 });
 
-
+app.use(morgan(config.get('server:morganFormat'), { 'stream': logStream }));
 //set up routing to auth and main API
 app.use(/(\/api)?/, apiRouter);
 
@@ -185,20 +178,20 @@ apiRouter.use('/config',configRouter);
 
 //Handle 500 error
 app.use((err, _req, res, next) => {
-  log.error(err.stack);
-  res.redirect(config.get('server:frontend') + '/error?message=500_internal_error');
+  log.error(err?.stack);
+  res?.redirect(config?.get('server:frontend') + '/error?message=500_internal_error');
   next();
 });
 
 // Handle 404 error
 app.use((_req, res) => {
   log.error('404 Error');
-  res.redirect(config.get('server:frontend') + '/error?message=404_Page_Not_Found');
+  res.redirect(config?.get('server:frontend') + '/error?message=404_Page_Not_Found');
 });
 
 // Prevent unhandled errors from crashing application
 process.on('unhandledRejection', err => {
-  log.error('Unhandled Rejection at:', err.stack || err);
+  log.error('Unhandled Rejection at:', err?.stack || err);
   // res.redirect(config.get('server:frontend') + '/error?message=unhandled_rejection');
 });
 scheduler.draftToAbandonRequestJob.start();

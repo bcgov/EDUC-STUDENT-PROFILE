@@ -1,5 +1,6 @@
 'use strict';
 let redisClient;
+let connectionClosed = false;
 const Redis = {
 
   /**
@@ -24,6 +25,19 @@ const Redis = {
     redisClient.on('error', (error) => {
       log.error(`error occurred in redis client. ${error}`);
     });
+    redisClient.on('end', (error) => {
+      log.error(`redis client end. ${error}`);
+      connectionClosed = true;
+    });
+    redisClient.on('ready', () => {
+      log.info('Redis Ready.');
+    });
+    redisClient.on('connect', () => {
+      log.info('connected to redis.');
+    });
+  },
+  isConnectionClosed() {
+    return connectionClosed;
   },
   getRedisClient() {
     return redisClient;
