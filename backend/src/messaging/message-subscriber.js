@@ -5,6 +5,7 @@ const SagaMessageHandler = require('./handlers/profile-request-saga-message-hand
 let connection={};
 const server = config.get('messaging:natsUrl');
 const nats = require('nats');
+let connectionClosed = false;
 const natsOptions = {
   url: server,
   servers: [server],
@@ -37,7 +38,7 @@ const NATS = {
     });
     connection.on('close', (error) => {
       log.error('NATS closed', error);
-      process.exit(1);
+      connectionClosed = true;
     });
     connection.on('reconnecting', () => {
       log.error('NATS reconnecting');
@@ -50,7 +51,10 @@ const NATS = {
     if(connection){
       connection.close();
     }
-  }
+  },
+  isConnectionClosed() {
+    return connectionClosed;
+  },
 
 };
 
