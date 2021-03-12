@@ -12,9 +12,9 @@
       <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">{{subtitle}}</span>
     </v-card-subtitle>
 
-    <v-form 
+    <v-form
       autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-      ref="form" 
+      ref="form"
       id="requestForm"
       v-model="validForm"
     >
@@ -48,7 +48,7 @@
               :hint="firstNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
-              maxlength="50"
+              maxlength="25"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               dense
             ></v-text-field>
@@ -64,7 +64,7 @@
               :hint="middleNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
-              maxlength="50"
+              maxlength="25"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               dense
             ></v-text-field>
@@ -80,7 +80,7 @@
               :hint="lastNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
-              maxlength="50"
+              maxlength="25"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               dense
             ></v-text-field>
