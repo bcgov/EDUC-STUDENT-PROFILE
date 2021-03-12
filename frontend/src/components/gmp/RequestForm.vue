@@ -57,7 +57,7 @@
               :disabled="enableDisableForm.disabled"
               required
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              maxlength="40"
+              maxlength="25"
               dense
             ></v-text-field>
           </v-col>
@@ -73,7 +73,7 @@
               label="Legal First Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              maxlength="40"
+              maxlength="25"
               dense
               :rules="charRules"
             ></v-text-field>
@@ -90,7 +90,7 @@
               label="Legal Middle Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              maxlength="255"
+              maxlength="25"
               dense
               :rules="charRules"
             ></v-text-field>
@@ -106,7 +106,7 @@
               label="Usual Last Name (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              maxlength="40"
+              maxlength="25"
               dense
               :rules="charRules"
             ></v-text-field>
@@ -122,7 +122,7 @@
               label="Usual First Name(s) (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              maxlength="40"
+              maxlength="25"
               dense
               :rules="charRules"
             ></v-text-field>
@@ -138,7 +138,7 @@
               label="Usual Middle Name(s) (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              maxlength="255"
+              maxlength="25"
               dense
               :rules="charRules"
             ></v-text-field>
@@ -336,7 +336,7 @@
 
               <p><strong>Collection Notice:</strong></p>
               <p>
-                The information included in this form is collected under ss. 26(c) of the Freedom of Information and Protection of Privacy Act, R.S.B.C. 1996, c. 165. 
+                The information included in this form is collected under ss. 26(c) of the Freedom of Information and Protection of Privacy Act, R.S.B.C. 1996, c. 165.
                 The information you provide will be used in confirming your identity and communicating with you.
               </p>
               <p>
@@ -576,7 +576,7 @@ export default {
       if(this.acceptance) {
         this.validate();
       }
-    },      
+    },
     focusBirthdateField(event) {
       if(event.key === 'Tab' && event.type === 'keyup') {
         this.menu = true;
