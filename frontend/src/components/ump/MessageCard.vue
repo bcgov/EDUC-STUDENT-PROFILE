@@ -8,7 +8,7 @@
     <p class="mb-2" v-else><strong>Your UpdateMyPENInfo request has now been re-submitted for processing.</strong></p>
     <ul>
       <li>Requests are processed M-F 8am - 4:30pm excluding stat holidays</li>
-      <li>In most cases you will get a response within one business day</li>
+      <li>In most cases you will get a response within 1-3 business days</li>
       <li>You will receive an email when your request has been processed. You can also log into UpdateMyPENInfo after one business day to check on the status of your request</li>
     </ul>
   </v-alert>
