@@ -12,7 +12,7 @@
               <p class="mb-2"><strong>Your email has been verified and your {{requestName}} request has now been submitted for processing.</strong></p>
               <ul>
                 <li>Requests are processed M-F 8am – 4:30pm excluding stat holidays</li>
-                <li>In most cases you will get a response within one business day</li>
+                <li>In most cases you will get a response within 1-3 business days</li>
                 <li>You will receive an email when your request has been processed. You can also log into {{appName}} after one business day to check on status of your request</li>
               </ul>
             </v-card>
