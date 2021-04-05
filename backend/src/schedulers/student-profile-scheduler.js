@@ -75,7 +75,7 @@ const draftToAbandonRequestJob = new CronJob(schedulerCronPenRequestDraft, async
       findAndSendEmailForStaleReturnedRequests('studentRequest', data.accessToken)
     ]);
   } catch (e) {
-    log.info(`locks:student-profile-request:draft-abandoned, check other pods. ${e}`);
+    log.debug(`locks:student-profile-request:draft-abandoned, check other pods. ${e}`);
   }
 });
 

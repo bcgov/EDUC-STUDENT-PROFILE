@@ -72,7 +72,7 @@ try {
         await removeStaleSagas(staleSagas);
       }
     } catch (e) {
-      log.info(`locks:remove-stale-saga-record-student-profile, check other pods. ${e}`);
+      log.debug(`locks:remove-stale-saga-record-student-profile, check other pods. ${e}`);
     }
   });
   removeStaleSagaRecordFromRedis.start();
