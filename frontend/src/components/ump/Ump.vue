@@ -36,7 +36,7 @@
                 <MessageCard></MessageCard>
               </template>
               <template v-slot:request>
-                <RequestCard :request="request"></RequestCard>
+                <StudentInfoCard :request="request"></StudentInfoCard>
               </template>
             </RequestDisplay>
           </v-col>
@@ -91,7 +91,7 @@ import Login from '../Login';
 import RequestDisplay from '../RequestDisplay';
 import ModalJourney from '../ModalJourney';
 import MessageCard from './MessageCard';
-import RequestCard from './RequestCard';
+import StudentInfoCard from '../StudentInfoCard';
 import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
 import { mapGetters, mapMutations } from 'vuex';
 import { pick, values } from 'lodash';
@@ -102,7 +102,7 @@ export default {
     RequestDisplay,
     ModalJourney,
     MessageCard,
-    RequestCard,
+    StudentInfoCard,
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'userInfo', 'isLoading']),

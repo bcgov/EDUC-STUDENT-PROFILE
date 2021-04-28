@@ -4,7 +4,11 @@
     <article id="request-form-container" class="top-banner full-height">
       <v-row align="center" justify="center">
         <v-col xs="8" sm="8" md="8" lg="8" xl="8">
-          <RequestForm></RequestForm>
+          <RequestStepper
+            :steps="steps"
+            :titles="titles"
+            stepRoutePrefix="gmp-"
+          ></RequestStepper>
         </v-col>
       </v-row>
     </article>
@@ -12,12 +16,18 @@
 </template>
 
 <script>
-import RequestForm from './RequestForm';
+import RequestStepper from '../RequestStepper';
 import { mapGetters } from 'vuex';
 export default {
   name: 'request-page',
   components: {
-    RequestForm,
+    RequestStepper,
+  },
+  data() {
+    return {
+      steps: 3,
+      titles: ['PEN Request Form', 'Confirm Information', 'PEN Request Status'],
+    };
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'userInfo']),

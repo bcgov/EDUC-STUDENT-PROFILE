@@ -228,6 +228,7 @@ export default {
   computed: {
     ...mapGetters('studentRequest', ['genders', 'genderInfo']),
     ...mapGetters(['student']),
+    ...mapGetters('ump', { previousData: 'recordedData' }),
     hasStudentRecord() {
       return !!this.student;
     },
@@ -276,9 +277,10 @@ export default {
   mounted() {
     if (this.student) {
       this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email', 'pen']);
-      const gender = this.genderInfo(this.student.genderCode);
-      this.recordedData.genderLabel = gender.label;
     }
+    Object.assign(this.recordedData, this.previousData);
+    const gender = this.recordedData.genderCode && this.genderInfo(this.recordedData.genderCode);
+    gender && (this.recordedData.genderLabel = gender.label);
   },
   methods: {
     ...mapMutations('ump', ['setRecordedData']),

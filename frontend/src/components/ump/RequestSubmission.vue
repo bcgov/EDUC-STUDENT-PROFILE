@@ -26,7 +26,7 @@
       </v-row>
     </v-card>
 
-    <RequestCard :request="request" class="px-3">
+    <StudentInfoCard :request="request" class="px-3">
       <template v-slot:hint>
         <v-row no-gutters>
           <p>
@@ -43,19 +43,19 @@
           </p>
         </v-row>
       </template>
-    </RequestCard>
+    </StudentInfoCard>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import ApiService from '@/common/apiService';
-import RequestCard from './RequestCard';
+import StudentInfoCard from '../StudentInfoCard';
 
 export default {
   name: 'requestSubmission',
   components: {
-    RequestCard,
+    StudentInfoCard,
   },
   data() {
     return {

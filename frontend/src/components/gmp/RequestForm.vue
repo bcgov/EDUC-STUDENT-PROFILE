@@ -1,12 +1,5 @@
 <template>
-  <v-card class="mainCard" v-if="dataReady">
-    <v-row align-content="center" class="flex-grow-0 pb-5">
-      <v-card style="margin-right: 1.4rem;margin-left: 1.4rem" height="100%" width="100%" elevation=0 color="#036"
-              class="white--text">
-        <v-card-title class="py-3 pl-5"><h1>PEN Request Form</h1></v-card-title>
-      </v-card>
-    </v-row>
-
+  <div v-if="dataReady">
     <v-card color="#FFECA9" class="pa-3 mb-8 mx-3">
       <h3>Guidance:</h3>
       <ul class="pt-2">
@@ -374,39 +367,26 @@
                 :disabled="!validForm"
                 :loading="submitting"
               >
-                Submit
+                Next
               </v-btn>
             </v-card-actions>
           </v-col>
         </v-row>
       </v-container>
     </v-form>
-    <v-dialog
-      v-model="dialog"
-      width="500px"
-    >
-      <v-card>
-        <v-card-text class="fullPadding">
-          {{ dialogMessage }}
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="#003366"
-            class="white--text"
-            @click="closeDialog"
-          >
-            Close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+  </div>
 </template>
 
 <script>
-import {mapGetters, mapMutations, mapActions} from 'vuex';
+import {mapGetters, mapMutations} from 'vuex';
 import {LocalDate} from '@js-joda/core';
+import { createHelpers } from 'vuex-map-fields';
+
+// `gmp` is the name of the Vuex module.
+const { mapFields } = createHelpers({
+  getterType: 'gmp/getField',
+  mutationType: 'gmp/updateField',
+});
 
 export default {
   data() {
@@ -424,12 +404,9 @@ export default {
       search: null,
       nameLimit: 80,
       validForm: false,
-      dialog: false,
       submitting: false,
-      dialogMessage: null,
       apiGenderCodes: [],
       genderLabel: null,
-      declared: false,
       acceptance: false,
       userPost: {
         digitalID: null,
@@ -461,7 +438,11 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('penRequest', ['genders']),
+    ...mapGetters('penRequest', ['genders', 'genderInfo']),
+    ...mapGetters('gmp', ['requestData']),
+    ...mapFields([
+      'declared'
+    ]),
     dataReady() {
       return !!this.userInfo;
     },
@@ -506,10 +487,12 @@ export default {
       this.userPost.usualFirstName = this.userInfo.usualFirstName;
       this.userPost.dob = this.userInfo.dob?(this.userInfo.dob).substr(0, 10):'';
     }
+    Object.assign(this.userPost, this.requestData);
+    const gender = this.userPost.genderCode && this.genderInfo(this.userPost.genderCode);
+    gender && (this.genderLabel = gender.label);
   },
   methods: {
-    ...mapMutations('penRequest', ['setRequest']),
-    ...mapActions('penRequest', ['postRequest']),
+    ...mapMutations('gmp', ['setRequestData']),
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,
@@ -531,43 +514,14 @@ export default {
     validate() {
       this.$refs.form.validate();
     },
-    setSuccessDialog() {
-      this.dialogMessage = 'Form submit success!';
-      this.dialog = true;
-    },
-    setErrorDialog() {
-      this.dialogMessage = 'Sorry, an unexpected error seems to have occured. You can click on the submit button again later.';
-      this.dialog = true;
-    },
-    async submitRequestForm() {
+    submitRequestForm() {
       this.validate();
       if (this.validForm) {
-        try {
-          const code = this.genders.filter(it => (it.label === this.genderLabel));
-          this.userPost.genderCode = code[0].genderCode;
-
-          this.submitting = true;
-          const resData = await this.postRequest(this.userPost);
-          if (resData) {
-            this.$refs.form.reset();
-            this.setSuccessDialog();
-            this.setRequest(resData);
-            if (this.$route.name !== 'gmp') {
-              this.$router.replace({name: 'gmp'});
-            }
-          } else {
-            this.setErrorDialog();
-          }
-        } catch (e) {
-          this.setErrorDialog();
-          throw e;
-        } finally {
-          this.submitting = false;
-        }
+        const code = this.genders.filter(it => (it.label === this.genderLabel));
+        this.userPost.genderCode = code[0].genderCode;
+        this.setRequestData(this.userPost);
+        this.$emit('next');
       }
-    },
-    closeDialog() {
-      this.dialog = false;
     },
     maxSelectableDate(){
       return new Date(LocalDate.now().minusYears(5).toString()).toISOString().substr(0, 10);
@@ -603,16 +557,8 @@ export default {
     /* max-width: 900px; */
   }
 
-  .v-dialog {
-    max-width: 1vw;
-  }
-
   .declaration /deep/ .v-icon {
     padding-left: 2px;
-  }
-
-  .v-dialog > .v-card > .v-card__text {
-    padding: 24px 24px 20px;
   }
 
   .noPadding {

@@ -17,13 +17,16 @@ import RouterView from '@/components/RouterView.vue';
 import Ump from '@/components/ump/Ump.vue';
 import Gmp from '@/components/gmp/Gmp.vue';
 import CurrentInfo from './components/ump/CurrentInfo';
-import RequestForm from './components/ump/RequestForm';
-import RequestSummary from './components/ump/RequestSummary';
-import RequestSubmission from './components/ump/RequestSubmission';
+import StudentRequestForm from './components/ump/RequestForm';
+import StudentRequestSummary from './components/ump/RequestSummary';
+import StudentRequestSubmission from './components/ump/RequestSubmission';
+import PenRequestForm from './components/gmp/RequestForm';
+import PenRequestSummary from './components/gmp/RequestSummary';
+import PenRequestSubmission from './components/gmp/RequestSubmission';
 import authStore from './store/modules/auth';
 import store from './store/index';
 import {pick, values} from 'lodash';
-import { PenRequestStatuses } from '@/utils/constants';
+import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
 import Login from '@/components/Login.vue';
 import BackendSessionExpired from '@/components/BackendSessionExpired';
 
@@ -60,7 +63,8 @@ const router = new VueRouter({
             requiresAuth: true
           },
           beforeEnter: (to, from, next) => {
-            const hasInflightGMPRequest = store.getters['penRequest/request'] && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === store.getters['penRequest/request']);
+            store.commit('ump/clearUmpState');
+            const hasInflightGMPRequest = store.getters['penRequest/request'] && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === store.getters['penRequest/request'].penRequestStatusCode);
             if(authStore.state.isAuthenticated && !store.getters['studentRequest/request'] && !hasInflightGMPRequest) {
               store.commit('setRequestType','studentRequest');
               next('ump/request');
@@ -80,7 +84,7 @@ const router = new VueRouter({
               path: '',
               name: 'step1',
               component: CurrentInfo,
-              beforeEnter: checkRequestExists,
+              beforeEnter: checkStudentRequestExists,
               meta: {
                 requiresAuth: true
               },
@@ -88,8 +92,8 @@ const router = new VueRouter({
             {
               path: 'requestForm',
               name: 'step2',
-              component: RequestForm,
-              beforeEnter: checkRequestExists,
+              component: StudentRequestForm,
+              beforeEnter: checkStudentRequestExists,
               meta: {
                 requiresAuth: true
               },
@@ -97,8 +101,8 @@ const router = new VueRouter({
             {
               path: 'requestSummary',
               name: 'step3',
-              component: RequestSummary,
-              beforeEnter: checkRequestExists,
+              component: StudentRequestSummary,
+              beforeEnter: checkStudentRequestExists,
               meta: {
                 requiresAuth: true
               },
@@ -106,7 +110,7 @@ const router = new VueRouter({
             {
               path: 'requestSubmission',
               name: 'step4',
-              component: RequestSubmission,
+              component: StudentRequestSubmission,
               meta: {
                 requiresAuth: true
               },
@@ -132,14 +136,51 @@ const router = new VueRouter({
           meta: {
             requiresAuth: true
           },
+          beforeEnter: (to, from, next) => {
+            store.commit('gmp/clearGmpState');
+            const hasInflightOrCompletedUMPRequest = store.getters['studentRequest/request'] && values(pick(StudentRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV', 'COMPLETED'])).some(status => status === store.getters['studentRequest/request'].studentRequestStatusCode);
+            if(authStore.state.isAuthenticated && !store.getters['penRequest/request'] && !hasInflightOrCompletedUMPRequest) {
+              store.commit('setRequestType','penRequest');
+              next('gmp/request');
+            } else {
+              next();
+            }
+          },
         },
         {
           path: 'request',
-          name: 'pen-request',
           component: PenRequestPage,
           meta: {
             requiresAuth: true
           },
+          children: [
+            {
+              path: '',
+              name: 'gmp-step1',
+              component: PenRequestForm,
+              beforeEnter: checkPenRequestExists,
+              meta: {
+                requiresAuth: true
+              },
+            },
+            {
+              path: 'requestSummary',
+              name: 'gmp-step2',
+              component: PenRequestSummary,
+              beforeEnter: checkPenRequestExists,
+              meta: {
+                requiresAuth: true
+              },
+            },
+            {
+              path: 'requestSubmission',
+              name: 'gmp-step3',
+              component: PenRequestSubmission,
+              meta: {
+                requiresAuth: true
+              },
+            }
+          ]
         },
         {
           path: 'verification/:status',
@@ -193,7 +234,7 @@ const router = new VueRouter({
   ]
 });
 
-function checkRequestExists(to, from, next) {
+function checkStudentRequestExists(to, from, next) {
   if(authStore.state.isAuthenticated && (!store.getters['studentRequest/request'] || ['COMPLETED', 'ABANDONED', 'REJECTED'].includes(store.getters['studentRequest/request'].studentRequestStatusCode))) {
     store.commit('setRequestType','studentRequest');
     next();
@@ -201,6 +242,16 @@ function checkRequestExists(to, from, next) {
     next('/ump');
   }
 }
+
+function checkPenRequestExists(to, from, next) {
+  if(authStore.state.isAuthenticated && (!store.getters['penRequest/request'] || ['ABANDONED', 'REJECTED'].includes(store.getters['penRequest/request'].penRequestStatusCode))) {
+    store.commit('setRequestType','penRequest');
+    next();
+  } else {
+    next('/gmp');
+  }
+}
+
 router.beforeEach((to, _from, next) => {
   if (to.meta.requiresAuth && authStore.state.isAuthenticated) {
     store.dispatch('auth/getJwtToken').then(() => {

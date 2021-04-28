@@ -1,7 +1,7 @@
 <template>
   <v-card height="100%" width="100%" elevation=0>
-    <v-card-subtitle class="px-1">
-      <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Student Information</span>
+    <v-card-subtitle class="px-1 info-card-title">
+      Student Information
     </v-card-subtitle>
     <v-container fluid class="pt-0 px-1">
       <slot name="hint"></slot>
@@ -52,7 +52,7 @@
 import { mapGetters } from 'vuex';
 
 export default {
-  name: 'requestCard',
+  name: 'studentInfoCard',
   props: {
     request: {
       type: Object,
@@ -78,5 +78,11 @@ export default {
 
 .names {
   text-transform: uppercase;
+}
+
+.info-card-title {
+  font-size: 1.3rem;
+  font-weight: bolder;
+  color: #333333;
 }
 </style>
