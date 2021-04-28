@@ -18,7 +18,7 @@
                   <p class="ml-2 mb-3"><strong>{{ request.statusUpdateDate ? moment(request.statusUpdateDate).fromNow():'' }}</strong>, at {{ request.statusUpdateDate ? moment(request.statusUpdateDate).format('YYYY-MM-DD LT'):'' }}</p>
                 </v-col>
             </v-row>
-            <v-row no-gutters>
+            <v-row no-gutters v-if="showFirstSubmission">
                 <v-col xl="auto" lg="auto" md="auto" sm="auto">
                   <p class="mb-3">Request was first Submitted:</p>
                 </v-col>
@@ -56,11 +56,15 @@ export default {
   props: {
     canCreateRequest: {
       type: Function,
-      required: true
+      default: () => false
     },
     newRequestText: {
       type: String,
-      required: true
+      default: ''
+    },
+    showFirstSubmission: {
+      type: Boolean,
+      default: true
     }
   },
   data() {

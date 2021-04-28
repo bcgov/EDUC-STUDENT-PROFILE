@@ -4,6 +4,7 @@ import auth from '@/store/modules/auth.js';
 import request from '@/store/modules/request.js';
 import config from '@/store/modules/config.js';
 import ump from '@/store/modules/ump.js';
+import gmp from '@/store/modules/gmp.js';
 import root from '@/store/modules/root.js';
 Vue.use(Vuex);
 
@@ -14,6 +15,7 @@ export default new Vuex.Store({
     penRequest: request, 
     studentRequest: request, 
     config,
-    ump
+    ump,
+    gmp
   }
 });

@@ -368,6 +368,7 @@ export default {
       enableDisableForm: {
         disabled: true
       },
+      acceptance: false
     };
   },
   mounted() {
@@ -376,7 +377,7 @@ export default {
     this.request.legalMiddleNames = this.editLegalMiddleNames ? this.updateData.legalMiddleNames : this.recordedData.legalMiddleNames;
     this.request.dob = this.editBirthdate ? this.updateData.dob : this.recordedData.dob;
     this.request.genderLabel = this.editGenderLabel ? this.updateData.genderLabel : this.recordedData.genderLabel;
-    this.request.email = this.editEmail ? this.updateData.email : this.recordedData.email;
+    this.request.email = (this.editEmail || !this.hasStudentRecord) ? this.updateData.email : this.recordedData.email;
 
   },
   computed: {
@@ -390,8 +391,7 @@ export default {
       'isEditable.editBirthdate',
       'isEditable.editGenderLabel',
       'isEditable.editEmail',
-      'declared',
-      'acceptance'
+      'declared'
     ]),
     hasStudentRecord() {
       return !!this.student;

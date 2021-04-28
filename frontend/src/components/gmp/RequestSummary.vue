@@ -1,5 +1,5 @@
 <template>
-  <div v-if="updateData">
+  <div v-if="requestData">
     <v-alert
       dense
       outlined
@@ -13,24 +13,21 @@
     <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
       <h3>Guidance:</h3>
       <ul class="pt-2">
-        <li>Please review your information below before completing the request. If requested updates are incorrect or need to be adjusted further, use the <strong>Back</strong> button to return to the UpdateMyPENInfo form</li>
-        <li>If your name and/or gender has been legally changed, proof of this change may be requested</li>
+        <li>Please review your information and email below before completing the request. If anything is incorrect, use the <strong>Back</strong> button to return to the GetMyPEN form</li>
+        <li>If we are unable to locate your PEN based on the information provided below;</li>
+        <div class="pl-16">
+          <li>identification may be requested or,</li>
+          <li>your PEN request may be rejected</li>
+        </div>
       </ul>
     </v-alert>
 
-    <StudentInfoCard :request="updateData" class="px-3">
+    <StudentInfoCard :request="requestData" class="px-3">
       <template v-slot:hint>
         <v-row no-gutters>
           <p>
             <strong>
-              Please confirm that the information below correctly summarizes the requested changes to your PEN Information
-            </strong>
-          </p>
-        </v-row>
-        <v-row no-gutters>
-          <p class="mb-0">
-            <strong>
-              My PEN Information should be changed to:
+              Please confirm the information below correctly summarizes your legal names, demographic information and contact information before continuing.
             </strong>
           </p>
         </v-row>
@@ -64,7 +61,7 @@
             @click="submitRequest"
             :loading="submitting"
           >
-            {{ emailChanged ? 'Next' : 'Submit' }}
+            Next
           </v-btn>
         </v-card-actions>
       </v-col>
@@ -73,9 +70,8 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'vuex';
+import {mapActions, mapGetters, mapMutations} from 'vuex';
 import StudentInfoCard from '../StudentInfoCard';
-import {mapKeys, pick} from 'lodash';
 
 export default {
   name: 'requestSummary',
@@ -91,42 +87,23 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('ump', ['recordedData', 'updateData']),
-    emailChanged() {
-      return this.recordedData.email !== this.updateData.email;
-    },
+    ...mapGetters('gmp', ['requestData']),
   },
   methods: {
-    ...mapActions('studentRequest', ['postRequest']),
+    ...mapMutations('penRequest', ['setRequest']),
+    ...mapActions('penRequest', ['postRequest']),
     setErrorAlert() {
       this.alertMessage = 'Sorry, an unexpected error seems to have occured. Please try again later.';
       this.alert = true;
       window.scrollTo(0,0);
     },
-    createRequestData() {
-      let request = pick(this.updateData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email']);
-      let recorded = pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email', 'pen']);
-      recorded = mapKeys(recorded, (_, key) => {
-        return 'recorded' + key.slice(0,1).toUpperCase() + key.slice(1);
-      });
-      return { ...request, ...recorded };
-    },
     async submitRequest() {
       try {
         this.submitting = true;
-        const data = this.createRequestData();
-        if (this.emailChanged) {
-          data.emailVerified = 'N';
-        } else {
-          data.emailVerified = 'Y';
-        }
-        const resData = await this.postRequest(data);
+        const resData = await this.postRequest(this.requestData);
         if (resData) {
-          if (this.emailChanged) {
-            this.nextStep();
-          } else {
-            this.$router.replace({name: 'ump'});
-          }
+          this.setRequest(resData);
+          this.nextStep();
         } else {
           this.setErrorAlert();
         }

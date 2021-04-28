@@ -1,8 +1,8 @@
 import { getField, updateField } from 'vuex-map-fields';
-export default {
-  namespaced: true,
-  state: {
-    recordedData: null,
+
+const getDefaultState = () => {
+  return {
+    recordedData: {},
     updateData: {
       legalLastName: null,
       legalFirstName: null,
@@ -21,7 +21,12 @@ export default {
       editGenderLabel: false,
       editEmail: false
     }
-  },
+  };
+};
+
+export default {
+  namespaced: true,
+  state: getDefaultState,
   getters: {
     recordedData: state => state.recordedData,
     updateData: state => state.updateData,
@@ -34,6 +39,9 @@ export default {
     setUpdateData: (state, updateData) => {
       state.updateData = updateData;
     },
-    updateField
-  }
+    updateField,
+    clearUmpState: (state) => {
+      Object.assign(state, {...getDefaultState()});
+    },
+  },
 };

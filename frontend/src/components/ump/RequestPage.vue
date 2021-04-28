@@ -22,7 +22,10 @@
     <article id="request-form-container" class="top-banner full-height">
       <v-row align="center" justify="center">
         <v-col xs="10" sm="10" md="10" lg="10" xl="10">
-        <RequestStepper></RequestStepper>
+        <RequestStepper
+          :steps="steps"
+          :titles="titles"
+        ></RequestStepper>
         </v-col>
       </v-row>
     </article>
@@ -30,7 +33,7 @@
 </template>
 
 <script>
-import RequestStepper from './RequestStepper';
+import RequestStepper from '../RequestStepper';
 import { mapGetters } from 'vuex';
 import { PenRequestStatuses } from '@/utils/constants';
 import { pick, values } from 'lodash';
@@ -39,14 +42,30 @@ export default {
   components: {
     RequestStepper,
   },
+  data() {
+    return {
+      steps: 3,
+      titles: ['Current Student Information', 'Requested Changes to Student Information', 'Confirm Changes', 'Submit Changes'],
+    };
+  },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'userInfo']),
     ...mapGetters('penRequest', {penRequest: 'request'}),
+    ...mapGetters('ump', ['recordedData', 'updateData']),
     hasPen() {
       return !!this.userInfo && !!this.userInfo.pen;
     },
     hasInflightGMPRequest() {
       return this.penRequest && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === this.penRequest.penRequestStatusCode);
+    },
+  },
+  watch: {
+    'updateData.email': function(newVal) {
+      if(newVal && this.updateData.email !== this.recordedData.email) {
+        this.steps = 4;
+      } else if(newVal && this.updateData.email === this.recordedData.email) {
+        this.steps = 3;
+      }
     },
   },
   mounted() {

@@ -33,38 +33,40 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'requestStepper',
+  props: {
+    steps: {
+      type: Number,
+      required: true
+    },
+    titles: {
+      type: Array,
+      required: true
+    },
+    stepRoutePrefix: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
-      steps: 3,
       stepCount: 1,
-      titles: ['Current Student Information', 'Requested Changes to Student Information', 'Confirm Changes', 'Submit Changes'],
-      dialog: false,
-      dialogMessage: null,
     };
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('ump', ['recordedData', 'updateData']),
-    ...mapState('studentRequest', ['request']),
     dataReady() {
       return !!this.userInfo;
     },
   },
   watch: {
-    'updateData.email': function(newVal) {
-      if(newVal && this.updateData.email !== this.recordedData.email) {
-        this.steps = 4;
-      } else if(newVal && this.updateData.email === this.recordedData.email) {
-        this.steps = 3;
-      }
-    },
     $route: {
       handler() {
-        switch (this.$route.name) {
+        const stepName = this.$route.name.replace(this.stepRoutePrefix, '');
+        switch (stepName) {
         case 'step1':
           this.stepCount = 1;
           break;
@@ -85,21 +87,12 @@ export default {
     goToRoute(name) {
       this.$router.push({ name: name });
     },
-    setDialog(message) {
-      this.dialogMessage = message;
-      this.dialog = true;
-    },
-    closeDialog() {
-      this.dialog = false;
-    },
     nextStep() {
-      this.stepCount++;
-      this.goToRoute('step'+this.stepCount);
+      this.goToRoute(`${this.stepRoutePrefix}step${this.stepCount + 1}`);
       window.scrollTo(0,0);
     },
     previousStep() {
-      this.stepCount--;
-      this.goToRoute('step'+this.stepCount);
+      this.goToRoute(`${this.stepRoutePrefix}step${this.stepCount - 1}`);
       window.scrollTo(0,0);
     }
   }
@@ -112,14 +105,6 @@ export default {
     padding: 10px;
     width: 100%;
     /* max-width: 900px; */
-  }
-
-  .v-dialog {
-    max-width: 1vw;
-  }
-
-  .v-dialog > .v-card > .v-card__text {
-    padding: 24px 24px 20px;
   }
 
   .v-stepper /deep/ .v-icon {
