@@ -77,20 +77,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-@media screen and (max-width: 600px) {
-
-  .request-display-header {
-    display: flex;
-    justify-content: center;
-  }
-
-  .request-display-header h1 {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
-</style>
