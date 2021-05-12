@@ -1,4 +1,4 @@
-![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)
+![Lifecycle:Stable](https://img.shields.io/badge/Lifecycle-Stable-97ca00)
 # EDUC-STUDENT-PROFILE
 This project contains the frontend for data change requests. 
 
