@@ -49,6 +49,7 @@
           @click="submitRequest"
           :disabled="!dataReady"
           :loading="active"
+          :key="buttonKey"
         >
           Upload
         </v-btn>
@@ -89,6 +90,7 @@ export default {
       documentTypeCode: null,
       file: null,
       active: false,
+      buttonKey: 0,
 
       alert: false,
       alertMessage: null,
@@ -101,6 +103,12 @@ export default {
       console.log(e);
       this.setErrorAlert('Sorry, an unexpected error seems to have occured. You can upload files later.');
     });
+  },
+  watch: {
+    dataReady() {
+      //force re-renders of the button to solve the color issue
+      this.buttonKey += 1;
+    },
   },
   computed: {
     ...mapGetters(['requestType']),
