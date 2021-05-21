@@ -157,7 +157,7 @@ export default {
     submitRequest() {
       if(this.dataReady){
         try {
-          if(this.file.name && this.file.name.match('^[\\u0080-\\uFFFF\\w,\\s-_]+\\.[A-Za-z]{3}$')){
+          if(this.file.name && this.file.name.match('^[\\u0080-\\uFFFF\\w,\\s-_]+\\.[A-Za-z]{3,4}$')){
             this.active = true;
             const reader = new FileReader(); 
             reader.onload = this.uploadFile;
