@@ -116,6 +116,15 @@ h1 {
   margin-bottom: auto !important;
 }
 
+/* Fix color issue on Safari*/
+.v-application .white--text {
+  -webkit-text-fill-color: #fff !important;
+}
+
+.theme--light.v-btn.v-btn--disabled {
+  -webkit-text-fill-color: rgba(0, 0, 0, 0.26) !important;
+}
+
 @media screen and (max-width: 370px) {
 
   .v-toolbar__title{
