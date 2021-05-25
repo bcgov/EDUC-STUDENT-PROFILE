@@ -87,7 +87,6 @@
 
 <script>
 import Login from '../Login';
-import RequestForm from './RequestForm';
 import RequestDisplay from '../RequestDisplay';
 import ModalJourney from '../ModalJourney';
 import MessageCard from './MessageCard';
@@ -99,7 +98,6 @@ export default {
   name: 'home',
   components: {
     Login,
-    RequestForm,
     RequestDisplay,
     ModalJourney,
     MessageCard,
