@@ -375,7 +375,7 @@ export default {
     ...mapGetters('studentRequest', ['genders', 'genderInfo']),
     ...mapGetters(['student']),
     ...mapState('ump', ['recordedData']),
-    ...mapGetters('ump', { request: 'updateData' }),
+    ...mapState('ump', { request: 'updateData' }),
     ...mapFields([
       'isEditable.editLegalLastName',
       'isEditable.editLegalFirstName',
