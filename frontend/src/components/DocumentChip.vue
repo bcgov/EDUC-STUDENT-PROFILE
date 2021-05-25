@@ -7,7 +7,7 @@
     origin="top left"
   >
     <template v-slot:activator="{ on }">
-      <v-chip
+      <v-chip v-if="!disabled"
         class="chip-overflow ma-1 px-2 align-self-center"
         close
         close-icon="fa-chevron-down"
@@ -17,6 +17,14 @@
         outlined
         v-on="on"
         @click:close="menu = true"
+      >
+        {{document.fileName}}
+      </v-chip>
+      <v-chip v-else
+              class="chip-overflow ma-1 px-2 align-self-center"
+              color="black"
+              label
+              outlined
       >
         {{document.fileName}}
       </v-chip>
@@ -145,8 +153,8 @@ export default {
     },
     deleteDocument() {
       this.deleting = true;
-      this.deleteFile({ 
-        requestID: this.requestID, 
+      this.deleteFile({
+        requestID: this.requestID,
         documentID: this.document.documentID
       }).then(() => {
         this.setSuccessAlert('Your document has been deleted successfully.');
