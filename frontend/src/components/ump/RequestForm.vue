@@ -357,14 +357,14 @@ export default {
       alert: false,
       alertMessage: null,
 
-      request: {
-        legalLastName: null,
-        legalFirstName: null,
-        legalMiddleNames: null,
-        dob: null,
-        genderCode: null,
-        email: null,
-      },
+      // request: {
+      //   legalLastName: null,
+      //   legalFirstName: null,
+      //   legalMiddleNames: null,
+      //   dob: null,
+      //   genderCode: null,
+      //   email: null,
+      // },
       enableDisableForm: {
         disabled: true
       },
@@ -372,18 +372,19 @@ export default {
     };
   },
   mounted() {
-    this.request.legalLastName = this.editLegalLastName ? this.updateData.legalLastName : this.recordedData.legalLastName;
-    this.request.legalFirstName = this.editLegalFirstName ? this.updateData.legalFirstName : this.recordedData.legalFirstName;
-    this.request.legalMiddleNames = this.editLegalMiddleNames ? this.updateData.legalMiddleNames : this.recordedData.legalMiddleNames;
-    this.request.dob = this.editBirthdate ? this.updateData.dob : this.recordedData.dob;
-    this.request.genderLabel = this.editGenderLabel ? this.updateData.genderLabel : this.recordedData.genderLabel;
-    this.request.email = (this.editEmail || !this.hasStudentRecord) ? this.updateData.email : this.recordedData.email;
+    this.request.legalLastName = this.editLegalLastName ? this.request.legalLastName : this.recordedData.legalLastName;
+    this.request.legalFirstName = this.editLegalFirstName ? this.request.legalFirstName : this.recordedData.legalFirstName;
+    this.request.legalMiddleNames = this.editLegalMiddleNames ? this.request.legalMiddleNames : this.recordedData.legalMiddleNames;
+    this.request.dob = this.editBirthdate ? this.request.dob : this.recordedData.dob;
+    this.request.genderLabel = this.editGenderLabel ? this.request.genderLabel : this.recordedData.genderLabel;
+    this.request.email = (this.editEmail || !this.hasStudentRecord) ? this.request.email : this.recordedData.email;
 
   },
   computed: {
     ...mapGetters('studentRequest', ['genders', 'genderInfo']),
     ...mapGetters(['student']),
-    ...mapState('ump', ['recordedData', 'updateData']),
+    ...mapState('ump', ['recordedData']),
+    ...mapGetters('ump', { request: 'updateData' }),
     ...mapFields([
       'isEditable.editLegalLastName',
       'isEditable.editLegalFirstName',
@@ -441,8 +442,6 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('studentRequest', ['setRequest']),
-    ...mapMutations('ump', ['setUpdateData']),
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,
@@ -486,7 +485,6 @@ export default {
           mapValues(pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v => v === null ? '' : v))) {
           this.setNoChangeErrorDialog();
         } else {
-          this.setUpdateData(this.request);
           this.$emit('next');
         }
       }
