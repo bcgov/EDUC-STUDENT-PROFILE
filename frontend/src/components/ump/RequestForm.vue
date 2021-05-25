@@ -327,7 +327,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, mapValues, pick } from 'lodash';
 
