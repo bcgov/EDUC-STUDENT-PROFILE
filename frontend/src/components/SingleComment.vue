@@ -21,6 +21,7 @@
               :document="document"
               :key="document.documentID"
               :undeletable="true"
+              :disabled="document.fileSize===0"
             ></DocumentChip>
         </v-row>
         </v-col>
@@ -58,24 +59,19 @@ export default {
     commentObject() {
       const d = this.toTimeObject(this.comment.timestamp);
       let amPm = 'am';
-      //let hours = d.hour;
       if(d.hour > 12){
         amPm = 'pm';
         d.hour = d.hour - 12;
         //changes from 24 hour to 12 hour
       }
-      
-      //split the hour/minute object, make fixes, then add it back to the datatime object
+
+      //split the hour/minute object, make fixes, then add it back to the date time object
       let fixTime = (d.dateTime).split(' ');
       fixTime[1] = String(d.hour) + ':' +  d.minute;
       fixTime = fixTime.join(' ');
-  
 
-      // d.dayOfWeek = d.dayOfWeek.toLower();
-      // d.month = d.month.pascalCase();
-      //d.month = d.month.substring(0, 3);
-      //const readableTime = d.month + ' ' + d.day + ', ' + d.year + ' ' + hours + ':' + d.minute + ' ' + amPm;
-      const readableTime = fixTime + amPm; //d.year + '-' + d.month + '-' + d.day + ' ' + hours + ':' + d.minute + ' ' + amPm;
+
+      const readableTime = fixTime + amPm;
       if(this.comment.myself){
         return {
           name: this.myself.name,
@@ -106,9 +102,6 @@ export default {
       }
     }
   },
-  mounted() {
-
-  },
   methods: {
     toPascal(str){
       return str.replace(/\w\S*/g, m => m.charAt(0).toUpperCase() + m.substr(1).toLowerCase());
@@ -133,7 +126,7 @@ export default {
         second: retrievedTimestamp.second(),
         millisecond: retrievedTimestamp.nano(),
         dayOfWeek: retrievedTimestamp.dayOfWeek(),
-        dateTime: retrievedTimestamp.format(DateTimeFormatter.ofPattern('yyyy-MM-dd h:m')) 
+        dateTime: retrievedTimestamp.format(DateTimeFormatter.ofPattern('yyyy-MM-dd h:m'))
       };
     }
   }
@@ -201,7 +194,7 @@ export default {
   flex-grow: 0
 }
 .commentContent {
-  white-space: pre-wrap; 
+  white-space: pre-wrap;
   word-wrap: break-word;
 }
 </style>
