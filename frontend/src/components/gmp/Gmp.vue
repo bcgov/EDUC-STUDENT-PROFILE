@@ -27,7 +27,7 @@
     <article id="request-display-container" class="top-banner full-height">
         <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
           <v-col class="pt-1 pt-sm-3" xs="11" sm="11" md="10" lg="8" xl="6">
-            <RequestDisplay 
+            <RequestDisplay
               :title="requestTitle"
               :can-create-request="canCreateRequest"
               :new-request-text="newRequestText"
@@ -69,7 +69,7 @@
     <article id="request-form-container" class="top-banner full-height">
         <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
           <v-col xs="10" sm="10" md="10" lg="10" xl="10">
-            <RequestForm></RequestForm>
+            <router-view></router-view>
           </v-col>
         </v-row>
     </article>
@@ -131,6 +131,15 @@ export default {
   },
   created() {
     this.setRequestType('penRequest');
+  },
+  watch: {
+    isLoading(val) {
+      if(!val) {
+        if(!this.hasPenRequest && !this.hasInflightStudentRequest) {
+          this.$router.push({ name: 'gmp-step1' });
+        }
+      }
+    }
   },
   methods: {
     ...mapMutations(['setRequestType']),
