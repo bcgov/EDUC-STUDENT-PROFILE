@@ -356,15 +356,6 @@ export default {
 
       alert: false,
       alertMessage: null,
-
-      // request: {
-      //   legalLastName: null,
-      //   legalFirstName: null,
-      //   legalMiddleNames: null,
-      //   dob: null,
-      //   genderCode: null,
-      //   email: null,
-      // },
       enableDisableForm: {
         disabled: true
       },
