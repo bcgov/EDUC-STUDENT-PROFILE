@@ -7,9 +7,9 @@ jest.mock('../../../src/components/utils');
 const utils = require('../../../src/components/utils');
 const redisUtil = require('../../../src/util/redis/redis-utils');
 jest.mock('../../../src/components/auth');
-
+const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
 const changeRequest = require('../../../src/components/request');
-const { mockRequest, mockResponse } = require('../helpers'); 
+const { mockRequest, mockResponse } = require('../helpers');
 const { createStudentRequestCommentPayload, createStudentRequestCommentEvent } = require('../../../src/components/studentRequest');
 
 describe('verifyPostComment', () => {
@@ -107,7 +107,7 @@ describe('postComment', () => {
     }
   };
 
-  const postComment = changeRequest.postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent);
+  const postComment = changeRequest.postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent, correlationID);
 
   let req;
   let res;
@@ -132,6 +132,7 @@ describe('postComment', () => {
   });
 
   it('should return saga id', async () => {
+
     await postComment(req, res);
 
     const postReq =  {
@@ -143,7 +144,7 @@ describe('postComment', () => {
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     //expect(res.json).toHaveBeenCalledWith(commentRes);
-    expect(spy).toHaveBeenCalledWith('token', postReq, config.get('profileSagaAPIURL') + config.get(`${requestType}:commentSagaEndpoint`));
+    expect(spy).toHaveBeenCalledWith('token', postReq, config.get('profileSagaAPIURL') + config.get(`${requestType}:commentSagaEndpoint`),correlationID);
   });
 
   it('should return INTERNAL_SERVER_ERROR if postData is failed', async () => {
@@ -189,6 +190,9 @@ describe('getComments', () => {
     utils.getSessionUser.mockReturnValue(sessionUser);
     utils.getData.mockResolvedValue(getRes);
     req = mockRequest(null, null, params);
+    req.session={
+      correlationID
+    };
     res = mockResponse();
   });
 
@@ -272,10 +276,11 @@ describe('getComments', () => {
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(commentsRes);
-    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`);
+    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`, correlationID);
   });
 
   it('should return empty array of messages when no comment', async () => {
+
     await getComments(req, res);
 
     const commentsRes = {
@@ -289,7 +294,7 @@ describe('getComments', () => {
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(commentsRes);
-    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`);
+    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`,correlationID);
   });
 
   it('should return UNAUTHORIZED if no session', async () => {

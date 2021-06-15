@@ -8,11 +8,11 @@ jest.mock('../../../src/components/utils');
 const utils = require('../../../src/components/utils');
 jest.mock('../../../src/components/auth');
 const auth = require('../../../src/components/auth');
-
+const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
 const changeRequest = require('../../../src/components/request');
 const {  __RewireAPI__: rewireRequest} =  require('../../../src/components/request');
 const { ConflictStateError } = require('../../../src/components/error');
-const { mockRequest, mockResponse } = require('../helpers'); 
+const { mockRequest, mockResponse } = require('../helpers');
 
 describe('beforeUpdateRequestAsInitrev', () => {
   const localDateTime = '2020-01-01T12:00:00';
@@ -93,7 +93,7 @@ describe('setRequestAsInitrev', () => {
     utils.putData.mockResolvedValue(request);
     auth.getApiCredentials.mockResolvedValue({accessToken: 'token'});
 
-    const result = await changeRequest.__get__('setRequestAsInitrev')(requestID, requestType);
+    const result = await changeRequest.__get__('setRequestAsInitrev')(requestID, requestType, correlationID);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual(requestID);
@@ -103,8 +103,8 @@ describe('setRequestAsInitrev', () => {
     expect(result.statusUpdateDate).toEqual(localDateTime);
 
     expect(authSpy).toHaveBeenCalledTimes(1);
-    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}`);
-    expect(putDataSpy).toHaveBeenCalledWith('token', request ,config.get('studentRequest:apiEndpoint'));
+    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}`, correlationID);
+    expect(putDataSpy).toHaveBeenCalledWith('token', request ,config.get('studentRequest:apiEndpoint'), correlationID);
   });
 
   it('should throw ConflictStateError if request is not DRAFT', async () => {
@@ -166,7 +166,7 @@ describe('verifyEmail', () => {
   jest.spyOn(utils, 'getSessionUser');
   const setRequestAsInitrevSpy = jest.fn();
 
-  const requestType = 'studentRequest'; 
+  const requestType = 'studentRequest';
   let verifyEmail = changeRequest.verifyEmail(requestType);
 
   let req;

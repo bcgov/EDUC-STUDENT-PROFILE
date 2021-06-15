@@ -8,14 +8,14 @@ const utils = require('../../../src/components/utils');
 const changeRequest = require('../../../src/components/request');
 const {  __RewireAPI__: rewireRequest} =  require('../../../src/components/request');
 const { ServiceError, ApiError, ConflictStateError } = require('../../../src/components/error');
-const { mockRequest, mockResponse } = require('../helpers'); 
+const { mockRequest, mockResponse } = require('../helpers');
 const { setStudentRequestReplicateStatus, verifyStudentRequestStatus } = require('../../../src/components/studentRequest');
 const redis = require('redis-mock');
 jest.mock('../../../src/util/redis/redis-client');
 const redisClient = require('../../../src/util/redis/redis-client');
 jest.mock('../../../src/util/redis/redis-utils');
 const redisUtil = require('../../../src/util/redis/redis-utils');
-
+const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
 describe('verifyRequest', () => {
   const requestID = 'RequestID';
   const params = {
@@ -26,7 +26,8 @@ describe('verifyRequest', () => {
   const session = {
     [requestType]: {
       studentRequestID: requestID,
-    }
+    },
+    correlationID
   };
   const userInfo = { };
   const verifyRequest = changeRequest.verifyRequest(requestType);
@@ -97,12 +98,12 @@ describe('getDigitalIdData', () => {
   it('should return DigitalId data', async () => {
     utils.getData.mockResolvedValue(digitalIdData);
 
-    const result = await changeRequest.__get__('getDigitalIdData')('token', 'digitalID');
+    const result = await changeRequest.__get__('getDigitalIdData')('token', 'digitalID', correlationID);
 
     expect(result).toBeTruthy();
     expect(result.data).toEqual(digitalIdData.data);
     //expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('token', config.get('digitalID:apiEndpoint') + '/digitalID');
+    expect(spy).toHaveBeenCalledWith('token', config.get('digitalID:apiEndpoint') + '/digitalID', correlationID);
   });
 
   it('should throw ServiceError if getData is failed', async () => {
@@ -160,17 +161,17 @@ describe('getStudent', () => {
 describe('getLatestRequest', () => {
   const digitalID = 'ac337def-704b-169f-8170-653e2f7c001';
   let requests = [
-    { 
+    {
       digitalID,
-      statusUpdateDate: '2020-03-03T23:05:40' 
+      statusUpdateDate: '2020-03-03T23:05:40'
     },
-    { 
+    {
       digitalID,
-      statusUpdateDate: '2020-03-05T07:05:59' 
+      statusUpdateDate: '2020-03-05T07:05:59'
     },
-    { 
-      digitalID, 
-      statusUpdateDate: '2020-03-04T10:05:40' 
+    {
+      digitalID,
+      statusUpdateDate: '2020-03-04T10:05:40'
     },
   ];
   const requestType = 'studentRequest';
@@ -181,25 +182,25 @@ describe('getLatestRequest', () => {
   afterEach(() => {
     spy.mockClear();
   });
-  
+
   it('should return the last request', async () => {
     utils.getData.mockResolvedValue(requests);
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus, correlationID);
 
     expect(result).toBeTruthy();
     expect(result.statusUpdateDate).toEqual('2020-03-05T07:05:59');
     expect(result.digitalID).toBeNull();
-    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `/?digitalID=${digitalID}`);
+    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `/?digitalID=${digitalID}`, correlationID);
   });
 
   it('should return null if no requests', async () => {
     utils.getData.mockResolvedValue([]);
 
-    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus);
+    const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus, correlationID);
 
     expect(result).toBeNull();
-    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `/?digitalID=${digitalID}`);
+    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `/?digitalID=${digitalID}`, correlationID);
   });
 
   it('should return null if getData return NOT_FOUND', async () => {
@@ -218,7 +219,7 @@ describe('getLatestRequest', () => {
 
   it('should return tomorrow with false value if current time is after replicateTime', async () => {
     requests = [
-      { 
+      {
         digitalID,
         statusUpdateDate: '2020-03-03T07:05:40',
         studentRequestStatusCode: 'COMPLETED',
@@ -239,7 +240,7 @@ describe('getLatestRequest', () => {
 
   it('should return tomorrow with true value if current time is before replicateTime', async () => {
     requests = [
-      { 
+      {
         digitalID,
         statusUpdateDate: '2020-03-03T09:05:40',
         studentRequestStatusCode: 'COMPLETED',
@@ -260,7 +261,7 @@ describe('getLatestRequest', () => {
 
   it('should return tomorrow with true value if current time is the day after statusUpdateDate but before replicateTime', async () => {
     requests = [
-      { 
+      {
         digitalID,
         statusUpdateDate: '2020-03-03T09:05:40',
         studentRequestStatusCode: 'COMPLETED',
@@ -281,7 +282,7 @@ describe('getLatestRequest', () => {
 
   it('should return tomorrow with false value if current time is the day after statusUpdateDate but after replicateTimee', async () => {
     requests = [
-      { 
+      {
         digitalID,
         statusUpdateDate: '2020-03-03T09:05:40',
         studentRequestStatusCode: 'COMPLETED',
@@ -303,10 +304,10 @@ describe('getLatestRequest', () => {
 
 describe('getDefaultBcscInput', () => {
   it('should return middleNames', async () => {
-    const userInfo = { 
+    const userInfo = {
       _json: {
         givenNames: 'FirstName MiddleName',
-      } 
+      }
     };
 
     const result = changeRequest.__get__('getDefaultBcscInput')(userInfo);
@@ -316,10 +317,10 @@ describe('getDefaultBcscInput', () => {
   });
 
   it('should return empty string if no middle name', async () => {
-    const userInfo = { 
+    const userInfo = {
       _json: {
         givenNames: 'FirstName',
-      } 
+      }
     };
 
     const result = changeRequest.__get__('getDefaultBcscInput')(userInfo);
@@ -329,10 +330,10 @@ describe('getDefaultBcscInput', () => {
   });
 
   it('should return empty string if no given names', async () => {
-    const userInfo = { 
+    const userInfo = {
       _json: {
         givenNames: '',
-      } 
+      }
     };
 
     const result = changeRequest.__get__('getDefaultBcscInput')(userInfo);
@@ -399,9 +400,9 @@ describe('getServerSideCodes', () => {
 
 describe('getUserInfo', () => {
   const digitalID = 'ac337def-704b-169f-8170-653e2f7c001';
-  const request = { 
+  const request = {
     digitalID,
-    statusUpdateDate: '2020-03-03T23:05:40' 
+    statusUpdateDate: '2020-03-03T23:05:40'
   };
 
   const sessionUser = {
@@ -560,7 +561,7 @@ describe('getUserInfo', () => {
     rewireRequest.__Rewire__('getDigitalIdData', () => Promise.reject(new ServiceError('error')));
 
     await changeRequest.getUserInfo(req, res);
-    
+
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
 });
@@ -648,7 +649,7 @@ describe('sendVerificationEmail', () => {
   it('should return response data', async () => {
     utils.postData.mockResolvedValue(response);
     utils.generateJWTToken.mockResolvedValue(token);
-    const result = await changeRequest.__get__('sendVerificationEmail')('token', emailAddress, requestId, identityTypeLabel, requestType);
+    const result = await changeRequest.__get__('sendVerificationEmail')('token', emailAddress, requestId, identityTypeLabel, requestType, correlationID);
 
     const reqData = {
       emailAddress,
@@ -662,7 +663,7 @@ describe('sendVerificationEmail', () => {
     expect(generateTokenSpy).toHaveBeenCalledWith(requestId,emailAddress,'VerifyEmailAPI','HS256',{
       SCOPE: 'VERIFY_EMAIL'
     });
-    expect(spy).toHaveBeenCalledWith('token', reqData, config.get('email:apiEndpoint') + '/ump/verify');
+    expect(spy).toHaveBeenCalledWith('token', reqData, config.get('email:apiEndpoint') + '/ump/verify', correlationID);
   });
 
   it('should throw ServiceError if postData is failed', async () => {
@@ -690,7 +691,7 @@ describe('getAutoMatchResults', () => {
     const autoMatchResults = [];
     utils.getDataWithParams.mockResolvedValue(autoMatchResults);
 
-    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo);
+    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo, correlationID);
 
     expect(result).toEqual({
       bcscAutoMatchOutcome: 'ZEROMATCHES',
@@ -705,7 +706,7 @@ describe('getAutoMatchResults', () => {
         studBirth: '20000101',
         studSex: 'F'
       }
-    });
+    }, correlationID);
   });
 
   it('should return MANYMATCHES if multiple PEN records', async () => {
@@ -727,7 +728,7 @@ describe('getAutoMatchResults', () => {
     }];
     utils.getDataWithParams.mockResolvedValue(autoMatchResults);
 
-    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo);
+    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo, correlationID);
 
     expect(result).toEqual({
       bcscAutoMatchOutcome: 'MANYMATCHES',
@@ -742,7 +743,7 @@ describe('getAutoMatchResults', () => {
         studBirth: '',
         studSex: ''
       }
-    });
+    }, correlationID);
   });
 
   it('should return ONEMATCH if one PEN record', async () => {
@@ -758,7 +759,7 @@ describe('getAutoMatchResults', () => {
     }];
     utils.getDataWithParams.mockResolvedValue(autoMatchResults);
 
-    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo);
+    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo, correlationID);
 
     expect(result).toEqual({
       bcscAutoMatchOutcome: 'ONEMATCH',
@@ -769,7 +770,7 @@ describe('getAutoMatchResults', () => {
         studSurName: 'Surname',
         studGiven: 'Givenname',
       }
-    });
+    }, correlationID);
   });
 
   it('should throw ServiceError if getDataWithParams is failed', async () => {
@@ -799,7 +800,7 @@ describe('postRequest', () => {
   it('should return request data', async () => {
     utils.postData.mockResolvedValue({studentRequestID: 'requestID'});
 
-    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType);
+    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType, correlationID);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual('requestID');
@@ -809,7 +810,7 @@ describe('postRequest', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/');
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/', correlationID);
   });
 
   it('should return request data with autoMatchResults if accountType is BCSC', async () => {
@@ -825,7 +826,7 @@ describe('postRequest', () => {
     utils.postData.mockResolvedValue({studentRequestID: 'requestID'});
     rewireRequest.__Rewire__('getAutoMatchResults', () => Promise.resolve(autoMatchResults));
 
-    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType);
+    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType, correlationID);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual('requestID');
@@ -836,7 +837,7 @@ describe('postRequest', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/');
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/', correlationID);
   });
 
   it('should return request data with ZEROMATCHES if accountType is BCSC and no autoMatchResults', async () => {
@@ -855,7 +856,7 @@ describe('postRequest', () => {
     utils.getDataWithParams.mockResolvedValue(autoMatchRes);
     utils.postData.mockResolvedValue({studentRequestID: 'requestID'});
 
-    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType);
+    const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType, correlationID);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual('requestID');
@@ -866,20 +867,20 @@ describe('postRequest', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/');
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/', correlationID);
   });
 
   it('should throw ServiceError if postData is failed', async () => {
     utils.postData.mockRejectedValue(new Error('error'));
 
-    expect(changeRequest.__get__('postRequest')('token', reqData, userInfo)).rejects.toThrowError(ServiceError);
+    expect(changeRequest.__get__('postRequest')('token', reqData, userInfo, correlationID)).rejects.toThrowError(ServiceError);
   });
 });
 
 describe('submitRequest', () => {
   const digitalID = 'ac337def-704b-169f-8170-653e2f7c001';
-  const request = { 
-    legalLastName: 'legalLastName' 
+  const request = {
+    legalLastName: 'legalLastName'
   };
 
   const requestRes = {
@@ -965,7 +966,7 @@ describe('submitRequest', () => {
     rewireRequest.__Rewire__('postRequest', () => Promise.reject(new ServiceError('error')));
 
     await submitRequest(req, res);
-    
+
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
 
@@ -1026,7 +1027,7 @@ describe('updateRequestStatus', () => {
     utils.getData.mockResolvedValue(request);
     utils.putData.mockResolvedValue(request);
 
-    const result = await changeRequest.__get__('updateRequestStatus')('token', requestID, utils.RequestStatuses.INITREV, requestType, () => request);
+    const result = await changeRequest.__get__('updateRequestStatus')('token', requestID, utils.RequestStatuses.INITREV, requestType, () => request, correlationID);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual(requestID);
@@ -1034,8 +1035,8 @@ describe('updateRequestStatus', () => {
     expect(result.studentRequestStatusCode).toEqual(utils.RequestStatuses.INITREV);
     expect(result.statusUpdateDate).toEqual(localDateTime);
 
-    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}`);
-    expect(putDataSpy).toHaveBeenCalledWith('token', request ,config.get('studentRequest:apiEndpoint'));
+    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}`, correlationID);
+    expect(putDataSpy).toHaveBeenCalledWith('token', request ,config.get('studentRequest:apiEndpoint'), correlationID);
   });
 
   it('should throw ConflictStateError if ConflictStateError is already raised', async () => {
