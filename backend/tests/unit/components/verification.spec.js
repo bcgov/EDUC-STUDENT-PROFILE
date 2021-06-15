@@ -175,6 +175,9 @@ describe('verifyEmail', () => {
   beforeEach(() => {
     utils.getSessionUser.mockReturnValue({});
     req = mockRequest(null, undefined, undefined, query);
+    req.session={
+      correlationID
+    };
     res = mockResponse();
     setRequestAsInitrevSpy.mockResolvedValue(request);
     rewireRequest.__Rewire__('setRequestAsInitrev', setRequestAsInitrevSpy);
@@ -190,7 +193,7 @@ describe('verifyEmail', () => {
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}`);
     expect(req.session[requestType]).toEqual(request);
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType,correlationID);
   });
 
   it('should redirect to verification OK url if the user not logged in', async () => {
@@ -199,7 +202,7 @@ describe('verifyEmail', () => {
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.OK}`);
     expect(req.session[requestType]).toBeFalsy();
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType,correlationID);
   });
 
   it('should redirect to TOKEN_ERROR url if no verificationToken', async () => {
@@ -247,7 +250,7 @@ describe('verifyEmail', () => {
     await verifyEmail(req, res);
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}`);
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType, correlationID);
   });
 
   it('should redirect to verification OK url if ConflictStateError thrown and the user not logged in', async () => {
@@ -258,7 +261,7 @@ describe('verifyEmail', () => {
     await verifyEmail(req, res);
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.OK}`);
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType, correlationID);
   });
 
   it('should redirect to SERVER_ERROR url if other Errors thrown', async () => {
@@ -268,6 +271,6 @@ describe('verifyEmail', () => {
     await verifyEmail(req, res);
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.SERVER_ERROR}`);
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType, correlationID);
   });
 });
