@@ -451,7 +451,7 @@ async function setRequestAsInitrev(requestID, requestType, correlationID) {
   let data = await getApiCredentials(config.get('oidc:clientId'), config.get('oidc:clientSecret'));
   const accessToken = data.accessToken;
 
-  return await updateRequestStatus(accessToken, requestID, RequestStatuses.INITREV, requestType, beforeUpdateRequestAsInitrev, correlationID);
+  return updateRequestStatus(accessToken, requestID, RequestStatuses.INITREV, requestType, beforeUpdateRequestAsInitrev, correlationID);
 }
 
 function verifyEmailToken(token) {
