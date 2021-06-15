@@ -8,11 +8,11 @@ jest.mock('../../../src/components/utils');
 const utils = require('../../../src/components/utils');
 jest.mock('../../../src/components/auth');
 const auth = require('../../../src/components/auth');
-
+const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
 const changeRequest = require('../../../src/components/request');
 const {  __RewireAPI__: rewireRequest} =  require('../../../src/components/request');
 const { ConflictStateError } = require('../../../src/components/error');
-const { mockRequest, mockResponse } = require('../helpers'); 
+const { mockRequest, mockResponse } = require('../helpers');
 
 describe('beforeUpdateRequestAsInitrev', () => {
   const localDateTime = '2020-01-01T12:00:00';
@@ -93,7 +93,7 @@ describe('setRequestAsInitrev', () => {
     utils.putData.mockResolvedValue(request);
     auth.getApiCredentials.mockResolvedValue({accessToken: 'token'});
 
-    const result = await changeRequest.__get__('setRequestAsInitrev')(requestID, requestType);
+    const result = await changeRequest.__get__('setRequestAsInitrev')(requestID, requestType, correlationID);
 
     expect(result).toBeTruthy();
     expect(result.studentRequestID).toEqual(requestID);
@@ -103,8 +103,8 @@ describe('setRequestAsInitrev', () => {
     expect(result.statusUpdateDate).toEqual(localDateTime);
 
     expect(authSpy).toHaveBeenCalledTimes(1);
-    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}`);
-    expect(putDataSpy).toHaveBeenCalledWith('token', request ,config.get('studentRequest:apiEndpoint'));
+    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}`, correlationID);
+    expect(putDataSpy).toHaveBeenCalledWith('token', request ,config.get('studentRequest:apiEndpoint'), correlationID);
   });
 
   it('should throw ConflictStateError if request is not DRAFT', async () => {
@@ -166,7 +166,7 @@ describe('verifyEmail', () => {
   jest.spyOn(utils, 'getSessionUser');
   const setRequestAsInitrevSpy = jest.fn();
 
-  const requestType = 'studentRequest'; 
+  const requestType = 'studentRequest';
   let verifyEmail = changeRequest.verifyEmail(requestType);
 
   let req;
@@ -175,6 +175,9 @@ describe('verifyEmail', () => {
   beforeEach(() => {
     utils.getSessionUser.mockReturnValue({});
     req = mockRequest(null, undefined, undefined, query);
+    req.session={
+      correlationID
+    };
     res = mockResponse();
     setRequestAsInitrevSpy.mockResolvedValue(request);
     rewireRequest.__Rewire__('setRequestAsInitrev', setRequestAsInitrevSpy);
@@ -190,7 +193,7 @@ describe('verifyEmail', () => {
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}`);
     expect(req.session[requestType]).toEqual(request);
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType,correlationID);
   });
 
   it('should redirect to verification OK url if the user not logged in', async () => {
@@ -199,7 +202,7 @@ describe('verifyEmail', () => {
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.OK}`);
     expect(req.session[requestType]).toBeFalsy();
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType,correlationID);
   });
 
   it('should redirect to TOKEN_ERROR url if no verificationToken', async () => {
@@ -247,7 +250,7 @@ describe('verifyEmail', () => {
     await verifyEmail(req, res);
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}`);
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType, correlationID);
   });
 
   it('should redirect to verification OK url if ConflictStateError thrown and the user not logged in', async () => {
@@ -258,7 +261,7 @@ describe('verifyEmail', () => {
     await verifyEmail(req, res);
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.OK}`);
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType, correlationID);
   });
 
   it('should redirect to SERVER_ERROR url if other Errors thrown', async () => {
@@ -268,6 +271,6 @@ describe('verifyEmail', () => {
     await verifyEmail(req, res);
 
     expect(res.redirect).toHaveBeenCalledWith(`${config.get('server:frontend')}/${appName}/verification/${utils.VerificationResults.SERVER_ERROR}`);
-    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType);
+    expect(setRequestAsInitrevSpy).toHaveBeenCalledWith('1234567890', requestType, correlationID);
   });
 });
