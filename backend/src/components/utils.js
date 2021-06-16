@@ -151,11 +151,14 @@ async function postData(token, data, url, correlationID) {
       headers: {
         Authorization: `Bearer ${token}`,
         correlationID: correlationID || uuidv4()
-      }
+      },
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
     };
 
     log.info('post Data Url', url);
     log.verbose('post Data Req', minify(data));
+    log.info(data?.documentData?.length);
     data.createUser = 'STUDENT-PROFILE';
     data.updateUser = 'STUDENT-PROFILE';
     const response = await axios.post(url, data, postDataConfig);
