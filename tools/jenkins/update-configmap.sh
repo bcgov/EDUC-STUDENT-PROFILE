@@ -233,5 +233,5 @@ echo Creating config map $APP_NAME-flb-sc-config-map
 oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-flb-sc-config-map --from-literal=fluent-bit.conf="$FLB_CONFIG"  --from-literal=parsers.conf="$PARSER_CONFIG" --dry-run -o yaml | oc apply -f -
 
 echo Removing un-needed config entries
-oc -n "$PEN_NAMESPACE"-"$envValue" set env dc/"$APP_NAME"-$SOAM_KC_REALM_ID STUDENT_PROFILE_CLIENT_ID-
-oc -n "$PEN_NAMESPACE"-"$envValue" set env dc/"$APP_NAME"-$SOAM_KC_REALM_ID STUDENT_PROFILE_CLIENT_SECRET-
+oc -n "$PEN_NAMESPACE"-"$envValue" set env dc/$APP_NAME-backend-$SOAM_KC_REALM_ID STUDENT_PROFILE_CLIENT_ID-
+oc -n "$PEN_NAMESPACE"-"$envValue" set env dc/$APP_NAME-backend-$SOAM_KC_REALM_ID STUDENT_PROFILE_CLIENT_SECRET-
