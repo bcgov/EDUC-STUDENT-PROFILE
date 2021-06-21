@@ -6,7 +6,6 @@ APP_NAME_UPPER=${APP_NAME^^}
 
 TZVALUE="America/Vancouver"
 SOAM_KC_REALM_ID="master"
-KCADM_FILE_BIN_FOLDER="/tmp/keycloak-9.0.3/bin"
 SOAM_KC=soam-$envValue.apps.silver.devops.gov.bc.ca
 siteMinderLogoutUrl=""
 HOST_ROUTE="${envValue}.getmypen.gov.bc.ca"
@@ -21,13 +20,17 @@ else
 fi
 NATS_CLUSTER=educ_nats_cluster
 NATS_URL="nats://nats.${COMMON_NAMESPACE}-${envValue}.svc.cluster.local:4222"
-oc project $COMMON_NAMESPACE-$envValue
-SOAM_KC_LOAD_USER_ADMIN=$(oc -o json get secret sso-admin-${envValue} | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
-SOAM_KC_LOAD_USER_PASS=$(oc -o json get secret sso-admin-${envValue} | sed -n 's/.*"password": "\(.*\)",/\1/p' | base64 --decode)
-oc project $PEN_NAMESPACE-$envValue
+SOAM_KC_LOAD_USER_ADMIN=$(oc -n $COMMON_NAMESPACE-$envValue -o json get secret sso-admin-${envValue} | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
+SOAM_KC_LOAD_USER_PASS=$(oc -n $COMMON_NAMESPACE-$envValue -o json get secret sso-admin-${envValue} | sed -n 's/.*"password": "\(.*\)",/\1/p' | base64 --decode)
+SPLUNK_TOKEN=$(oc -n $PEN_NAMESPACE-$envValue -o json get configmaps ${APP_NAME}-${envValue}-setup-config | sed -n "s/.*\"SPLUNK_TOKEN_${APP_NAME_UPPER}\": \"\(.*\)\"/\1/p")
 
-
-$KCADM_FILE_BIN_FOLDER/kcadm.sh config credentials --server https://$SOAM_KC/auth --realm $SOAM_KC_REALM_ID --user $SOAM_KC_LOAD_USER_ADMIN --password $SOAM_KC_LOAD_USER_PASS
+echo Fetching SOAM token
+TKN=$(curl -s \
+  -d "client_id=admin-cli" \
+  -d "username=$SOAM_KC_LOAD_USER_ADMIN" \
+  -d "password=$SOAM_KC_LOAD_USER_PASS" \
+  -d "grant_type=password" \
+  "https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/protocol/openid-connect/token" | jq -r '.access_token')
 
 if [ "$envValue" = "tools" ]
 then
@@ -40,56 +43,82 @@ then
   SERVER_FRONTEND="https://uat.getmypen.gov.bc.ca"
 fi
 
-getStudentProfileServiceClientSecret(){
-    executorID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get clients/$studentProfileClientID/client-secret -r $SOAM_KC_REALM_ID | grep -Po "(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}"
-}
+echo
+echo Retrieving client ID for student-profile-soam
+studentProfileClientID=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  | jq '.[] | select(.clientId=="student-profile-soam")' | jq -r '.id')
 
-getStudentProfileClientID(){
-    executorID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get clients -r $SOAM_KC_REALM_ID --fields 'id,clientId' | grep -B2 '"clientId" : "student-profile-soam"' | grep -Po "(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}"
-}
-studentProfileClientID=$(getStudentProfileClientID)
+echo
+echo Retrieving client secret for student-profile-soam
+studentProfileServiceClientSecret=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$studentProfileClientID/client-secret" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  | jq -r '.value')
 
-echo Fetching client secret for student-profile-soam client
-studentProfileServiceClientSecret=$(getStudentProfileServiceClientSecret)
-
-echo Removing PEN Request client if exists
-$KCADM_FILE_BIN_FOLDER/kcadm.sh delete clients/$studentProfileClientID -r $SOAM_KC_REALM_ID
+echo
+echo Removing student-profile-soam if exists
+curl -sX DELETE "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$studentProfileClientID" \
+  -H "Authorization: Bearer $TKN" \
 
 if [ "$studentProfileServiceClientSecret" != "" ] && [ "$envValue" = "tools" ]
 then
-  echo Creating student-profile-soam Keycloak client with secret
-  $KCADM_FILE_BIN_FOLDER/kcadm.sh create clients -r $SOAM_KC_REALM_ID --body "{\"clientId\" : \"student-profile-soam\",\"secret\" : \"$studentProfileServiceClientSecret\", \"name\" : \"Student Profile SOAM\", \"description\" : \"Connect user from Student Profile backend to the SOAM\", \"surrogateAuthRequired\" : false, \"enabled\" : true, \"clientAuthenticatorType\" : \"client-secret\", \"redirectUris\" : [ \"http://localhost*\", \"$SERVER_FRONTEND\", \"$SERVER_FRONTEND/api/auth/callback_bcsc\", \"$SERVER_FRONTEND/api/auth/callback_bcsc_gmp\", \"$SERVER_FRONTEND/api/auth/callback_bcsc_ump\" , \"$SERVER_FRONTEND/logout\", \"$SERVER_FRONTEND/session-expired\", \"$SERVER_FRONTEND/api/auth/callback_bceid\", \"$SERVER_FRONTEND/api/auth/callback_bceid_gmp\", \"$SERVER_FRONTEND/api/auth/callback_bceid_ump\", \"$SERVER_FRONTEND/login-error\", \"$SERVER_FRONTEND/api/auth/login_bcsc\", \"$SERVER_FRONTEND/api/auth/login_bcsc_gmp\", \"$SERVER_FRONTEND/api/auth/login_bcsc_ump\", \"$SERVER_FRONTEND/api/auth/login_bceid\", \"$SERVER_FRONTEND/api/auth/login_bceid_gmp\", \"$SERVER_FRONTEND/api/auth/login_bceid_ump\" ], \"webOrigins\" : [ ], \"notBefore\" : 0, \"bearerOnly\" : false, \"consentRequired\" : false, \"standardFlowEnabled\" : true, \"implicitFlowEnabled\" : false, \"directAccessGrantsEnabled\" : false, \"serviceAccountsEnabled\" : true, \"publicClient\" : false, \"frontchannelLogout\" : false, \"protocol\" : \"openid-connect\", \"attributes\" : { \"saml.assertion.signature\" : \"false\", \"saml.multivalued.roles\" : \"false\", \"saml.force.post.binding\" : \"false\", \"saml.encrypt\" : \"false\", \"saml.server.signature\" : \"false\", \"saml.server.signature.keyinfo.ext\" : \"false\", \"exclude.session.state.from.auth.response\" : \"false\", \"saml_force_name_id_format\" : \"false\", \"saml.client.signature\" : \"false\", \"tls.client.certificate.bound.access.tokens\" : \"false\", \"saml.authnstatement\" : \"false\", \"display.on.consent.screen\" : \"false\", \"saml.onetimeuse.condition\" : \"false\" }, \"authenticationFlowBindingOverrides\" : { }, \"fullScopeAllowed\" : true, \"nodeReRegistrationTimeout\" : -1, \"protocolMappers\" : [ { \"name\" : \"last_name\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"last_name\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"last_name\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"first_name\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"first_name\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"first_name\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"middle_names\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"middle_names\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"middle_names\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"SOAM Mapper\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-soam-mapper\", \"consentRequired\" : false, \"config\" : {\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"userinfo.token.claim\" : \"true\" } }, { \"name\" : \"idir_guid\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"idir_guid\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"idir_guid\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"bceid_guid\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"bceid_guid\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"bceid_guid\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"email_address\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"email_address\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"email_address\",\"jsonType.label\" : \"String\" } } ], \"defaultClientScopes\" : [ \"web-origins\", \"role_list\", \"READ_STUDENT_CODES\", \"READ_STUDENT_PROFILE_CODES\", \"WRITE_STUDENT_PROFILE\", \"profile\", \"roles\", \"email\", \"READ_STUDENT_PROFILE\", \"READ_DIGITALID\", \"READ_STUDENT\", \"SEND_STUDENT_PROFILE_EMAIL\", \"DELETE_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_REQUIREMENTS_STUDENT_PROFILE\", \"WRITE_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_TYPES_STUDENT_PROFILE\", \"SEND_STUDENT_PROFILE_EMAIL\", \"READ_DIGITALID_CODETABLE\", \"READ_STUDENT_PROFILE_STATUSES\", \"READ_PEN_DEMOGRAPHICS\", \"READ_PEN_REQUEST_CODES\", \"WRITE_PEN_REQUEST\", \"READ_PEN_REQUEST\", \"SEND_PEN_REQUEST_EMAIL\", \"DELETE_DOCUMENT\", \"READ_DOCUMENT\", \"READ_DOCUMENT_REQUIREMENTS\", \"WRITE_DOCUMENT\", \"READ_DOCUMENT_TYPES\", \"READ_PEN_REQUEST_STATUSES\",\"PEN_REQUEST_COMMENT_SAGA\",\"STUDENT_PROFILE_COMMENT_SAGA\",\"STUDENT_PROFILE_READ_SAGA\"], \"optionalClientScopes\" : [ \"address\", \"phone\"], \"access\" : { \"view\" : true, \"configure\" : true, \"manage\" : true }}"
+  echo
+  echo Creating client student-profile-soam with secret
+  curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TKN" \
+    -d "{\"clientId\" : \"student-profile-soam\",\"secret\" : \"$studentProfileServiceClientSecret\", \"name\" : \"Student Profile SOAM\", \"description\" : \"Connect user from Student Profile backend to the SOAM\", \"surrogateAuthRequired\" : false, \"enabled\" : true, \"clientAuthenticatorType\" : \"client-secret\", \"redirectUris\" : [ \"http://localhost*\", \"$SERVER_FRONTEND\", \"$SERVER_FRONTEND/api/auth/callback_bcsc\", \"$SERVER_FRONTEND/api/auth/callback_bcsc_gmp\", \"$SERVER_FRONTEND/api/auth/callback_bcsc_ump\" , \"$SERVER_FRONTEND/logout\", \"$SERVER_FRONTEND/session-expired\", \"$SERVER_FRONTEND/api/auth/callback_bceid\", \"$SERVER_FRONTEND/api/auth/callback_bceid_gmp\", \"$SERVER_FRONTEND/api/auth/callback_bceid_ump\", \"$SERVER_FRONTEND/login-error\", \"$SERVER_FRONTEND/api/auth/login_bcsc\", \"$SERVER_FRONTEND/api/auth/login_bcsc_gmp\", \"$SERVER_FRONTEND/api/auth/login_bcsc_ump\", \"$SERVER_FRONTEND/api/auth/login_bceid\", \"$SERVER_FRONTEND/api/auth/login_bceid_gmp\", \"$SERVER_FRONTEND/api/auth/login_bceid_ump\" ], \"webOrigins\" : [ ], \"notBefore\" : 0, \"bearerOnly\" : false, \"consentRequired\" : false, \"standardFlowEnabled\" : true, \"implicitFlowEnabled\" : false, \"directAccessGrantsEnabled\" : false, \"serviceAccountsEnabled\" : true, \"publicClient\" : false, \"frontchannelLogout\" : false, \"protocol\" : \"openid-connect\", \"attributes\" : { \"saml.assertion.signature\" : \"false\", \"saml.multivalued.roles\" : \"false\", \"saml.force.post.binding\" : \"false\", \"saml.encrypt\" : \"false\", \"saml.server.signature\" : \"false\", \"saml.server.signature.keyinfo.ext\" : \"false\", \"exclude.session.state.from.auth.response\" : \"false\", \"saml_force_name_id_format\" : \"false\", \"saml.client.signature\" : \"false\", \"tls.client.certificate.bound.access.tokens\" : \"false\", \"saml.authnstatement\" : \"false\", \"display.on.consent.screen\" : \"false\", \"saml.onetimeuse.condition\" : \"false\" }, \"authenticationFlowBindingOverrides\" : { }, \"fullScopeAllowed\" : true, \"nodeReRegistrationTimeout\" : -1, \"protocolMappers\" : [ { \"name\" : \"last_name\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"last_name\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"last_name\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"first_name\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"first_name\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"first_name\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"middle_names\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"middle_names\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"middle_names\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"SOAM Mapper\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-soam-mapper\", \"consentRequired\" : false, \"config\" : {\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"userinfo.token.claim\" : \"true\" } }, { \"name\" : \"idir_guid\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"idir_guid\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"idir_guid\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"bceid_guid\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"bceid_guid\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"bceid_guid\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"email_address\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"email_address\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"email_address\",\"jsonType.label\" : \"String\" } } ], \"defaultClientScopes\" : [ \"web-origins\", \"role_list\", \"READ_STUDENT_CODES\", \"READ_STUDENT_PROFILE_CODES\", \"WRITE_STUDENT_PROFILE\", \"profile\", \"roles\", \"email\", \"READ_STUDENT_PROFILE\", \"READ_DIGITALID\", \"READ_STUDENT\", \"SEND_STUDENT_PROFILE_EMAIL\", \"DELETE_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_REQUIREMENTS_STUDENT_PROFILE\", \"WRITE_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_TYPES_STUDENT_PROFILE\", \"SEND_STUDENT_PROFILE_EMAIL\", \"READ_DIGITALID_CODETABLE\", \"READ_STUDENT_PROFILE_STATUSES\", \"READ_PEN_DEMOGRAPHICS\", \"READ_PEN_REQUEST_CODES\", \"WRITE_PEN_REQUEST\", \"READ_PEN_REQUEST\", \"SEND_PEN_REQUEST_EMAIL\", \"DELETE_DOCUMENT\", \"READ_DOCUMENT\", \"READ_DOCUMENT_REQUIREMENTS\", \"WRITE_DOCUMENT\", \"READ_DOCUMENT_TYPES\", \"READ_PEN_REQUEST_STATUSES\",\"PEN_REQUEST_COMMENT_SAGA\",\"STUDENT_PROFILE_COMMENT_SAGA\",\"STUDENT_PROFILE_READ_SAGA\"], \"optionalClientScopes\" : [ \"address\", \"phone\"], \"access\" : { \"view\" : true, \"configure\" : true, \"manage\" : true }}"
 else
-  echo Creating student-profile-soam Keycloak client without secret
-  $KCADM_FILE_BIN_FOLDER/kcadm.sh create clients -r $SOAM_KC_REALM_ID --body "{\"clientId\" : \"student-profile-soam\", \"name\" : \"Student Profile SOAM\", \"description\" : \"Connect user from Student Profile backend to the SOAM\", \"surrogateAuthRequired\" : false, \"enabled\" : true, \"clientAuthenticatorType\" : \"client-secret\", \"redirectUris\" : [ \"$SERVER_FRONTEND\", \"$SERVER_FRONTEND/api/auth/callback_bcsc\", \"$SERVER_FRONTEND/api/auth/callback_bcsc_gmp\", \"$SERVER_FRONTEND/api/auth/callback_bcsc_ump\" , \"$SERVER_FRONTEND/logout\", \"$SERVER_FRONTEND/session-expired\", \"$SERVER_FRONTEND/api/auth/callback_bceid\", \"$SERVER_FRONTEND/api/auth/callback_bceid_gmp\", \"$SERVER_FRONTEND/api/auth/callback_bceid_ump\", \"$SERVER_FRONTEND/login-error\", \"$SERVER_FRONTEND/api/auth/login_bcsc\", \"$SERVER_FRONTEND/api/auth/login_bcsc_gmp\", \"$SERVER_FRONTEND/api/auth/login_bcsc_ump\", \"$SERVER_FRONTEND/api/auth/login_bceid\", \"$SERVER_FRONTEND/api/auth/login_bceid_gmp\", \"$SERVER_FRONTEND/api/auth/login_bceid_ump\" ], \"webOrigins\" : [ ], \"notBefore\" : 0, \"bearerOnly\" : false, \"consentRequired\" : false, \"standardFlowEnabled\" : true, \"implicitFlowEnabled\" : false, \"directAccessGrantsEnabled\" : false, \"serviceAccountsEnabled\" : true, \"publicClient\" : false, \"frontchannelLogout\" : false, \"protocol\" : \"openid-connect\", \"attributes\" : { \"saml.assertion.signature\" : \"false\", \"saml.multivalued.roles\" : \"false\", \"saml.force.post.binding\" : \"false\", \"saml.encrypt\" : \"false\", \"saml.server.signature\" : \"false\", \"saml.server.signature.keyinfo.ext\" : \"false\", \"exclude.session.state.from.auth.response\" : \"false\", \"saml_force_name_id_format\" : \"false\", \"saml.client.signature\" : \"false\", \"tls.client.certificate.bound.access.tokens\" : \"false\", \"saml.authnstatement\" : \"false\", \"display.on.consent.screen\" : \"false\", \"saml.onetimeuse.condition\" : \"false\" }, \"authenticationFlowBindingOverrides\" : { }, \"fullScopeAllowed\" : true, \"nodeReRegistrationTimeout\" : -1, \"protocolMappers\" : [ { \"name\" : \"last_name\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"last_name\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"last_name\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"first_name\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"first_name\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"first_name\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"middle_names\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"middle_names\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"middle_names\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"SOAM Mapper\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-soam-mapper\", \"consentRequired\" : false, \"config\" : {\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"userinfo.token.claim\" : \"true\" } }, { \"name\" : \"idir_guid\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"idir_guid\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"idir_guid\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"bceid_guid\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"bceid_guid\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"bceid_guid\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"email_address\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"email_address\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"email_address\",\"jsonType.label\" : \"String\" } } ], \"defaultClientScopes\" : [ \"web-origins\", \"role_list\", \"READ_STUDENT_CODES\", \"READ_STUDENT_PROFILE_CODES\", \"WRITE_STUDENT_PROFILE\", \"profile\", \"roles\", \"email\", \"READ_STUDENT_PROFILE\", \"READ_DIGITALID\", \"READ_STUDENT\", \"SEND_STUDENT_PROFILE_EMAIL\", \"DELETE_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_REQUIREMENTS_STUDENT_PROFILE\", \"WRITE_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_TYPES_STUDENT_PROFILE\", \"SEND_STUDENT_PROFILE_EMAIL\", \"READ_DIGITALID_CODETABLE\", \"READ_STUDENT_PROFILE_STATUSES\", \"READ_PEN_DEMOGRAPHICS\", \"READ_PEN_REQUEST_CODES\", \"WRITE_PEN_REQUEST\", \"READ_PEN_REQUEST\", \"SEND_PEN_REQUEST_EMAIL\", \"DELETE_DOCUMENT\", \"READ_DOCUMENT\", \"READ_DOCUMENT_REQUIREMENTS\", \"WRITE_DOCUMENT\", \"READ_DOCUMENT_TYPES\", \"READ_PEN_REQUEST_STATUSES\",\"PEN_REQUEST_COMMENT_SAGA\",\"STUDENT_PROFILE_COMMENT_SAGA\",\"STUDENT_PROFILE_READ_SAGA\"], \"optionalClientScopes\" : [ \"address\", \"phone\"], \"access\" : { \"view\" : true, \"configure\" : true, \"manage\" : true }}"
+  echo
+  echo Creating client student-profile-soam without secret
+  curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TKN" \
+    -d "{\"clientId\" : \"student-profile-soam\", \"name\" : \"Student Profile SOAM\", \"description\" : \"Connect user from Student Profile backend to the SOAM\", \"surrogateAuthRequired\" : false, \"enabled\" : true, \"clientAuthenticatorType\" : \"client-secret\", \"redirectUris\" : [ \"$SERVER_FRONTEND\", \"$SERVER_FRONTEND/api/auth/callback_bcsc\", \"$SERVER_FRONTEND/api/auth/callback_bcsc_gmp\", \"$SERVER_FRONTEND/api/auth/callback_bcsc_ump\" , \"$SERVER_FRONTEND/logout\", \"$SERVER_FRONTEND/session-expired\", \"$SERVER_FRONTEND/api/auth/callback_bceid\", \"$SERVER_FRONTEND/api/auth/callback_bceid_gmp\", \"$SERVER_FRONTEND/api/auth/callback_bceid_ump\", \"$SERVER_FRONTEND/login-error\", \"$SERVER_FRONTEND/api/auth/login_bcsc\", \"$SERVER_FRONTEND/api/auth/login_bcsc_gmp\", \"$SERVER_FRONTEND/api/auth/login_bcsc_ump\", \"$SERVER_FRONTEND/api/auth/login_bceid\", \"$SERVER_FRONTEND/api/auth/login_bceid_gmp\", \"$SERVER_FRONTEND/api/auth/login_bceid_ump\" ], \"webOrigins\" : [ ], \"notBefore\" : 0, \"bearerOnly\" : false, \"consentRequired\" : false, \"standardFlowEnabled\" : true, \"implicitFlowEnabled\" : false, \"directAccessGrantsEnabled\" : false, \"serviceAccountsEnabled\" : true, \"publicClient\" : false, \"frontchannelLogout\" : false, \"protocol\" : \"openid-connect\", \"attributes\" : { \"saml.assertion.signature\" : \"false\", \"saml.multivalued.roles\" : \"false\", \"saml.force.post.binding\" : \"false\", \"saml.encrypt\" : \"false\", \"saml.server.signature\" : \"false\", \"saml.server.signature.keyinfo.ext\" : \"false\", \"exclude.session.state.from.auth.response\" : \"false\", \"saml_force_name_id_format\" : \"false\", \"saml.client.signature\" : \"false\", \"tls.client.certificate.bound.access.tokens\" : \"false\", \"saml.authnstatement\" : \"false\", \"display.on.consent.screen\" : \"false\", \"saml.onetimeuse.condition\" : \"false\" }, \"authenticationFlowBindingOverrides\" : { }, \"fullScopeAllowed\" : true, \"nodeReRegistrationTimeout\" : -1, \"protocolMappers\" : [ { \"name\" : \"last_name\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"last_name\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"last_name\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"first_name\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"first_name\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"first_name\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"middle_names\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"middle_names\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"middle_names\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"SOAM Mapper\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-soam-mapper\", \"consentRequired\" : false, \"config\" : {\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"userinfo.token.claim\" : \"true\" } }, { \"name\" : \"idir_guid\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"idir_guid\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"idir_guid\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"bceid_guid\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"bceid_guid\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"bceid_guid\",\"jsonType.label\" : \"String\" } }, { \"name\" : \"email_address\", \"protocol\" : \"openid-connect\", \"protocolMapper\" : \"oidc-usermodel-attribute-mapper\", \"consentRequired\" : false, \"config\" : {\"userinfo.token.claim\" : \"true\",\"user.attribute\" : \"email_address\",\"id.token.claim\" : \"true\",\"access.token.claim\" : \"true\",\"claim.name\" : \"email_address\",\"jsonType.label\" : \"String\" } } ], \"defaultClientScopes\" : [ \"web-origins\", \"role_list\", \"READ_STUDENT_CODES\", \"READ_STUDENT_PROFILE_CODES\", \"WRITE_STUDENT_PROFILE\", \"profile\", \"roles\", \"email\", \"READ_STUDENT_PROFILE\", \"READ_DIGITALID\", \"READ_STUDENT\", \"SEND_STUDENT_PROFILE_EMAIL\", \"DELETE_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_REQUIREMENTS_STUDENT_PROFILE\", \"WRITE_DOCUMENT_STUDENT_PROFILE\", \"READ_DOCUMENT_TYPES_STUDENT_PROFILE\", \"SEND_STUDENT_PROFILE_EMAIL\", \"READ_DIGITALID_CODETABLE\", \"READ_STUDENT_PROFILE_STATUSES\", \"READ_PEN_DEMOGRAPHICS\", \"READ_PEN_REQUEST_CODES\", \"WRITE_PEN_REQUEST\", \"READ_PEN_REQUEST\", \"SEND_PEN_REQUEST_EMAIL\", \"DELETE_DOCUMENT\", \"READ_DOCUMENT\", \"READ_DOCUMENT_REQUIREMENTS\", \"WRITE_DOCUMENT\", \"READ_DOCUMENT_TYPES\", \"READ_PEN_REQUEST_STATUSES\",\"PEN_REQUEST_COMMENT_SAGA\",\"STUDENT_PROFILE_COMMENT_SAGA\",\"STUDENT_PROFILE_READ_SAGA\"], \"optionalClientScopes\" : [ \"address\", \"phone\"], \"access\" : { \"view\" : true, \"configure\" : true, \"manage\" : true }}"
 fi
 
-getPublicKey(){
-    executorID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get keys -r $SOAM_KC_REALM_ID | grep -Po 'publicKey" : "\K([^"]*)'
-}
+echo Fetching public key from SOAM
+fullKey=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/keys" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  | jq -r '.keys | .[] | select(has("publicKey")) | .publicKey')
 
 echo Fetching public key from SOAM
-soamFullPublicKey="-----BEGIN PUBLIC KEY----- $(getPublicKey) -----END PUBLIC KEY-----"
+soamFullPublicKey="-----BEGIN PUBLIC KEY----- $fullKey -----END PUBLIC KEY-----"
 
-getOfflineAccessID(){
-  offlineAccessScopeID= $KCADM_FILE_BIN_FOLDER/kcadm.sh get client-scopes --fields 'id,name' | grep -B2 '"name" : "offline_access"' | grep -Po "(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}"
-}
 getSecret(){
 head /dev/urandom | tr -dc A-Za-z0-9 | head -c 5000 | base64
 }
 JWT_SECRET_KEY=$(getSecret)
 
 echo
-echo Fetching client ID for student-profile-soam client
-studentProfileClientID=$(getStudentProfileClientID)
+echo Retrieving client ID for student-profile-soam
+studentProfileClientID=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  | jq '.[] | select(.clientId=="student-profile-soam")' | jq -r '.id')
 
-echo Fetching client secret for student-profile-soam client
-studentProfileServiceClientSecret=$(getStudentProfileServiceClientSecret)
 echo
-echo getting scope id for offline access.
-offlineAccessID=$(getOfflineAccessID)
+echo Retrieving client secret for student-profile-soam
+studentProfileServiceClientSecret=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$studentProfileClientID/client-secret" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  | jq -r '.value')
 
-$KCADM_FILE_BIN_FOLDER/kcadm.sh update clients/$studentProfileClientID/default-client-scopes/$offlineAccessID
+echo
+echo Retrieving scope id for offline access
+offlineAccessID=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  | jq '.[] | select(.name=="offline_access")' | jq -r '.id')
+
+echo
+echo Updating client to include offline access scope
+curl -sX PUT "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$studentProfileClientID/default-client-scopes/$offlineAccessID" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN"
 
 echo Generating private and public keys
 ssh-keygen -b 4096 -t rsa -f tempPenBackendkey -q -N ""
@@ -102,7 +131,7 @@ echo Creating config map $APP_NAME-backend-config-map
 oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map --from-literal=TZ=$TZVALUE --from-literal=UI_PRIVATE_KEY="$UI_PRIVATE_KEY_VAL" --from-literal=UI_PUBLIC_KEY="$UI_PUBLIC_KEY_VAL" --from-literal=SOAM_CLIENT_ID=$APP_NAME-soam --from-literal=SOAM_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=SERVER_FRONTEND="$SERVER_FRONTEND" --from-literal=ISSUER=PEN_Retrieval_Application --from-literal=STUDENT_PROFILE_API_ENDPOINT="http://student-profile-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student-profile" --from-literal=SOAM_PUBLIC_KEY="$soamFullPublicKey" --from-literal=SOAM_DISCOVERY=https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/.well-known/openid-configuration --from-literal=SOAM_URL=https://$SOAM_KC --from-literal=STUDENT_API_ENDPOINT="http://student-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student" --from-literal=DIGITALID_API_ENDPOINT="http://digitalid-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/digital-id" --from-literal=STUDENT_PROFILE_CLIENT_ID=student-profile-soam --from-literal=STUDENT_PROFILE_CLIENT_SECRET=$studentProfileServiceClientSecret --from-literal=STUDENT_PROFILE_EMAIL_API_ENDPOINT="http://student-profile-email-api-master.$PEN_NAMESPACE-$envValue.svc.cluster.local:8080" --from-literal=STUDENT_PROFILE_EMAIL_SECRET_KEY="$JWT_SECRET_KEY" --from-literal=SITEMINDER_LOGOUT_ENDPOINT="$siteMinderLogoutUrl" --from-literal=STUDENT_DEMOG_API_ENDPOINT="http://pen-demographics-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080" --from-literal=LOG_LEVEL=info --from-literal=REDIS_HOST=redis --from-literal=REDIS_PORT=6379 --from-literal=TOKEN_TTL_MINUTES=1440 --from-literal=SCHEDULER_CRON_PROFILE_REQUEST_DRAFT="0 0 0 * * *" --from-literal=NUM_DAYS_ALLOWED_IN_DRAFT_STATUS=7 --from-literal=EXPECTED_DRAFT_REQUESTS=200  --from-literal=NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL=5 --from-literal=NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED=7  --from-literal=PEN_REQUEST_API_ENDPOINT="http://pen-request-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/pen-request" --from-literal=NATS_URL="$NATS_URL" --from-literal=NATS_CLUSTER="$NATS_CLUSTER" --from-literal=SCHEDULER_CRON_STALE_SAGA_RECORD_REDIS="0 0/5 * * * *" --from-literal=MIN_TIME_BEFORE_SAGA_IS_STALE_IN_MINUTES=5 --from-literal=PROFILE_REQUEST_SAGA_API_URL="http://student-profile-saga-api-master.$PEN_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student-profile-saga" --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for $APP_NAME-backend-$SOAM_KC_REALM_ID application
-oc set env --from=configmap/$APP_NAME-backend-config-map dc/$APP_NAME-backend-$SOAM_KC_REALM_ID
+oc -n $PEN_NAMESPACE-$envValue set env --from=configmap/$APP_NAME-backend-config-map dc/$APP_NAME-backend-$SOAM_KC_REALM_ID
 
 bceid_reg_url=""
 journey_builder_url=""
@@ -125,7 +154,6 @@ elif [ "$envValue" = "test" ]
 then
   HOST_ROUTE="uat.getmypen.gov.bc.ca"
 fi
-
 
 snowplow="
 // <!-- Snowplow starts plowing - Standalone vE.2.14.0 -->
@@ -163,9 +191,7 @@ echo Creating config map $APP_NAME-frontend-config-map
 oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map --from-literal=TZ=$TZVALUE --from-literal=HOST_ROUTE=$HOST_ROUTE --from-literal=config.js="$regConfig" --from-literal=snowplow.js="$snowplow"  --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for $APP_NAME-frontend-$SOAM_KC_REALM_ID application
-oc set env --from=configmap/$APP_NAME-frontend-config-map dc/$APP_NAME-frontend-$SOAM_KC_REALM_ID
-
-SPLUNK_TOKEN=$(oc -o json get configmaps ${APP_NAME}-${envValue}-setup-config | sed -n "s/.*\"SPLUNK_TOKEN_${APP_NAME_UPPER}\": \"\(.*\)\"/\1/p")
+oc -n $PEN_NAMESPACE-$envValue set env --from=configmap/$APP_NAME-frontend-config-map dc/$APP_NAME-frontend-$SOAM_KC_REALM_ID
 
 SPLUNK_URL="gww.splunk.educ.gov.bc.ca"
 FLB_CONFIG="[SERVICE]
