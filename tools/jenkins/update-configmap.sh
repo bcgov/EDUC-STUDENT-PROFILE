@@ -60,7 +60,7 @@ studentProfileServiceClientSecret=$(curl -sX GET "https://$SOAM_KC/auth/admin/re
 echo
 echo Removing student-profile-soam if exists
 curl -sX DELETE "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$studentProfileClientID" \
-  -H "Authorization: Bearer $TKN" \
+  -H "Authorization: Bearer $TKN"
 
 if [ "$studentProfileServiceClientSecret" != "" ] && [ "$envValue" = "tools" ]
 then
