@@ -196,5 +196,7 @@ export default {
 .commentContent {
   white-space: pre-wrap;
   word-wrap: break-word;
+  max-width: 100%;
+  padding-right: 1.5em;
 }
 </style>
