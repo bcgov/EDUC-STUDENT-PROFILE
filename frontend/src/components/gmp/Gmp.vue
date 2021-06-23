@@ -130,20 +130,20 @@ export default {
   created() {
     this.setRequestType('penRequest');
   },
+  watch: {
+    isLoading(val) {
+      if(!val) {
+        if(!this.hasPenRequest && !this.hasInflightStudentRequest) {
+          this.$router.push({ name: 'gmp-step1' });
+        }
+      }
+    }
+  },
   methods: {
     ...mapMutations(['setRequestType']),
     canCreateRequest(status) {
       return status === PenRequestStatuses.REJECTED || status === PenRequestStatuses.ABANDONED;
     },
-  },
-  watch: {
-    isLoading(val) {
-      if(!val) {
-        if(!this.hasRequest && !this.hasInflightGMPRequest) {
-          this.$router.push({ name: 'gmp-step1' });
-        }
-      }
-    }
   }
 };
 </script>
