@@ -34,7 +34,7 @@ Vue.prototype.moment = moment;
 
 Vue.use(VueRouter);
 Vue.use(VueMeta);
-
+// a comment for commit.
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,

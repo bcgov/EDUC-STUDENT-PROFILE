@@ -5,8 +5,9 @@ const config = require('../config/index');
 const log = require('./logger');
 const HttpStatus = require('http-status-codes');
 const lodash = require('lodash');
-const { ApiError } = require('./error');
+const {ApiError} = require('./error');
 const jsonwebtoken = require('jsonwebtoken');
+const {v4: uuidv4} = require('uuid');
 let discovery = null;
 
 // Returns OIDC Discovery values
@@ -22,9 +23,9 @@ async function getOidcDiscovery() {
   return discovery;
 }
 
-function minify(obj, keys=['documentData']) {
-  return lodash.transform(obj, (result, value, key) => 
-    result[key] = keys.includes(key) && lodash.isString(value) ? value.substring(0,1) + ' ...' : value );
+function minify(obj, keys = ['documentData']) {
+  return lodash.transform(obj, (result, value, key) =>
+    result[key] = keys.includes(key) && lodash.isString(value) ? value.substring(0, 1) + ' ...' : value);
 }
 
 function getSessionUser(req) {
@@ -38,11 +39,12 @@ function getAccessToken(req) {
   return user && user.jwt;
 }
 
-async function deleteData(token, url) {
-  try{
+async function deleteData(token, url, correlationID) {
+  try {
     const delConfig = {
       headers: {
         Authorization: `Bearer ${token}`,
+        correlationID: correlationID || uuidv4()
       }
     };
 
@@ -56,21 +58,21 @@ async function deleteData(token, url) {
   } catch (e) {
     log.error('deleteData Error', e.response ? e.response.status : e.message);
     const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
-    throw new ApiError(status, { message: 'API Delete error'}, e);
+    throw new ApiError(status, {message: 'API Delete error'}, e);
   }
 }
 
 async function forwardGetReq(req, res, url) {
-  try{
+  try {
     const accessToken = getAccessToken(req);
-    if(!accessToken) {
+    if (!accessToken) {
       return res.status(HttpStatus.UNAUTHORIZED).json({
         message: 'No access token'
       });
     }
 
     log.info('forwardGetReq Url', url);
-    const data = await getData(accessToken, url);
+    const data = await getData(accessToken, url, req.session?.correlationID);
     return res.status(HttpStatus.OK).json(data);
   } catch (e) {
     log.error('forwardGetReq Error', e.stack);
@@ -80,11 +82,12 @@ async function forwardGetReq(req, res, url) {
   }
 }
 
-async function getData(token, url) {
-  try{
+async function getData(token, url, correlationID) {
+  try {
     const getDataConfig = {
       headers: {
         Authorization: `Bearer ${token}`,
+        correlationID: correlationID || uuidv4()
       }
     };
 
@@ -98,14 +101,15 @@ async function getData(token, url) {
   } catch (e) {
     log.error('getData Error', e.response ? e.response.status : e.message);
     const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
-    throw new ApiError(status, { message: 'API Get error'}, e);
+    throw new ApiError(status, {message: 'API Get error'}, e);
   }
 }
 
-async function getDataWithParams(token, url, params) {
-  try{
+async function getDataWithParams(token, url, params, correlationID) {
+  try {
     params.headers = {
       Authorization: `Bearer ${token}`,
+      correlationID: correlationID || uuidv4()
     };
 
     log.info('get Data Url', url);
@@ -118,22 +122,22 @@ async function getDataWithParams(token, url, params) {
   } catch (e) {
     log.error('getDataWithParams Error', e.response ? e.response.status : e.message);
     const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
-    throw new ApiError(status, { message: 'API Get error'}, e);
+    throw new ApiError(status, {message: 'API Get error'}, e);
   }
 }
 
 async function forwardPostReq(req, res, url) {
-  try{
+  try {
     const accessToken = getAccessToken(req);
-    if(!accessToken) {
+    if (!accessToken) {
       return res.status(HttpStatus.UNAUTHORIZED).json({
         message: 'No session data'
       });
     }
 
-    const data = await postData(accessToken, req.body, url);
+    const data = await postData(accessToken, req.body, url, req.session?.correlationID);
     return res.status(HttpStatus.OK).json(data);
-  } catch(e) {
+  } catch (e) {
     log.error('forwardPostReq Error', e.stack);
     return res.status(e.status || HttpStatus.INTERNAL_SERVER_ERROR).json({
       message: 'Forward Post error'
@@ -141,43 +145,48 @@ async function forwardPostReq(req, res, url) {
   }
 }
 
-async function postData(token, data, url) {
-  try{
+async function postData(token, data, url, correlationID) {
+  try {
     const postDataConfig = {
       headers: {
         Authorization: `Bearer ${token}`,
-      }
+        correlationID: correlationID || uuidv4()
+      },
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
     };
 
     log.info('post Data Url', url);
     log.verbose('post Data Req', minify(data));
-    data.createUser='STUDENT-PROFILE';
-    data.updateUser='STUDENT-PROFILE';
+    log.info(data?.documentData?.length);
+    data.createUser = 'STUDENT-PROFILE';
+    data.updateUser = 'STUDENT-PROFILE';
     const response = await axios.post(url, data, postDataConfig);
 
     log.info(`post Data Status for url ${url} :: is :: `, response.status);
     log.info(`post Data StatusText for url ${url}  :: is :: `, response.statusText);
-    log.verbose(`post Data Response for url ${url}  :: is :: `,typeof response.data === 'string' ? response.data : minify(response.data));
+    log.verbose(`post Data Response for url ${url}  :: is :: `, typeof response.data === 'string' ? response.data : minify(response.data));
 
     return response.data;
-  } catch(e) {
+  } catch (e) {
     log.error('postData Error', e.response ? e.response.status : e.message);
     const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
-    throw new ApiError(status, { message: 'API Post error'}, e);
+    throw new ApiError(status, {message: 'API Post error'}, e);
   }
 }
 
-async function putData(token, data, url) {
-  try{
+async function putData(token, data, url, correlationID) {
+  try {
     const putDataConfig = {
       headers: {
         Authorization: `Bearer ${token}`,
+        correlationID: correlationID || uuidv4()
       }
     };
 
     log.info('put Data Url', url);
     log.verbose('put Data Req', data);
-    data.updateUser='STUDENT-PROFILE';
+    data.updateUser = 'STUDENT-PROFILE';
     const response = await axios.put(url, data, putDataConfig);
 
     log.info(`put Data Status for url ${url} :: is :: `, response.status);
@@ -185,10 +194,10 @@ async function putData(token, data, url) {
     log.verbose(`put Data Response for url ${url}  :: is :: `, minify(response.data));
 
     return response.data;
-  } catch(e) {
-    log.error('putData Error',  e.response ? e.response.status : e.message);
+  } catch (e) {
+    log.error('putData Error', e.response ? e.response.status : e.message);
     const status = e.response ? e.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
-    throw new ApiError(status, { message: 'API Put error'}, e);
+    throw new ApiError(status, {message: 'API Put error'}, e);
   }
 }
 

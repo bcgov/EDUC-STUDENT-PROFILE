@@ -8,7 +8,7 @@ function subscribeSagaMessages(nats, topic, handleMessage) {
     queue : 'student-profile-pen-req-saga-queue-group'
   };
   nats.subscribe(topic, opts, (msg, reply, subject, sid) => {
-    log.silly(`Received message, on ${subject} , Subscription Id ::  [${sid}], Reply to ::  [${reply}] :: Data ::`, JSON.parse(msg));
+    log.info(`Received message, on ${subject} , Subscription Id ::  [${sid}], Reply to ::  [${reply}] :: Data ::`, JSON.parse(msg));
     handleMessage(msg);
   });
 }

@@ -75,7 +75,7 @@ describe('DocumentChip.vue', () => {
     wrapper.setProps({ disabled: true });
 
     const chip = wrapper.find('.v-chip');
-    expect(chip.html()).toContain('disabled');
+    expect(chip.html()).toContain('black');
   });
 
   test('not have delete button if undeletable', async () => {
@@ -152,7 +152,7 @@ function mockStore(requestType, deleteFile) {
   };
 
   let store = new Vuex.Store({
-    modules: { 
+    modules: {
       root: rootStore,
       [requestType]: requestStore
     }

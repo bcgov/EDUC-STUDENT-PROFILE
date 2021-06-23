@@ -4,6 +4,8 @@ const config = require('../config/index');
 const passport = require('passport');
 const express = require('express');
 const auth = require('../components/auth');
+const log = require('../components/logger');
+const {v4: uuidv4} = require('uuid');
 const {
   body,
   validationResult
@@ -88,7 +90,7 @@ router.get('/logout', async (req, res) => {
   } else {
     retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/logout');
   }
-  res.redirect(config.get('siteMinder_logout_endpoint')+ retUrl);
+  res.redirect(config.get('siteMinder_logout_endpoint') + retUrl);
 });
 
 const UnauthorizedRsp = {
@@ -107,7 +109,7 @@ router.post('/refresh', [
       errors: errors.array()
     });
   }
-  if(!req || !req.user || !req.user.refreshToken){
+  if (!req || !req.user || !req.user.refreshToken) {
     res.status(401).json(UnauthorizedRsp);
   } else {
     if (auth.isTokenExpired(req.user.jwt)) {
@@ -123,7 +125,7 @@ router.post('/refresh', [
       } else {
         res.status(401).json(UnauthorizedRsp);
       }
-    }else {
+    } else {
       const responseJson = {
         jwtFrontend: req.user.jwtFrontend
       };
@@ -135,6 +137,15 @@ router.post('/refresh', [
 //provides a jwt to authenticated users
 router.use('/token', auth.refreshJWT, (req, res) => {
   if (req.user && req.user.jwtFrontend && req.user.refreshToken) {
+    if (req.session?.passport?.user?._json) {
+      const correlationID = uuidv4();
+      req.session.correlationID = correlationID;
+      const correlation = {
+        user_guid: req.session?.passport?.user?._json.preferred_username,
+        correlation_id: correlationID
+      };
+      log.info('created correlation id and stored in session', correlation);
+    }
     const responseJson = {
       jwtFrontend: req.user.jwtFrontend
     };

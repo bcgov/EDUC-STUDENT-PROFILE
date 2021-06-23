@@ -6,15 +6,15 @@
     <v-form
       ref="form"
       v-model="validForm"
-    > 
-      <v-select 
-        color="#003366" 
-        v-model="documentTypeCode" 
-        required 
-        :rules="requiredRules" 
-        outlined 
+    >
+      <v-select
+        color="#003366"
+        v-model="documentTypeCode"
+        required
+        :rules="requiredRules"
+        outlined
         :eager="eager"
-        :items="documentTypes" 
+        :items="documentTypes"
         label="Document Type"
       ></v-select>
       <v-file-input
@@ -29,7 +29,6 @@
 
 
       </v-form>
-      <!-- </v-card-text> -->
       <v-alert
         dense
         outlined
@@ -61,7 +60,7 @@
           Close
         </v-btn>
       </v-card-actions>
-    
+
 
   </v-card>
 </template>
@@ -95,7 +94,7 @@ export default {
       alert: false,
       alertMessage: null,
       alertType: null
-      
+
     };
   },
   created() {
@@ -122,7 +121,7 @@ export default {
       return this.validForm && this.file;
     },
     documentTypes() {
-      return sortBy(this.documentTypeCodes, ['displayOrder']).map(code => 
+      return sortBy(this.documentTypeCodes, ['displayOrder']).map(code =>
         ({text: code.label, value: code.documentTypeCode}));
     }
   },
@@ -167,7 +166,7 @@ export default {
         try {
           if(this.file.name && this.file.name.match('^[\\u0080-\\uFFFF\\w,\\s-_]+\\.[A-Za-z]{3,4}$')){
             this.active = true;
-            const reader = new FileReader(); 
+            const reader = new FileReader();
             reader.onload = this.uploadFile;
             reader.onabort = this.handleFileReadErr;
             reader.onerror = this.handleFileReadErr;
@@ -184,7 +183,7 @@ export default {
     },
     handleFileReadErr() {
       this.active = false;
-      this.setErrorAlert('Sorry, an unexpected error seems to have occured. Try uploading your files later.');
+      this.setErrorAlert('Sorry, an unexpected error seems to have occurred. Try uploading your files later.');
     },
     uploadFile(env) {
       let document = {

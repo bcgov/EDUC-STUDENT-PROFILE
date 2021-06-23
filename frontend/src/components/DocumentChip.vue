@@ -10,15 +10,15 @@
       <v-chip
         class="chip-overflow ma-1 px-2 align-self-center"
         close
-        close-icon="fa-chevron-down"
-        color="#0C7CBA"
+        :close-icon="disabled ? '' : 'fa-chevron-down' "
+        :color="disabled ? 'black' : '#0C7CBA' "
         :disabled="disabled"
         label
         outlined
         v-on="on"
         @click:close="menu = true"
       >
-        {{document.fileName}}
+        {{ document.fileName }}
       </v-chip>
     </template>
 
@@ -29,7 +29,7 @@
             <v-icon>fa-id-card</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title>{{documentType}}</v-list-item-title>
+            <v-list-item-title>{{ documentType }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -39,7 +39,7 @@
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>
-              <router-link :to="{ path: documentUrl }" target="_blank">{{document.fileName}}</router-link>
+              <router-link :to="{ path: documentUrl }" target="_blank">{{ document.fileName }}</router-link>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -49,7 +49,7 @@
             <v-icon>fa-hdd</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title>{{fileSize}}</v-list-item-title>
+            <v-list-item-title>{{ fileSize }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
@@ -58,7 +58,7 @@
             <v-icon>fa-clock</v-icon>
           </v-list-item-avatar>
           <v-list-item-content>
-            <v-list-item-title>{{humanCreateDate}}</v-list-item-title>
+            <v-list-item-title>{{ humanCreateDate }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -69,18 +69,20 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-          <v-btn color="#003366" @click.stop="deleteDocument()" class="white--text" id="delete-document" :loading="deleting" v-if="!undeletable">Delete</v-btn>
-          <v-btn id="documentUploadCancel" color="#003366" @click="menu = false" class="white--text">Cancel</v-btn>
-        </v-card-actions>
+        <v-btn color="#003366" @click.stop="deleteDocument()" class="white--text" id="delete-document"
+               :loading="deleting" v-if="!undeletable">Delete
+        </v-btn>
+        <v-btn id="documentUploadCancel" color="#003366" @click="menu = false" class="white--text">Cancel</v-btn>
+      </v-card-actions>
     </v-card>
   </v-menu>
 </template>
 
 <script>
-import { humanFileSize } from '@/utils/file';
-import { mapGetters } from 'vuex';
-import { ApiRoutes } from '@/utils/constants';
-import { find } from 'lodash';
+import {humanFileSize} from '@/utils/file';
+import {mapGetters} from 'vuex';
+import {ApiRoutes} from '@/utils/constants';
+import {find} from 'lodash';
 
 export default {
   props: {
@@ -145,8 +147,8 @@ export default {
     },
     deleteDocument() {
       this.deleting = true;
-      this.deleteFile({ 
-        requestID: this.requestID, 
+      this.deleteFile({
+        requestID: this.requestID,
         documentID: this.document.documentID
       }).then(() => {
         this.setSuccessAlert('Your document has been deleted successfully.');
@@ -185,6 +187,7 @@ export default {
 .v-list-item {
   min-height: 0;
 }
+
 .v-list-item__content {
   padding: 8px 0;
 }

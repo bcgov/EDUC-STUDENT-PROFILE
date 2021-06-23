@@ -62,9 +62,9 @@ function verifyPostCommentRequest(requestType) {
   };
 }
 
-async function getDigitalIdData(token, digitalID) {
+async function getDigitalIdData(token, digitalID, correlationID) {
   try {
-    return await getData(token, config.get('digitalID:apiEndpoint') + `/${digitalID}`);
+    return await getData(token, config.get('digitalID:apiEndpoint') + `/${digitalID}`, correlationID);
   } catch (e) {
     throw new ServiceError('getDigitalIdData error', e);
   }
@@ -85,12 +85,12 @@ async function getStudent(token, studentID, sexCodes) {
   return student;
 }
 
-async function getLatestRequest(token, digitalID, requestType, setReplicateStatus) {
+async function getLatestRequest(token, digitalID, requestType, setReplicateStatus, correlationID) {
   let request = null;
   let sagaInProgress = false;
   const url = config.get(`${requestType}:apiEndpoint`);
   try {
-    let data = await getData(token, `${url}/?digitalID=${digitalID}`);
+    let data = await getData(token, `${url}/?digitalID=${digitalID}`, correlationID);
     request = lodash.maxBy(data, 'statusUpdateDate') || null;
     if(request) {
       sagaInProgress = await redisUtil.isSagaInProgressForDigitalID(request.digitalID);
@@ -123,22 +123,23 @@ function getDefaultBcscInput(userInfo) {
 
 async function getUserInfo(req, res) {
   const userInfo = getSessionUser(req);
+  const correlationID = req.session?.correlationID;
   if(!userInfo || !userInfo.jwt || !userInfo._json || !userInfo._json.digitalIdentityID) {
     return res.status(HttpStatus.UNAUTHORIZED).json({
       message: 'No session data'
     });
   }
-  
+
   const accessToken = userInfo.jwt;
   const digitalID = userInfo._json.digitalIdentityID;
 
   return Promise.all([
-    getDigitalIdData(accessToken, digitalID), 
-    getServerSideCodes(accessToken), 
-    getLatestRequest(accessToken, digitalID, 'penRequest', setPenRequestReplicateStatus),
-    getLatestRequest(accessToken, digitalID, 'studentRequest', setStudentRequestReplicateStatus),
+    getDigitalIdData(accessToken, digitalID, correlationID),
+    getServerSideCodes(accessToken, correlationID),
+    getLatestRequest(accessToken, digitalID, 'penRequest', setPenRequestReplicateStatus, correlationID),
+    getLatestRequest(accessToken, digitalID, 'studentRequest', setStudentRequestReplicateStatus, correlationID),
   ]).then(async ([digitalIdData, codesData, penRequest, studentRequest]) => {
-  
+
     const identityType = lodash.find(codesData.identityTypes, ['identityTypeCode', digitalIdData.identityTypeCode]);
     if(! identityType) {
       log.error('getIdentityType Error identityTypeCode', digitalIdData.identityTypeCode);
@@ -189,14 +190,14 @@ function getCodes(requestType) {
           message: 'No access token'
         });
       }
-
+      const correlationID = req.session?.correlationID;
       const endpoint = config.get(`${requestType}:apiEndpoint`);
       const codeUrls = [
-        `${endpoint}/gender-codes`, 
+        `${endpoint}/gender-codes`,
         `${endpoint}/statuses`,
       ];
 
-      const [genderCodes, statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url)));
+      const [genderCodes, statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url, correlationID)));
       if(genderCodes){
         // forcing sort if API did not return in sorted order.
         genderCodes.sort((a,b)=> a.displayOrder - b.displayOrder);
@@ -211,7 +212,7 @@ function getCodes(requestType) {
   };
 }
 
-async function getServerSideCodes(accessToken) {
+async function getServerSideCodes(accessToken, correlationID) {
   if(!codes) {
     try{
       const codeUrls = [
@@ -219,7 +220,7 @@ async function getServerSideCodes(accessToken) {
         `${config.get('digitalID:apiEndpoint')}/identityTypeCodes`
       ];
 
-      const [sexCodes, identityTypes] = await Promise.all(codeUrls.map(url => getData(accessToken, url)));
+      const [sexCodes, identityTypes] = await Promise.all(codeUrls.map(url => getData(accessToken, url), correlationID));
       codes = {sexCodes, identityTypes};
     } catch(e) {
       throw new ServiceError('getServerSideCodes error', e);
@@ -228,7 +229,7 @@ async function getServerSideCodes(accessToken) {
   return codes;
 }
 
-async function sendVerificationEmail(accessToken, emailAddress, requestId, identityTypeLabel, requestType) {
+async function sendVerificationEmail(accessToken, emailAddress, requestId, identityTypeLabel, requestType, correlationID) {
   const verificationUrl = config.get('server:frontend') + `/api/${RequestApps[requestType]}/verification?verificationToken`;
   const reqData = {
     emailAddress,
@@ -243,13 +244,13 @@ async function sendVerificationEmail(accessToken, emailAddress, requestId, ident
       SCOPE: 'VERIFY_EMAIL'
     };
     reqData.jwtToken = await generateJWTToken(requestId, emailAddress, 'VerifyEmailAPI', 'HS256', payload);
-    return await postData(accessToken, reqData, url);
+    return await postData(accessToken, reqData, url, correlationID);
   } catch (e) {
     throw new ServiceError('sendVerificationEmail error', e);
   }
 }
 
-async function getAutoMatchResults(accessToken, userInfo) {
+async function getAutoMatchResults(accessToken, userInfo, correlationID) {
   try {
     const url = config.get('demographics:apiEndpoint');
 
@@ -263,7 +264,7 @@ async function getAutoMatchResults(accessToken, userInfo) {
       }
     };
 
-    const autoMatchResults = await getDataWithParams(accessToken, url, params);
+    const autoMatchResults = await getDataWithParams(accessToken, url, params, correlationID);
     let bcscAutoMatchOutcome;
     let bcscAutoMatchDetails;
     if(autoMatchResults.length < 1) {
@@ -291,12 +292,12 @@ async function getAutoMatchResults(accessToken, userInfo) {
   }
 }
 
-async function postRequest(accessToken, reqData, userInfo, requestType) {
+async function postRequest(accessToken, reqData, userInfo, requestType, correlationID) {
   try{
     const url = config.get(`${requestType}:apiEndpoint`) + '/';
 
     if(userInfo.accountType === 'BCSC') {
-      const autoMatchResults = await getAutoMatchResults(accessToken, userInfo);
+      const autoMatchResults = await getAutoMatchResults(accessToken, userInfo, correlationID);
       reqData.bcscAutoMatchOutcome = autoMatchResults.bcscAutoMatchOutcome;
       reqData.bcscAutoMatchDetails = autoMatchResults.bcscAutoMatchDetails;
     }
@@ -304,7 +305,7 @@ async function postRequest(accessToken, reqData, userInfo, requestType) {
       reqData.emailVerified = EmailVerificationStatuses.NOT_VERIFIED;
     }
     reqData.digitalID = userInfo.digitalIdentityID;
-    let resData = await postData(accessToken, reqData, url);
+    let resData = await postData(accessToken, reqData, url, correlationID);
     resData.digitalID = null;
 
     return resData;
@@ -330,12 +331,13 @@ function submitRequest(requestType, verifyRequestStatus) {
           message: `Submit ${requestType} not allowed`
         });
       }
+      const correlationID = req.session?.correlationID;
 
-      const resData = await postRequest(accessToken, req.body, userInfo._json, requestType);
+      const resData = await postRequest(accessToken, req.body, userInfo._json, requestType, correlationID);
 
       req.session[requestType] = resData;
       if(req.body.email && req.body.email !== req.body.recordedEmail) {
-        sendVerificationEmail(accessToken, req.body.email, resData[`${requestType}ID`], req.session.digitalIdentityData.identityTypeLabel, requestType).catch(e => 
+        sendVerificationEmail(accessToken, req.body.email, resData[`${requestType}ID`], req.session.digitalIdentityData.identityTypeLabel, requestType, correlationID).catch(e =>
           log.error('sendVerificationEmail Error', e.stack)
         );
       }
@@ -351,14 +353,14 @@ function submitRequest(requestType, verifyRequestStatus) {
   };
 }
 
-function postComment(requestType, createCommentPayload, createCommentEvent) {
+function postComment(requestType, createCommentPayload, createCommentEvent, correlationID) {
   return async function postCommentHandler(req, res) {
     try{
       const userInfo = req.userInfo;
       const accessToken = req.accessToken;
       const url = config.get('profileSagaAPIURL') + config.get(`${requestType}:commentSagaEndpoint`);
       const payload = createCommentPayload(req.params.id, req.body.content);
-      const sagaId = await postData(accessToken, payload, url);
+      const sagaId = await postData(accessToken, payload, url, correlationID);
       const event = createCommentEvent(sagaId, req.params.id, userInfo._json.digitalIdentityID);
 
       log.info(`going to store event object in redis for ${requestType} comment saga :: `, event);
@@ -386,8 +388,7 @@ function getComments(requestType) {
       const accessToken = userInfo.jwt;
       const endpoint = config.get(`${requestType}:apiEndpoint`);
       const url = `${endpoint}/${req.params.id}/comments`;
-
-      const apiResData = await getData(accessToken, url);
+      const apiResData = await getData(accessToken, url, req.session?.correlationID);
 
       let response = {
         participants: [],
@@ -439,18 +440,18 @@ function beforeUpdateRequestAsInitrev(request, requestType) {
   if(request.emailVerified !== EmailVerificationStatuses.NOT_VERIFIED) {
     throw new ConflictStateError(`Current ${requestType} Email Verification Status: ` + request.emailVerified);
   }
-  
+
   request.initialSubmitDate = localDateTime.now().toString();
   request.emailVerified = EmailVerificationStatuses.VERIFIED;
 
   return request;
 }
 
-async function setRequestAsInitrev(requestID, requestType) {
+async function setRequestAsInitrev(requestID, requestType, correlationID) {
   let data = await getApiCredentials(config.get('oidc:clientId'), config.get('oidc:clientSecret'));
   const accessToken = data.accessToken;
 
-  return await updateRequestStatus(accessToken, requestID, RequestStatuses.INITREV, requestType, beforeUpdateRequestAsInitrev);
+  return updateRequestStatus(accessToken, requestID, RequestStatuses.INITREV, requestType, beforeUpdateRequestAsInitrev, correlationID);
 }
 
 function verifyEmailToken(token) {
@@ -492,7 +493,7 @@ function verifyEmail(requestType) {
         return res.redirect(verificationUrl + VerificationResults.TOKEN_ERROR);
       }
 
-      const data = await setRequestAsInitrev(requestID, requestType);
+      const data = await setRequestAsInitrev(requestID, requestType, req.session?.correlationID);
       if(loggedin) {
         req.session[requestType] = data;
       }
@@ -509,16 +510,16 @@ function verifyEmail(requestType) {
   };
 }
 
-async function updateRequestStatus(accessToken, requestID, requestStatus, requestType, beforeUpdate) {
+async function updateRequestStatus(accessToken, requestID, requestStatus, requestType, beforeUpdate, correlationID) {
   try {
     const endpoint = config.get(`${requestType}:apiEndpoint`);
-    let data = await getData(accessToken, `${endpoint}/${requestID}`);
+    let data = await getData(accessToken, `${endpoint}/${requestID}`, correlationID);
 
     let request = beforeUpdate(data, requestType);
     request[`${requestType}StatusCode`] = requestStatus;
     request.statusUpdateDate = localDateTime.now().toString();
 
-    data = await putData(accessToken, request, endpoint);
+    data = await putData(accessToken, request, endpoint, correlationID);
     data.digitalID = null;
 
     return data;
@@ -537,7 +538,7 @@ function beforeUpdateRequestAsSubsrev(request, requestType) {
   }
 
   return request;
-} 
+}
 
 function setRequestAsSubsrev(requestType) {
   return async function setRequestAsSubsrevHandler(req, res) {
@@ -594,7 +595,7 @@ function resendVerificationEmail(requestType) {
         });
       }
 
-      const data = await sendVerificationEmail(accessToken, req.session[requestType].email, req.session[requestType][`${requestType}ID`], 
+      const data = await sendVerificationEmail(accessToken, req.session[requestType].email, req.session[requestType][`${requestType}ID`],
         req.session.digitalIdentityData.identityTypeLabel, requestType);
 
       return res.status(HttpStatus.OK).json(data);
@@ -627,7 +628,7 @@ function uploadFile(requestType) {
       const endpoint = config.get(`${requestType}:apiEndpoint`);
       const url = `${endpoint}/${req.params.id}/documents`;
 
-      const data = await postData(accessToken, req.body, url);
+      const data = await postData(accessToken, req.body, url, req.session?.correlationID);
       return res.status(HttpStatus.OK).json(data);
     } catch(e) {
       log.error('uploadFile Error', e.stack);
@@ -641,7 +642,7 @@ function uploadFile(requestType) {
 async function getDocument(token, requestID, documentID, requestType, includeDocData = 'Y') {
   try {
     const endpoint = config.get(`${requestType}:apiEndpoint`);
-    return await getData(token, `${endpoint}/${requestID}/documents/${documentID}?includeDocData=${includeDocData}`);  
+    return await getData(token, `${endpoint}/${requestID}/documents/${documentID}?includeDocData=${includeDocData}`);
   } catch (e) {
     throw new ServiceError('getDocument error', e);
   }
@@ -659,7 +660,7 @@ function deleteDocument(requestType) {
 
       let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'N');
 
-      if(!req.session[requestType] || resData.createDate <= req.session[requestType].statusUpdateDate || 
+      if(!req.session[requestType] || resData.createDate <= req.session[requestType].statusUpdateDate ||
         req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
         return res.status(HttpStatus.CONFLICT).json({
           message: `Delete ${requestType} file not allowed`

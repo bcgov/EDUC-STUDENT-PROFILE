@@ -9,8 +9,8 @@ jest.mock('../../../src/components/auth');
 
 const changeRequest = require('../../../src/components/request');
 const { ServiceError } = require('../../../src/components/error');
-const { mockRequest, mockResponse } = require('../helpers'); 
-
+const { mockRequest, mockResponse } = require('../helpers');
+const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
 describe('uploadFile', () => {
   const document = {
     documentData: 'test data'
@@ -39,6 +39,7 @@ describe('uploadFile', () => {
     utils.getAccessToken.mockReturnValue('token');
     utils.postData.mockResolvedValue(postRes);
     req = mockRequest(document, session, params);
+    req.session.correlationID=correlationID;
     res = mockResponse();
   });
 
@@ -51,7 +52,7 @@ describe('uploadFile', () => {
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(postRes);
-    expect(spy).toHaveBeenCalledWith('token', document, `${config.get('studentRequest:apiEndpoint')}/${params.id}/documents`);
+    expect(spy).toHaveBeenCalledWith('token', document, `${config.get('studentRequest:apiEndpoint')}/${params.id}/documents`, correlationID);
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
