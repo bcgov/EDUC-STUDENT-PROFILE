@@ -130,15 +130,6 @@ export default {
   created() {
     this.setRequestType('penRequest');
   },
-  watch: {
-    isLoading(val) {
-      if(!val) {
-        if(!this.hasPenRequest && !this.hasInflightStudentRequest) {
-          this.$router.push({ name: 'gmp-step1' });
-        }
-      }
-    }
-  },
   methods: {
     ...mapMutations(['setRequestType']),
     canCreateRequest(status) {
