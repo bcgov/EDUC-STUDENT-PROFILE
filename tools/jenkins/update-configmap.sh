@@ -107,19 +107,6 @@ studentProfileServiceClientSecret=$(curl -sX GET "https://$SOAM_KC/auth/admin/re
   -H "Authorization: Bearer $TKN" \
   | jq -r '.value')
 
-echo
-echo Retrieving scope id for offline access
-offlineAccessID=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TKN" \
-  | jq '.[] | select(.name=="offline_access")' | jq -r '.id')
-
-echo
-echo Updating client to include offline access scope
-curl -sX PUT "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$studentProfileClientID/default-client-scopes/$offlineAccessID" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TKN"
-
 echo Generating private and public keys
 ssh-keygen -b 4096 -t rsa -f tempPenBackendkey -q -N ""
 UI_PRIVATE_KEY_VAL="$(cat tempPenBackendkey)"
