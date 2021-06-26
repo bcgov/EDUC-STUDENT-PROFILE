@@ -12,7 +12,8 @@ object = {
   SESSION_EXPIRED: authRoot + '/logout?sessionExpired=true',
   LOGIN_FAILED: authRoot + '/logout?loginError=true',
   REFRESH: authRoot + '/refresh',
-  TOKEN: authRoot + '/token'
+  TOKEN: authRoot + '/token',
+  SESSION_REMAINING_TIME: authRoot + '/user-session-remaining-time',
 };
 //Authentication endpoints
 export const AuthRoutes = Object.freeze(object);
