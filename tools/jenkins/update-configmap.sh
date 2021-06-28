@@ -134,12 +134,18 @@ fi
 if [ "$envValue" = "tools" ]
 then
   HOST_ROUTE="dev.getmypen.gov.bc.ca"
+  bannerEnvironment="DEV"
+  bannerColor="#dba424"
 elif [ "$envValue" = "dev" ]
 then
   HOST_ROUTE="test.getmypen.gov.bc.ca"
+  bannerEnvironment="TEST"
+  bannerColor="#8d28d7"
 elif [ "$envValue" = "test" ]
 then
   HOST_ROUTE="uat.getmypen.gov.bc.ca"
+  bannerEnvironment="UAT"
+  bannerColor="#58fe01"
 fi
 
 snowplow="
@@ -169,6 +175,8 @@ var collector = 'spt.apps.gov.bc.ca';
 regConfig="var config = (function() {
   return {
     \"VUE_APP_BCEID_REG_URL\" : \"$bceid_reg_url\",
+    \"BANNER_ENVIRONMENT\" : \"$bannerEnvironment\",
+    \"BANNER_COLOR\" : \"$bannerColor\",
     \"VUE_APP_JOURNEY_BUILDER\" : \"$journey_builder_url\",
     \"VUE_APP_IDLE_TIMEOUT_IN_MILLIS\" : \"1800000\"
   };
