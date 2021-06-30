@@ -158,7 +158,6 @@ async function postData(token, data, url, correlationID) {
 
     log.info('post Data Url', url);
     log.verbose('post Data Req', minify(data));
-    log.info(data?.documentData?.length);
     data.createUser = 'STUDENT-PROFILE';
     data.updateUser = 'STUDENT-PROFILE';
     const response = await axios.post(url, data, postDataConfig);
