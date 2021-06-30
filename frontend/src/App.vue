@@ -8,7 +8,7 @@
                sticky
                dense
     ><div><h3>{{ bannerEnvironment }} Environment</h3></div></v-app-bar>
-    <ModalIdle v-if="isAuthenticated && isIdle"/>
+    <ModalIdle v-if="isAuthenticated"/>
     <router-view/>
     <Footer/>
   </v-app>
@@ -36,9 +36,6 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'loginError', 'isLoading']),
-    isIdle(){
-      return this.$store.state.idleVue.isIdle;
-    },
     isIE() {
       return /Trident\/|MSIE/.test(window.navigator.userAgent);
     }
@@ -57,7 +54,7 @@ export default {
   },
   async created() {
     this.setLoading(true);
-    this.getJwtToken().then(() => 
+    this.getJwtToken().then(() =>
       Promise.all([this.getPenRequestCodes('penRequest'), this.getStudentRequestCodes('studentRequest'), this.getUserInfo()])
     ).catch(e => {
       if(! e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
