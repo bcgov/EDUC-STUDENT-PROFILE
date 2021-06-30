@@ -2,7 +2,13 @@
   <v-app id="app">
     <MsieBanner v-if="isIE"/>
     <Header/>
-    <ModalIdle v-if="isAuthenticated"/>
+    <v-app-bar v-if="bannerColor !== ''"
+               style="color:white;"
+               :color="bannerColor"
+               sticky
+               dense
+    ><div><h3>{{ bannerEnvironment }} Environment</h3></div></v-app-bar>
+    <ModalIdle v-if="isAuthenticated && isIdle"/>
     <router-view/>
     <Footer/>
   </v-app>
@@ -30,9 +36,18 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'loginError', 'isLoading']),
+    isIdle(){
+      return this.$store.state.idleVue.isIdle;
+    },
     isIE() {
       return /Trident\/|MSIE/.test(window.navigator.userAgent);
     }
+  },
+  data() {
+    return {
+      bannerEnvironment: StaticConfig.BANNER_ENVIRONMENT,
+      bannerColor: StaticConfig.BANNER_COLOR
+    };
   },
   methods: {
     ...mapMutations('auth', ['setLoading']),
@@ -42,7 +57,7 @@ export default {
   },
   async created() {
     this.setLoading(true);
-    this.getJwtToken().then(() =>
+    this.getJwtToken().then(() => 
       Promise.all([this.getPenRequestCodes('penRequest'), this.getStudentRequestCodes('studentRequest'), this.getUserInfo()])
     ).catch(e => {
       if(! e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
