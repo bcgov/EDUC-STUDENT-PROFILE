@@ -33,7 +33,6 @@
     "faker": "4.1.0",
     "glob-all": "^3.1.0",
     "http-status-codes": "^1.4.0",
-    "idle-vue": "^2.0.5",
     "jest-junit": "^7.0.0",
     "minimist": "1.2.5",
     "moment": "^2.29.1",

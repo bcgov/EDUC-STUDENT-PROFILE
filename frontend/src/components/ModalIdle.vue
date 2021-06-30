@@ -5,24 +5,44 @@
 </template>
 
 <script>
-import {AuthRoutes} from '../utils/constants';
+import {AuthRoutes} from '@/utils/constants';
+import ApiService from '@/common/apiService';
+import {mapGetters} from 'vuex';
+
 export default {
   data() {
     return {
       routes: AuthRoutes
     };
   },
-  mounted() {
-    window.location = document.getElementById('logout_href').href;
+  async mounted() {
+    await this.checkAndLogoutUserOnSessionExpiry();
+
+  },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated']),
   },
   methods: {
-    logout() {
-      this.$store.commit('auth/setJwtToken');
+
+    async checkAndLogoutUserOnSessionExpiry() {
+      if (this.isAuthenticated) {
+        try {
+          const response = await ApiService.apiAxios
+            .get(AuthRoutes.SESSION_REMAINING_TIME);
+          if (response.data > 0) {
+            const timeOutValue = parseInt(response.data) + 200; // add 200 ms
+            setTimeout(() => {
+              this.checkAndLogoutUserOnSessionExpiry();
+            }, timeOutValue);
+          } else {
+            window.location = document.getElementById('logout_href').href;
+          }
+        } catch (e) {
+          window.location = document.getElementById('logout_href').href;
+        }
+      }
+
     }
   }
-
 };
 </script>
-<style scoped>
-
-</style>

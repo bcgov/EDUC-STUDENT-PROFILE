@@ -7,7 +7,7 @@ const jsonwebtoken = require('jsonwebtoken');
 const qs = require('querystring');
 const utils = require('./utils');
 const HttpStatus = require('http-status-codes');
-const { ApiError } = require('./error'); 
+const { ApiError } = require('./error');
 const { pick } =  require('lodash');
 
 const auth = {
@@ -16,7 +16,7 @@ const auth = {
     const now = Date.now().valueOf() / 1000;
     const payload = jsonwebtoken.decode(token);
 
-    return (!!payload.exp && payload.exp < now);
+    return (!!payload['exp'] && payload['exp'] < (now + 30)); // Add 30 seconds to make sure , edge case is avoided and token is refreshed.
   },
 
   // Check if JWT Refresh Token has expired
@@ -145,7 +145,7 @@ const auth = {
       const status = error.response ? error.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
       throw new ApiError(status, { message: 'Get getApiCredentials error'}, error);
     }
-  } 
+  }
 };
 
 module.exports = auth;

@@ -109,19 +109,12 @@ router.post('/refresh', [
       errors: errors.array()
     });
   }
-  if (!req || !req.user || !req.user.refreshToken) {
+  if (!req['user'] || !req['user'].refreshToken || !req?.user?.jwt) {
     res.status(401).json(UnauthorizedRsp);
   } else {
     if (auth.isTokenExpired(req.user.jwt)) {
-      const result = await auth.renew(req.user.refreshToken);
-      if (result && result.jwt && result.refreshToken) {
-        req.user.jwt = result.jwt;
-        req.user.refreshToken = result.refreshToken;
-        req.user.jwtFrontend = auth.generateUiToken();
-        const responseJson = {
-          jwtFrontend: req.user.jwtFrontend
-        };
-        res.status(200).json(responseJson);
+      if (req?.user?.refreshToken && auth.isRenewable(req.user.refreshToken)) {
+        return generateTokens(req, res);
       } else {
         res.status(401).json(UnauthorizedRsp);
       }
@@ -135,8 +128,8 @@ router.post('/refresh', [
 });
 
 //provides a jwt to authenticated users
-router.use('/token', auth.refreshJWT, (req, res) => {
-  if (req.user && req.user.jwtFrontend && req.user.refreshToken) {
+router.get('/token', auth.refreshJWT, (req, res) => {
+  if (req?.user && req.user?.jwtFrontend && req.user?.refreshToken) {
     if (req.session?.passport?.user?._json) {
       const correlationID = uuidv4();
       req.session.correlationID = correlationID;
@@ -154,5 +147,27 @@ router.use('/token', auth.refreshJWT, (req, res) => {
     res.status(401).json(UnauthorizedRsp);
   }
 });
-
+async function generateTokens(req, res) {
+  const result = await auth.renew(req.user.refreshToken);
+  if (result && result.jwt && result.refreshToken) {
+    req.user.jwt = result.jwt;
+    req.user.refreshToken = result.refreshToken;
+    req.user.jwtFrontend = auth.generateUiToken();
+    const responseJson = {
+      jwtFrontend: req.user.jwtFrontend
+    };
+    res.status(200).json(responseJson);
+  } else {
+    res.status(401).json(UnauthorizedRsp);
+  }
+}
+router.get('/user-session-remaining-time', passport.authenticate('jwt', {session: false}), (req, res) => {
+  if (req?.session?.cookie && req?.session?.passport?.user) {
+    const remainingTime = req.session.cookie.maxAge;
+    log.info(`session remaining time is :: ${remainingTime} for user`, req.session?.passport?.user?.displayName);
+    return res.status(200).json(req.session.cookie.maxAge);
+  } else {
+    return res.sendStatus(401);
+  }
+});
 module.exports = router;
