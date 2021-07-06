@@ -468,6 +468,8 @@ export default {
         if(this.request.genderLabel) {
           const code = this.genders.filter(it => (it.label === this.request.genderLabel));
           this.request.genderCode = code[0].genderCode;
+        }else if(!this.editGenderLabel) {
+          this.request.genderCode = this.recordedData.genderCode;
         }
         if(isEqual(mapValues(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v=> v === null ? '' : v),
           mapValues(pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v => v === null ? '' : v))) {
