@@ -27,8 +27,8 @@
             v-model="declared"
             color="green"
             class="mt-0"
-            :rules="privacyRule('')"
-            @click.native="clickAcceptance"
+            :rules="checkboxRules('')"
+            @click.native="clickCheckbox"
           >
             <template v-slot:label>
               <div class="pl-3">
@@ -254,8 +254,8 @@
               v-model="acceptance"
               color="green"
               class="mt-0"
-              :rules="acceptanceRule('')"
-              @click.native="clickAcceptance"
+              :rules="checkboxRules('')"
+              @click.native="clickCheckbox"
             >
               <template v-slot:label>
                 <div class="pl-3">
@@ -446,13 +446,9 @@ export default {
         ...this.charRules
       ];
     },
-    privacyRule(hint = 'Required') {
+    checkboxRules(hint = 'Required') {
       this.enableDisableForm.disabled = !this.declared;
       this.validForm = (this.declared && this.acceptance);
-      return [v => !!v || hint];
-    },
-    acceptanceRule(hint = 'Required') {
-      this.validForm = (this.validForm && this.declared && this.acceptance);
       return [v => !!v || hint];
     },
     save(date) {
@@ -468,8 +464,7 @@ export default {
       window.scrollTo(0,0);
     },
     validateRequestForm() {
-      this.validate();
-      if (this.validForm) {
+      if (this.$refs.form.validate() && this.validForm) {
         if(this.request.genderLabel) {
           const code = this.genders.filter(it => (it.label === this.request.genderLabel));
           this.request.genderCode = code[0].genderCode;
@@ -485,11 +480,9 @@ export default {
     closeDialog() {
       this.dialog = false;
     },
-    clickAcceptance() {
-      if(this.acceptance) {
-        this.validate();
-      }
-    },      
+    clickCheckbox() {
+      this.validate();
+    },
     focusBirthdateField(event) {
       if(event.key === 'Tab' && event.type === 'keyup') {
         this.menu = true;
