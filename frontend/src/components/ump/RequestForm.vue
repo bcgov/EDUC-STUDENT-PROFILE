@@ -28,6 +28,7 @@
             color="green"
             class="mt-0"
             :rules="privacyRule('')"
+            @click.native="clickAcceptance"
           >
             <template v-slot:label>
               <div class="pl-3">
@@ -447,6 +448,7 @@ export default {
     },
     privacyRule(hint = 'Required') {
       this.enableDisableForm.disabled = !this.declared;
+      this.validForm = (this.declared && this.acceptance);
       return [v => !!v || hint];
     },
     acceptanceRule(hint = 'Required') {
