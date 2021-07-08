@@ -32,6 +32,7 @@
 <script>
 import DocumentChip from './DocumentChip.vue';
 import {LocalDateTime, DateTimeFormatter} from '@js-joda/core';
+import {Locale} from '@js-joda/locale_en-us';
 
 export default {
   components: {
@@ -58,20 +59,8 @@ export default {
   computed: {
     commentObject() {
       const d = this.toTimeObject(this.comment.timestamp);
-      let amPm = 'am';
-      if(d.hour > 12){
-        amPm = 'pm';
-        d.hour = d.hour - 12;
-        //changes from 24 hour to 12 hour
-      }
 
-      //split the hour/minute object, make fixes, then add it back to the date time object
-      let fixTime = (d.dateTime).split(' ');
-      fixTime[1] = String(d.hour) + ':' +  d.minute;
-      fixTime = fixTime.join(' ');
-
-
-      const readableTime = fixTime + amPm;
+      const readableTime = d.dateTime;
       if(this.comment.myself){
         return {
           name: this.myself.name,
@@ -126,7 +115,7 @@ export default {
         second: retrievedTimestamp.second(),
         millisecond: retrievedTimestamp.nano(),
         dayOfWeek: retrievedTimestamp.dayOfWeek(),
-        dateTime: retrievedTimestamp.format(DateTimeFormatter.ofPattern('yyyy-MM-dd h:m'))
+        dateTime: retrievedTimestamp.format(DateTimeFormatter.ofPattern('yyyy-MM-dd h:ma').withLocale(Locale.US)).toLowerCase()
       };
     }
   }
