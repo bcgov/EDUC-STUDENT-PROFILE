@@ -115,7 +115,7 @@ export default {
         second: retrievedTimestamp.second(),
         millisecond: retrievedTimestamp.nano(),
         dayOfWeek: retrievedTimestamp.dayOfWeek(),
-        dateTime: retrievedTimestamp.format(DateTimeFormatter.ofPattern('yyyy-MM-dd h:ma').withLocale(Locale.US)).toLowerCase()
+        dateTime: retrievedTimestamp.format(DateTimeFormatter.ofPattern('yyyy-MM-dd h:mma').withLocale(Locale.US)).toLowerCase()
       };
     }
   }
