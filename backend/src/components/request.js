@@ -1,6 +1,6 @@
 'use strict';
 
-const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, RequestApps, generateJWTToken } = require('./utils');
+const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, RequestApps, generateJWTToken, formatCommentTimestamp } = require('./utils');
 const { getApiCredentials } = require('./auth');
 const config = require('../config/index');
 const log = require('./logger');
@@ -418,7 +418,8 @@ function getComments(requestType) {
           content: element.commentContent,
           participantId: (element.staffMemberIDIRGUID ? element.staffMemberIDIRGUID : '1'),
           myself: participant.id.toUpperCase() === response.myself.id.toUpperCase(),
-          timestamp: element.commentTimestamp
+          timestamp: element.commentTimestamp,
+          readableTime: formatCommentTimestamp(element.commentTimestamp)
         });
       });
 

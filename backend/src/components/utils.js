@@ -8,6 +8,8 @@ const lodash = require('lodash');
 const {ApiError} = require('./error');
 const jsonwebtoken = require('jsonwebtoken');
 const {v4: uuidv4} = require('uuid');
+const {LocalDateTime, DateTimeFormatter} = require('@js-joda/core');
+const {Locale} = require('@js-joda/locale_en');
 let discovery = null;
 
 // Returns OIDC Discovery values
@@ -241,6 +243,11 @@ function generateJWTToken(jwtid, subject, issuer, algorithm, payload) {
   return jsonwebtoken.sign(payload, jwtSecretKey, sign_options_schema);
 }
 
+function formatCommentTimestamp(time) {
+  const timestamp = LocalDateTime.parse(time);
+  return timestamp.format(DateTimeFormatter.ofPattern('yyyy-MM-dd h:mma').withLocale(Locale.CANADA));
+}
+
 const utils = {
   getOidcDiscovery,
   prettyStringify: (obj, indent = 2) => JSON.stringify(obj, null, indent),
@@ -257,7 +264,8 @@ const utils = {
   VerificationResults,
   EmailVerificationStatuses,
   RequestApps,
-  generateJWTToken
+  generateJWTToken,
+  formatCommentTimestamp
 };
 
 module.exports = utils;
