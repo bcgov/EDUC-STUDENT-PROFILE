@@ -21,10 +21,10 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: image-registry.openshift-image-registry.svc:5000/8878b4-tools/s2i-caddy:v1-stable
+        openshift.io/imported-from: image-registry.openshift-image-registry.svc:5000/8878b4-tools/caddy:v2
       from:
         kind: DockerImage
-        name: image-registry.openshift-image-registry.svc:5000/8878b4-tools/s2i-caddy:v1-stable
+        name: image-registry.openshift-image-registry.svc:5000/8878b4-tools/caddy:v2
       generation:
       importPolicy: {}
       name: v1-stable
@@ -71,10 +71,10 @@ objects:
     runPolicy: SerialLatestOnly
     source:
       dockerfile: |-
-        FROM image-registry.openshift-image-registry.svc:5000/8878b4-tools/s2i-caddy:v1-stable
-        COPY /tmp/src/dist /var/www/html
-        COPY /tmp/src/Caddyfile /etc/Caddyfile
-        CMD /tmp/scripts/run
+        FROM image-registry.openshift-image-registry.svc:5000/8878b4-tools/caddy:v2
+        EXPOSE 2015
+        COPY /tmp/src/dist /srv
+        COPY /tmp/src/Caddyfile /etc/caddy/Caddyfile
       images:
       - as:
         from:
@@ -89,7 +89,7 @@ objects:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: s2i-caddy:v1-stable
+          name: caddy:v2
       type: Docker
 parameters:
 - name: REPO_NAME
