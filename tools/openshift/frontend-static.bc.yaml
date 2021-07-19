@@ -15,7 +15,7 @@ objects:
     creationTimestamp:
     labels:
       build: "${REPO_NAME}-frontend-static"
-    name: s2i-caddy
+    name: caddy
   spec:
     lookupPolicy:
       local: false
@@ -27,7 +27,7 @@ objects:
         name: image-registry.openshift-image-registry.svc:5000/8878b4-tools/caddy:v2
       generation:
       importPolicy: {}
-      name: v1-stable
+      name: v2
       referencePolicy:
         type: Local
 - apiVersion: v1
