@@ -4,7 +4,7 @@
       <h3>Guidance:</h3>
       <ul class="pt-2">
         <li>This form can only be completed by the owner of the PEN</li>
-        <li>Enter your legal name exactly as indicated on your Government Photo ID</li>
+        <li>Enter your legal name exactly as it appears on your on your Government Photo ID; including any middle names if applicable</li>
         <li>If your name has been legally changed since attending school in British Columbia, please indicate previous
           name(s) in Past Names field
         </li>
