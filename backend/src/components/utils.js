@@ -12,6 +12,10 @@ const {LocalDateTime, DateTimeFormatter} = require('@js-joda/core');
 const {Locale} = require('@js-joda/locale_en');
 let discovery = null;
 
+axios.interceptors.request.use((axiosRequestConfig) => {
+  axiosRequestConfig.headers['X-Client-Name'] = 'PEN-STUDENT-PROFILE';
+  return axiosRequestConfig;
+});
 // Returns OIDC Discovery values
 async function getOidcDiscovery() {
   if (!discovery) {
