@@ -321,7 +321,8 @@ export default {
       }
     },
     checkDigit(pen) {
-      if(!pen || pen.length !== 9) {
+      const parsedPen = parseInt(pen);
+      if(!pen || pen.length !== 9 || parsedPen === 0 || isNaN(parsedPen)) {
         return false;
       }
 
