@@ -47,8 +47,8 @@ router.get('/requests/:id/documents', passport.authenticate('jwt', {session: fal
 router.get('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, verifyPenRequest,
   (req, res) => forwardGetReq(req, res, `${config.get('penRequest:apiEndpoint')}/${req.params.id}/documents/${req.params.documentId}`)
 );
-
-router.get('/requests/:id/documents/:documentId/download/:fileName', isValidBackendToken, [verifyPenRequest, downloadFile(requestType)]);
+// special case this does not use frontend axios, so need to refresh here to handle expired jwt.
+router.get('/requests/:id/documents/:documentId/download/:fileName', auth.refreshJWT, isValidBackendToken, [verifyPenRequest, downloadFile(requestType)]);
 
 router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyPenRequest, deleteDocument(requestType)]);
 
