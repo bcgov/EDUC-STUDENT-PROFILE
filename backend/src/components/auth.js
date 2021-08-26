@@ -145,6 +145,22 @@ const auth = {
       const status = error.response ? error.response.status : HttpStatus.INTERNAL_SERVER_ERROR;
       throw new ApiError(status, { message: 'Get getApiCredentials error'}, error);
     }
+  },
+  isValidBackendToken() {
+    return function (req, res, next) {
+      if (req?.session?.passport?.user?.jwt) {
+        try {
+          jsonwebtoken.verify(req.session.passport.user.jwt, config.get('oidc:publicKey'));
+        } catch (e) {
+          log.debug('error is from verify', e);
+          return res.status(HttpStatus.UNAUTHORIZED).json();
+        }
+        log.silly('Backend token is valid moving to next');
+        return next();
+      } else {
+        return res.status(HttpStatus.UNAUTHORIZED).json();
+      }
+    };
   }
 };
 

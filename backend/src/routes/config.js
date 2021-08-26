@@ -5,9 +5,10 @@ const config = require('../config/index');
 const log = require('../components/logger');
 const router = express.Router();
 const {getAccessToken} = require('../components/utils');
+const auth = require('../components/auth');
+const isValidBackendToken= auth.isValidBackendToken();
 
-
-router.get('/', passport.authenticate('jwt', {session: false}), getConfig);
+router.get('/', passport.authenticate('jwt', {session: false}),isValidBackendToken, getConfig);
 
 
 async function getConfig(req, res) {
