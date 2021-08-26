@@ -22,45 +22,28 @@ function processQueue(error, token = null) {
 const apiAxios = axios.create();
 const intercept = apiAxios.interceptors.response.use(config => config, error => {
   const originalRequest = error.config;
-  if (error.response && error.response.status && error.response.status === 401 && !originalRequest._retry) {
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        try {
-          failedQueue.push({ resolve: (token) => {
-            originalRequest.headers['Authorization'] = `Bearer ${token}`;
-            resolve(axios(originalRequest));
-          }, reject });
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }
-
-    originalRequest._retry = true;
-    isRefreshing = true;
-
-    return new Promise((resolve, reject) => {
-      AuthService.refreshAuthToken(localStorage.getItem('jwtToken'))
-        .then(response => {
-          if (response.jwtFrontend) {
-            localStorage.setItem('jwtToken', response.jwtFrontend);
-            apiAxios.defaults.headers.common['Authorization'] = `Bearer ${response.jwtFrontend}`;
-            originalRequest.headers['Authorization'] = `Bearer ${response.jwtFrontend}`;
-          }
-
-          processQueue(null, response.jwtFrontend);
-          resolve(axios(originalRequest));
-        })
-        .catch(e => {
-          processQueue(e, null);
-          localStorage.removeItem('jwtToken');
-          reject(e);
-        })
-        .finally(() => isRefreshing = false);
-    });
+  if (error.response.status !== 401) {
+    return Promise.reject(error);
   }
-
-  return Promise.reject(error);
+  axios.interceptors.response.eject(intercept);
+  return new Promise((resolve, reject) => {
+    AuthService.refreshAuthToken(localStorage.getItem('jwtToken'))
+      .then(response => {
+        if (response.jwtFrontend) {
+          localStorage.setItem('jwtToken', response.jwtFrontend);
+          apiAxios.defaults.headers.common['Authorization'] = `Bearer ${response.jwtFrontend}`;
+          originalRequest.headers['Authorization'] = `Bearer ${response.jwtFrontend}`;
+        }
+        processQueue(null, response.jwtFrontend);
+        resolve(axios(originalRequest));
+      })
+      .catch(e => {
+        processQueue(e, null);
+        localStorage.removeItem('jwtToken');
+        window.location = '/token-expired';
+        reject(e);
+      });
+  });
 });
 
 export default {
