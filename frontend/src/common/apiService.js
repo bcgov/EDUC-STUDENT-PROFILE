@@ -3,7 +3,6 @@ import {ApiRoutes} from '@/utils/constants';
 import AuthService from '@/common/authService';
 
 // Buffer concurrent requests while refresh token is being acquired
-let isRefreshing = false;
 let failedQueue = [];
 
 function processQueue(error, token = null) {
