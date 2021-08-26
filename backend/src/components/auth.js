@@ -158,6 +158,8 @@ const auth = {
         log.silly('Backend token is valid moving to next');
         return next();
       } else {
+        log.silly(req.session);
+        log.silly('no jwt responding back 401');
         return res.status(HttpStatus.UNAUTHORIZED).json();
       }
     };
