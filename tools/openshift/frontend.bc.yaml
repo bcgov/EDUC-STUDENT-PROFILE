@@ -43,8 +43,8 @@ objects:
         cpu: 1000m
         memory: 4Gi
       limits:
-        cpu: 2000m
-        memory: 8Gi
+        cpu: 4000m
+        memory: 12Gi
     runPolicy: SerialLatestOnly
     source:
       contextDir: frontend
