@@ -28,7 +28,7 @@
     "@js-joda/core": "^3.2.0",
     "@js-joda/locale_en": "^3.2.2",
     "atob": "2.1.2",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "body-parser": "^1.19.0",
     "config": "^3.3.3",
     "connect-redis": "^5.1.0",
