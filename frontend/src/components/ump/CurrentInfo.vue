@@ -41,7 +41,7 @@
             <v-text-field
               id='recordedLegalFirstName'
               v-model="recordedData.legalFirstName"
-              :rules="requiredRules(firstNameHint)"
+              :rules="charRules"
               color="#003366"
               outlined
               class="touppercase"
@@ -251,7 +251,7 @@ export default {
       return 'Personal Education Number (PEN), EG 123456789';
     },
     firstNameHint() {
-      return 'Recorded Legal First Name(s)';
+      return `Recorded Legal First Name(s)${this.hasStudentRecord ? '' :'; leave blank if you do not have a first name'}`;
     },
     middleNameHint() {
       return `Recorded Legal Middle Name(s) ${this.hasStudentRecord ? '' : 'if applicable'}`;
