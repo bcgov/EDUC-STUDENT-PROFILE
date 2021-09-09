@@ -73,7 +73,7 @@
                 :persistent-hint="!enableDisableForm.disabled && editLegalFirstName"
                 outlined
                 class="touppercase"
-                label="Current Legal First Name(s)"
+                label="Current Legal First Name(s); leave blank if you do not have a first name"
                 :disabled="enableDisableForm.disabled || !editLegalFirstName"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="25"
