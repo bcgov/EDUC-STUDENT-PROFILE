@@ -144,7 +144,7 @@ utils.getOidcDiscovery().then(discovery => {
       givenName: jwtPayload.given_name,
       jwt: jwtPayload,
       name: jwtPayload.name,
-      preferredUsername: jwtPayload.preferred_username,
+      user_guid: jwtPayload.user_guid,
       realmRole: jwtPayload.realm_role
     });
   }));
