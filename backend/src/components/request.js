@@ -197,9 +197,11 @@ function getCodes(requestType) {
         `${endpoint}/statuses`,
       ];
 
-      const [genderCodes, statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url, correlationID)));
+      let [genderCodes, statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url, correlationID)));
       if(genderCodes){
         // forcing sort if API did not return in sorted order.
+        const curDate = localDateTime.now();
+        genderCodes = genderCodes.filter(d => curDate.isAfter(localDateTime.parse(d.effectiveDate)) && curDate.isBefore(localDateTime.parse(d.expiryDate)));
         genderCodes.sort((a,b)=> a.displayOrder - b.displayOrder);
       }
       return res.status(HttpStatus.OK).json({genderCodes, statusCodes});
