@@ -569,19 +569,25 @@ describe('getUserInfo', () => {
 describe('getCodes', () => {
   const codes =[
     {
+      effectiveDate: '2020-01-01T00:00:00',
+      expiryDate: '2099-12-31T00:00:00',
+      code: 'Code2',
+      label: 'Label2',
+      displayOrder: 1
+    },
+    {
+      effectiveDate: '2020-01-01T00:00:00',
+      expiryDate: '2099-12-31T00:00:00',
       code: 'Code1',
       label: 'Label1',
       displayOrder: 2
     },
     {
+      effectiveDate: '2020-01-01T00:00:00',
+      expiryDate: '2099-12-31T00:00:00',
       code: 'Code3',
       label: 'Label3',
       displayOrder: 3
-    },
-    {
-      code: 'Code2',
-      label: 'Label2',
-      displayOrder: 1
     }
   ];
   const getCodes = changeRequest.getCodes('studentRequest');
