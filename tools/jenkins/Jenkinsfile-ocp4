@@ -16,7 +16,7 @@ pipeline{
     OWNER = 'bcgov'
     JOB_NAME = 'master'
     TAG = 'latest'
-    TARGET_ENV = 'dev'
+    TARGET_ENV = 'tools'
     TARGET_ENVIRONMENT = "${NAMESPACE}-${TARGET_ENV}"
 
     APP_NAME = 'student-profile'
