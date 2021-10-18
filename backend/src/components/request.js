@@ -697,7 +697,7 @@ function downloadFile(requestType) {
 
       let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'Y');
 
-      res.setHeader('Content-disposition', 'attachment; filename=' + resData.fileName);
+      res.setHeader('Content-disposition', 'attachment; filename=' + resData.fileName?.replace(/ /g, '_').replace(/,/g, '_').trim());
       res.setHeader('Content-type', resData.fileExtension);
 
       return res.status(HttpStatus.OK).send(Buffer.from(resData.documentData, 'base64'));
