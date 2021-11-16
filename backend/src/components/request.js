@@ -70,15 +70,18 @@ async function getDigitalIdData(token, digitalID, correlationID) {
   }
 }
 
-async function getStudent(token, studentID, sexCodes) {
-  let student;
-  try {
-    student = await getData(token, config.get('student:apiEndpoint') + `/${studentID}`);
-  } catch (e) {
-    throw new ServiceError('getStudent error', e);
-  }
+function getStudent(userInfo, sexCodes) {
+  const student = {
+    studentID: userInfo._json.studentID,
+    pen: userInfo._json.pen,
+    legalLastName: userInfo._json.legalLastName,
+    legalFirstName: userInfo._json.legalFirstName,
+    legalMiddleNames: userInfo._json.legalMiddleNames,
+    sexCode: userInfo._json.sexCode,
+    dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
+  };
   const sexInfo = lodash.find(sexCodes, ['sexCode', student.sexCode]);
-  if(!sexInfo) {
+  if (!sexInfo) {
     throw new ServiceError(`Wrong sexCode: ${student.sexCode}`);
   }
   student.sexLabel = sexInfo.label;
@@ -149,8 +152,8 @@ async function getUserInfo(req, res) {
     }
 
     let student = null;
-    if(digitalIdData.studentID) {
-      student = await getStudent(accessToken, digitalIdData.studentID, codesData.sexCodes);
+    if(userInfo?._json?.studentID) {
+      student = getStudent(userInfo, codesData.sexCodes);
     }
 
     if(req && req.session){
