@@ -113,50 +113,7 @@ describe('getDigitalIdData', () => {
   });
 });
 
-describe('getStudent', () => {
-  const studentData = { data: 'data', sexCode: 'M' };
-  const sexCodes = [
-    {
-      sexCode: 'M',
-      label: 'Male',
-    },
-    {
-      sexCode: 'F',
-      label: 'Female',
-    }
-  ];
 
-  const spy = jest.spyOn(utils, 'getData');
-
-  afterEach(() => {
-    spy.mockClear();
-  });
-
-  it('should return Student data with sexLabel', async () => {
-    utils.getData.mockResolvedValue(studentData);
-
-    const result = await changeRequest.__get__('getStudent')('token', 'studentID', sexCodes);
-
-    expect(result).toBeTruthy();
-    expect(result.data).toEqual(studentData.data);
-    expect(result.sexCode).toEqual(studentData.sexCode);
-    expect(result.sexLabel).toEqual('Male');
-    expect(spy).toHaveBeenCalledWith('token', config.get('student:apiEndpoint') + '/studentID');
-  });
-
-  it('should throw ServiceError if no sexCode label', async () => {
-    studentData.sexCode = 'NotExist';
-    utils.getData.mockResolvedValue(studentData);
-
-    expect(changeRequest.__get__('getStudent')('token', 'studentID', sexCodes)).rejects.toThrowError(ServiceError);
-  });
-
-  it('should throw ServiceError if getData is failed', async () => {
-    utils.getData.mockRejectedValue(new Error('error'));
-
-    expect(changeRequest.__get__('getStudent')('token', 'studentID', sexCodes)).rejects.toThrowError(ServiceError);
-  });
-});
 
 describe('getLatestRequest', () => {
   const digitalID = 'ac337def-704b-169f-8170-653e2f7c001';
@@ -494,10 +451,7 @@ describe('getUserInfo', () => {
       studentID
     };
 
-    const student = {
-      pen: '123456',
-      studentID
-    };
+    const student = null;
 
     rewireRequest.__Rewire__('getDigitalIdData', () => Promise.resolve(digitalIdData));
     rewireRequest.__Rewire__('getStudent', () => Promise.resolve(student));
