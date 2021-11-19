@@ -76,7 +76,7 @@ function getStudent(userInfo, sexCodes) {
     pen: userInfo._json.pen,
     legalLastName: userInfo._json.legalLastName,
     legalFirstName: userInfo._json.legalFirstName,
-    legalMiddleNames: userInfo._json.legalMiddleNames,
+    legalMiddleNames: userInfo._json.legalMiddleNames || null,
     email: userInfo._json.email,
     sexCode: userInfo._json.sexCode,
     genderCode: userInfo._json.sexCode,

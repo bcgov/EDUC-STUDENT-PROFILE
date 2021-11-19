@@ -276,7 +276,7 @@ export default {
   },
   mounted() {
     if (this.student) {
-      this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'sexCode', 'email', 'pen']);
+      this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'sexCode', 'email', 'pen']);
     }
     Object.assign(this.recordedData, this.previousData);
     const gender = this.recordedData.sexCode && this.genderInfo(this.recordedData.sexCode);
