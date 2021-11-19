@@ -77,6 +77,7 @@ function getStudent(userInfo, sexCodes) {
     legalLastName: userInfo._json.legalLastName,
     legalFirstName: userInfo._json.legalFirstName,
     legalMiddleNames: userInfo._json.legalMiddleNames,
+    email: userInfo._json.email,
     sexCode: userInfo._json.sexCode,
     dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
   };

@@ -276,10 +276,10 @@ export default {
   },
   mounted() {
     if (this.student) {
-      this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email', 'pen']);
+      this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'sexCode', 'email', 'pen']);
     }
     Object.assign(this.recordedData, this.previousData);
-    const gender = this.recordedData.genderCode && this.genderInfo(this.recordedData.genderCode);
+    const gender = this.recordedData.sexCode && this.genderInfo(this.recordedData.sexCode);
     gender && (this.recordedData.genderLabel = gender.label);
   },
   methods: {
