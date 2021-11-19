@@ -79,6 +79,7 @@ function getStudent(userInfo, sexCodes) {
     legalMiddleNames: userInfo._json.legalMiddleNames,
     email: userInfo._json.email,
     sexCode: userInfo._json.sexCode,
+    genderCode: userInfo._json.sexCode,
     dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
   };
   const sexInfo = lodash.find(sexCodes, ['sexCode', student.sexCode]);
