@@ -30,9 +30,6 @@ export default {
   name: 'StudentProfile',
   components: {
     PrimaryButton,
-  },
-  mounted() {
-    console.log(this.$vuetify.breakpoint.name);
   }
 };
 </script>
@@ -47,7 +44,7 @@ export default {
 }
 
 .fit-content {
-  widtH: fit-content;
+  width: fit-content;
 }
 
 </style>
