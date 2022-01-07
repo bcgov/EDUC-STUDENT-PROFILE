@@ -23,7 +23,6 @@ import StudentRequestSubmission from './components/ump/RequestSubmission';
 import PenRequestForm from './components/gmp/RequestForm';
 import PenRequestSummary from './components/gmp/RequestSummary';
 import PenRequestSubmission from './components/gmp/RequestSubmission';
-import StudentProfile from './components/StudentProfile';
 import authStore from './store/modules/auth';
 import store from './store/index';
 import {pick, values} from 'lodash';
@@ -48,14 +47,6 @@ const router = new VueRouter({
         requiresAuth: true
       },
 
-    },
-    {
-      path: '/profile',
-      name: 'profile',
-      component: StudentProfile,
-      meta: {
-        requiresAuth: true
-      },
     },
     {
       path: '/ump',
