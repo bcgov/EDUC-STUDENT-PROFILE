@@ -1,6 +1,6 @@
 'use strict';
 
-const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, RequestApps, generateJWTToken, formatCommentTimestamp } = require('./utils');
+const { getSessionUser, getAccessToken, deleteData, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, RequestApps, generateJWTToken, formatCommentTimestamp } = require('./utils');
 const { getApiCredentials } = require('./auth');
 const config = require('../config/index');
 const log = require('./logger');
@@ -70,7 +70,7 @@ async function getDigitalIdData(token, digitalID, correlationID) {
   }
 }
 
-function getStudent(userInfo, sexCodes) {
+function getStudent(userInfo, genderCodes) {
   const student = {
     studentID: userInfo._json.studentID,
     pen: userInfo._json.pen,
@@ -78,15 +78,14 @@ function getStudent(userInfo, sexCodes) {
     legalFirstName: userInfo._json.legalFirstName || null,
     legalMiddleNames: userInfo._json.legalMiddleNames || null,
     email: userInfo._json.email || null,
-    sexCode: userInfo._json.sexCode,
-    genderCode: userInfo._json.sexCode,
+    genderCode: userInfo._json.genderCode,
     dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
   };
-  const sexInfo = lodash.find(sexCodes, ['sexCode', student.sexCode]);
-  if (!sexInfo) {
-    throw new ServiceError(`Wrong sexCode: ${student.sexCode}`);
+  const genderInfo = lodash.find(genderCodes, ['genderCode', student.genderCode]);
+  if (!genderInfo) {
+    throw new ServiceError(`Wrong genderCode: ${student.genderCode}`);
   }
-  student.sexLabel = sexInfo.label;
+  student.genderLabel = genderInfo.label;
   return student;
 }
 
@@ -155,7 +154,7 @@ async function getUserInfo(req, res) {
 
     let student = null;
     if(userInfo?._json?.studentID) {
-      student = getStudent(userInfo, codesData.sexCodes);
+      student = getStudent(userInfo, codesData.genderCodes);
     }
 
     if(req && req.session){
@@ -223,12 +222,12 @@ async function getServerSideCodes(accessToken, correlationID) {
   if(!codes) {
     try{
       const codeUrls = [
-        `${config.get('student:apiEndpoint')}/sex-codes`,
+        `${config.get('student:apiEndpoint')}/gender-codes`,
         `${config.get('digitalID:apiEndpoint')}/identityTypeCodes`
       ];
 
-      const [sexCodes, identityTypes] = await Promise.all(codeUrls.map(url => getData(accessToken, url), correlationID));
-      codes = {sexCodes, identityTypes};
+      const [genderCodes, identityTypes] = await Promise.all(codeUrls.map(url => getData(accessToken, url), correlationID));
+      codes = {genderCodes, identityTypes};
     } catch(e) {
       throw new ServiceError('getServerSideCodes error', e);
     }
@@ -257,57 +256,10 @@ async function sendVerificationEmail(accessToken, emailAddress, requestId, ident
   }
 }
 
-async function getAutoMatchResults(accessToken, userInfo, correlationID) {
-  try {
-    const url = config.get('demographics:apiEndpoint');
-
-    let params = {
-      params: {
-        studSurName: userInfo['surname'],
-        studGiven: userInfo['givenName'],
-        studMiddle: userInfo['givenNames'] && userInfo['givenNames'].replace(userInfo['givenName'],'').trim(),
-        studBirth: userInfo['birthDate'] && userInfo['birthDate'].split('-').join(''),
-        studSex: userInfo['gender'] && userInfo['gender'].charAt(0)
-      }
-    };
-
-    const autoMatchResults = await getDataWithParams(accessToken, url, params, correlationID);
-    let bcscAutoMatchOutcome;
-    let bcscAutoMatchDetails;
-    if(autoMatchResults.length < 1) {
-      bcscAutoMatchOutcome = 'ZEROMATCHES';
-      bcscAutoMatchDetails = 'Zero PEN records found by BCSC auto-match';
-    }
-    else if(autoMatchResults.length > 1) {
-      bcscAutoMatchOutcome = 'MANYMATCHES';
-      bcscAutoMatchDetails = autoMatchResults.length + ' PEN records found by BCSC auto-match';
-    }
-    else {
-      bcscAutoMatchOutcome = 'ONEMATCH';
-      const lastName = autoMatchResults[0]['studSurname'] ? autoMatchResults[0]['studSurname'] : '(none)';
-      const firstName = autoMatchResults[0]['studGiven'] ? autoMatchResults[0]['studGiven'] : '(none)';
-      const middleName = autoMatchResults[0]['studMiddle'] ? autoMatchResults[0]['studMiddle'] : '(none)';
-      bcscAutoMatchDetails = `${autoMatchResults[0].pen} ${lastName}, ${firstName}, ${middleName}`;
-    }
-
-    return {
-      bcscAutoMatchOutcome: bcscAutoMatchOutcome,
-      bcscAutoMatchDetails: bcscAutoMatchDetails
-    };
-  } catch(e) {
-    throw new ServiceError('getAutoMatchResults error', e);
-  }
-}
-
 async function postRequest(accessToken, reqData, userInfo, requestType, correlationID) {
   try{
     const url = config.get(`${requestType}:apiEndpoint`) + '/';
 
-    if(userInfo.accountType === 'BCSC') {
-      const autoMatchResults = await getAutoMatchResults(accessToken, userInfo, correlationID);
-      reqData.bcscAutoMatchOutcome = autoMatchResults.bcscAutoMatchOutcome;
-      reqData.bcscAutoMatchDetails = autoMatchResults.bcscAutoMatchDetails;
-    }
     if(!reqData.emailVerified){
       reqData.emailVerified = EmailVerificationStatuses.NOT_VERIFIED;
     }

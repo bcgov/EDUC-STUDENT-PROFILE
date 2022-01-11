@@ -39,8 +39,7 @@ describe('Component initialized with namespaced Vuex module.', () => {
     legalFirstName: 'James',
     legalMiddleNames: 'Wayne',
     legalLastName: 'Duke',
-    sexCode: 'M',
-    sexLabel: 'Male',
+    genderLabel: 'Male',
     genderCode: 'M',
     dob: '1989-06-04'
   };

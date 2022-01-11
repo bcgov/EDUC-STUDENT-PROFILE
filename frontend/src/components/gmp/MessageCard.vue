@@ -84,7 +84,7 @@
           <p class="mb-2">Gender:</p>
         </v-col>
         <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ student.sexLabel }}</strong></p>
+          <p class="mb-2"><strong>{{ student.genderLabel }}</strong></p>
         </v-col>
       </v-row>
     </v-container>
@@ -117,7 +117,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('penRequest', ['request', 'sexInfo']),
+    ...mapGetters('penRequest', ['request', 'genderInfo']),
     ...mapGetters(['student']),
     ...mapGetters('config',['numDaysAllowedInDraftStatus']),
 
@@ -136,8 +136,8 @@ export default {
     timedout() {
       return Math.floor(new Date() - new Date(this.request.statusUpdateDate)) / (1000*60*60) > 24;
     },
-    sexLabel() { 
-      return this.sexInfo(this.student.sexCode).label;
+    genderLabel() {
+      return this.genderInfo(this.student.genderCodes).label;
     }
   },
   async created(){
