@@ -633,114 +633,6 @@ describe('sendVerificationEmail', () => {
   });
 });
 
-describe('getAutoMatchResults', () => {
-  const spy = jest.spyOn(utils, 'getDataWithParams');
-
-  afterEach(() => {
-    spy.mockClear();
-  });
-
-  it('should return ZEROMATCHES if no PEN records', async () => {
-    const userInfo = {
-      surname: 'Surname',
-      givenName: 'Givenname',
-      givenNames: 'Givenname Givenname2',
-      birthDate: '2000-01-01',
-      gender: 'Female'
-    };
-    const autoMatchResults = [];
-    utils.getDataWithParams.mockResolvedValue(autoMatchResults);
-
-    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo, correlationID);
-
-    expect(result).toEqual({
-      bcscAutoMatchOutcome: 'ZEROMATCHES',
-      bcscAutoMatchDetails: 'Zero PEN records found by BCSC auto-match'
-    });
-    //expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('token', config.get('demographics:apiEndpoint'), {
-      params: {
-        studSurName: 'Surname',
-        studGiven: 'Givenname',
-        studMiddle: 'Givenname2',
-        studBirth: '20000101',
-        studGender: 'F'
-      }
-    }, correlationID);
-  });
-
-  it('should return MANYMATCHES if multiple PEN records', async () => {
-    const userInfo = {
-      surname: 'Surname',
-      givenName: 'Givenname',
-      givenNames: '',
-      birthDate: '',
-      gender: ''
-    };
-    const autoMatchResults = [{
-      studSurname: 'studSurname',
-      studGiven: 'studGiven',
-      middleName: 'studMiddle'
-    }, {
-      studSurname: 'studSurname',
-      studGiven: 'studGiven',
-      middleName: 'studMiddle'
-    }];
-    utils.getDataWithParams.mockResolvedValue(autoMatchResults);
-
-    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo, correlationID);
-
-    expect(result).toEqual({
-      bcscAutoMatchOutcome: 'MANYMATCHES',
-      bcscAutoMatchDetails: '2 PEN records found by BCSC auto-match'
-    });
-    //expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('token', config.get('demographics:apiEndpoint'), {
-      params: {
-        studSurName: 'Surname',
-        studGiven: 'Givenname',
-        studMiddle: '',
-        studBirth: '',
-        studGender: ''
-      }
-    }, correlationID);
-  });
-
-  it('should return ONEMATCH if one PEN record', async () => {
-    const userInfo = {
-      surname: 'Surname',
-      givenName: 'Givenname',
-    };
-    const autoMatchResults = [{
-      studSurname: 'studSurname',
-      studGiven: 'studGiven',
-      studMiddle: 'studMiddle',
-      pen: 'pen'
-    }];
-    utils.getDataWithParams.mockResolvedValue(autoMatchResults);
-
-    const result = await changeRequest.__get__('getAutoMatchResults')('token', userInfo, correlationID);
-
-    expect(result).toEqual({
-      bcscAutoMatchOutcome: 'ONEMATCH',
-      bcscAutoMatchDetails: 'pen studSurname, studGiven, studMiddle'
-    });
-    expect(spy).toHaveBeenCalledWith('token', config.get('demographics:apiEndpoint'), {
-      params: {
-        studSurName: 'Surname',
-        studGiven: 'Givenname',
-      }
-    }, correlationID);
-  });
-
-  it('should throw ServiceError if getDataWithParams is failed', async () => {
-    const userInfo = {};
-    utils.getDataWithParams.mockRejectedValue(new Error('error'));
-
-    expect(changeRequest.__get__('getAutoMatchResults')('token', userInfo)).rejects.toThrowError(ServiceError);
-  });
-});
-
 describe('postRequest', () => {
   const reqData = { legalLastName: 'legalLastName' };
   const userInfo = {
@@ -754,7 +646,6 @@ describe('postRequest', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    rewireRequest.__ResetDependency__('getAutoMatchResults');
   });
 
   it('should return request data', async () => {
@@ -779,12 +670,8 @@ describe('postRequest', () => {
       displayName: 'Firstname Lastname',
       accountType: 'BCSC',
     };
-    const autoMatchResults = {
-      bcscAutoMatchOutcome: 'ONEMATCH',
-      bcscAutoMatchDetails: 'pen studSurname, studGiven, studMiddle'
-    };
+
     utils.postData.mockResolvedValue({studentRequestID: 'requestID'});
-    rewireRequest.__Rewire__('getAutoMatchResults', () => Promise.resolve(autoMatchResults));
 
     const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType, correlationID);
 
@@ -793,7 +680,6 @@ describe('postRequest', () => {
     expect(result.digitalID).toBeNull();
     const requst = {
       ...reqData,
-      ...autoMatchResults,
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
@@ -806,14 +692,8 @@ describe('postRequest', () => {
       displayName: 'Firstname Lastname',
       accountType: 'BCSC',
     };
-    const autoMatchResults = {
-      bcscAutoMatchOutcome: 'ZEROMATCHES',
-      bcscAutoMatchDetails: 'Zero PEN records found by BCSC auto-match'
-    };
-    const autoMatchRes = [];
 
     jest.spyOn(utils, 'getDataWithParams');
-    utils.getDataWithParams.mockResolvedValue(autoMatchRes);
     utils.postData.mockResolvedValue({studentRequestID: 'requestID'});
 
     const result = await changeRequest.__get__('postRequest')('token', reqData, userInfo, requestType, correlationID);
@@ -823,7 +703,6 @@ describe('postRequest', () => {
     expect(result.digitalID).toBeNull();
     const requst = {
       ...reqData,
-      ...autoMatchResults,
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };

@@ -256,57 +256,10 @@ async function sendVerificationEmail(accessToken, emailAddress, requestId, ident
   }
 }
 
-async function getAutoMatchResults(accessToken, userInfo, correlationID) {
-  try {
-    const url = config.get('demographics:apiEndpoint');
-
-    let params = {
-      params: {
-        studSurName: userInfo['surname'],
-        studGiven: userInfo['givenName'],
-        studMiddle: userInfo['givenNames'] && userInfo['givenNames'].replace(userInfo['givenName'],'').trim(),
-        studBirth: userInfo['birthDate'] && userInfo['birthDate'].split('-').join(''),
-        studGender: userInfo['gender'] && userInfo['gender'].charAt(0)
-      }
-    };
-
-    const autoMatchResults = await getDataWithParams(accessToken, url, params, correlationID);
-    let bcscAutoMatchOutcome;
-    let bcscAutoMatchDetails;
-    if(autoMatchResults.length < 1) {
-      bcscAutoMatchOutcome = 'ZEROMATCHES';
-      bcscAutoMatchDetails = 'Zero PEN records found by BCSC auto-match';
-    }
-    else if(autoMatchResults.length > 1) {
-      bcscAutoMatchOutcome = 'MANYMATCHES';
-      bcscAutoMatchDetails = autoMatchResults.length + ' PEN records found by BCSC auto-match';
-    }
-    else {
-      bcscAutoMatchOutcome = 'ONEMATCH';
-      const lastName = autoMatchResults[0]['studSurname'] ? autoMatchResults[0]['studSurname'] : '(none)';
-      const firstName = autoMatchResults[0]['studGiven'] ? autoMatchResults[0]['studGiven'] : '(none)';
-      const middleName = autoMatchResults[0]['studMiddle'] ? autoMatchResults[0]['studMiddle'] : '(none)';
-      bcscAutoMatchDetails = `${autoMatchResults[0].pen} ${lastName}, ${firstName}, ${middleName}`;
-    }
-
-    return {
-      bcscAutoMatchOutcome: bcscAutoMatchOutcome,
-      bcscAutoMatchDetails: bcscAutoMatchDetails
-    };
-  } catch(e) {
-    throw new ServiceError('getAutoMatchResults error', e);
-  }
-}
-
 async function postRequest(accessToken, reqData, userInfo, requestType, correlationID) {
   try{
     const url = config.get(`${requestType}:apiEndpoint`) + '/';
 
-    if(userInfo.accountType === 'BCSC') {
-      const autoMatchResults = await getAutoMatchResults(accessToken, userInfo, correlationID);
-      reqData.bcscAutoMatchOutcome = autoMatchResults.bcscAutoMatchOutcome;
-      reqData.bcscAutoMatchDetails = autoMatchResults.bcscAutoMatchDetails;
-    }
     if(!reqData.emailVerified){
       reqData.emailVerified = EmailVerificationStatuses.NOT_VERIFIED;
     }
