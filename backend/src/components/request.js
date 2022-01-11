@@ -1,6 +1,6 @@
 'use strict';
 
-const { getSessionUser, getAccessToken, deleteData, getDataWithParams, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, RequestApps, generateJWTToken, formatCommentTimestamp } = require('./utils');
+const { getSessionUser, getAccessToken, deleteData, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, RequestApps, generateJWTToken, formatCommentTimestamp } = require('./utils');
 const { getApiCredentials } = require('./auth');
 const config = require('../config/index');
 const log = require('./logger');
