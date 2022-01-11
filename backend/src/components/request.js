@@ -70,7 +70,7 @@ async function getDigitalIdData(token, digitalID, correlationID) {
   }
 }
 
-function getStudent(userInfo, sexCodes) {
+function getStudent(userInfo, genderCodes) {
   const student = {
     studentID: userInfo._json.studentID,
     pen: userInfo._json.pen,
@@ -78,15 +78,14 @@ function getStudent(userInfo, sexCodes) {
     legalFirstName: userInfo._json.legalFirstName || null,
     legalMiddleNames: userInfo._json.legalMiddleNames || null,
     email: userInfo._json.email || null,
-    sexCode: userInfo._json.sexCode,
-    genderCode: userInfo._json.sexCode,
+    genderCode: userInfo._json.genderCode,
     dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
   };
-  const sexInfo = lodash.find(sexCodes, ['sexCode', student.sexCode]);
-  if (!sexInfo) {
-    throw new ServiceError(`Wrong sexCode: ${student.sexCode}`);
+  const genderInfo = lodash.find(genderCodes, ['genderCode', student.genderCode]);
+  if (!genderInfo) {
+    throw new ServiceError(`Wrong genderCode: ${student.genderCode}`);
   }
-  student.sexLabel = sexInfo.label;
+  student.genderLabel = genderInfo.label;
   return student;
 }
 
@@ -155,7 +154,7 @@ async function getUserInfo(req, res) {
 
     let student = null;
     if(userInfo?._json?.studentID) {
-      student = getStudent(userInfo, codesData.sexCodes);
+      student = getStudent(userInfo, codesData.genderCodes);
     }
 
     if(req && req.session){
@@ -223,12 +222,12 @@ async function getServerSideCodes(accessToken, correlationID) {
   if(!codes) {
     try{
       const codeUrls = [
-        `${config.get('student:apiEndpoint')}/sex-codes`,
+        `${config.get('student:apiEndpoint')}/gender-codes`,
         `${config.get('digitalID:apiEndpoint')}/identityTypeCodes`
       ];
 
-      const [sexCodes, identityTypes] = await Promise.all(codeUrls.map(url => getData(accessToken, url), correlationID));
-      codes = {sexCodes, identityTypes};
+      const [genderCodes, identityTypes] = await Promise.all(codeUrls.map(url => getData(accessToken, url), correlationID));
+      codes = {genderCodes, identityTypes};
     } catch(e) {
       throw new ServiceError('getServerSideCodes error', e);
     }
@@ -267,7 +266,7 @@ async function getAutoMatchResults(accessToken, userInfo, correlationID) {
         studGiven: userInfo['givenName'],
         studMiddle: userInfo['givenNames'] && userInfo['givenNames'].replace(userInfo['givenName'],'').trim(),
         studBirth: userInfo['birthDate'] && userInfo['birthDate'].split('-').join(''),
-        studSex: userInfo['gender'] && userInfo['gender'].charAt(0)
+        studGender: userInfo['gender'] && userInfo['gender'].charAt(0)
       }
     };
 

@@ -325,25 +325,25 @@ describe('getServerSideCodes', () => {
     const result = await changeRequest.__get__('getServerSideCodes')('token');
 
     expect(result).toBeTruthy();
-    expect(result.sexCodes).toEqual(codes);
+    expect(result.genderCodes).toEqual(codes);
     expect(result.identityTypes).toEqual(codes);
-    expect(changeRequest.__get__('codes').sexCodes).toEqual(codes);
+    expect(changeRequest.__get__('codes').genderCodes).toEqual(codes);
     expect(changeRequest.__get__('codes').identityTypes).toEqual(codes);
     expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenCalledWith('token', `${config.get('student:apiEndpoint')}/sex-codes`);
+    expect(spy).toHaveBeenCalledWith('token', `${config.get('student:apiEndpoint')}/gender-codes`);
     expect(spy).toHaveBeenCalledWith('token', `${config.get('digitalID:apiEndpoint')}/identityTypeCodes`);
   });
 
   it('should not call getData if codes exist', async () => {
     changeRequest.__set__('codes', {
-      sexCodes: codes,
+      genderCodes: codes,
       identityTypes: codes
     });
 
     const result = await changeRequest.__get__('getServerSideCodes')('token');
 
     expect(result).toBeTruthy();
-    expect(result.sexCodes).toEqual(codes);
+    expect(result.genderCodes).toEqual(codes);
     expect(result.identityTypes).toEqual(codes);
     expect(spy).toHaveBeenCalledTimes(0);
   });
@@ -377,13 +377,13 @@ describe('getUserInfo', () => {
   };
 
   const codes = {
-    sexCodes: [
+    genderCodes: [
       {
-        sexCode: 'M',
+        genderCodes: 'M',
         label: 'Male',
       },
       {
-        sexCode: 'F',
+        genderCodes: 'F',
         label: 'Female',
       }
     ],
@@ -664,7 +664,7 @@ describe('getAutoMatchResults', () => {
         studGiven: 'Givenname',
         studMiddle: 'Givenname2',
         studBirth: '20000101',
-        studSex: 'F'
+        studGender: 'F'
       }
     }, correlationID);
   });
@@ -701,7 +701,7 @@ describe('getAutoMatchResults', () => {
         studGiven: 'Givenname',
         studMiddle: '',
         studBirth: '',
-        studSex: ''
+        studGender: ''
       }
     }, correlationID);
   });

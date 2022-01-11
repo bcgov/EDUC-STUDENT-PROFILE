@@ -76,7 +76,7 @@
           <p class="mb-2">Gender:</p>
         </v-col>
         <v-col xl="9" lg="9" md="9" sm="8" xs="8">
-          <p class="mb-2"><strong>{{ student.sexLabel }}</strong></p>
+          <p class="mb-2"><strong>{{ student.genderLabel }}</strong></p>
         </v-col>
       </v-row>
     </v-container>
