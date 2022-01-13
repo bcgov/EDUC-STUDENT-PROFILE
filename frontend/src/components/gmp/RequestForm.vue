@@ -225,7 +225,7 @@
             <v-select
               id='gender'
               color="#003366"
-              :readonly="serviceCardBool"
+              :readonly="genderReadOnly"
               v-model="genderLabel"
               :rules="requiredRules(genderHint)"
               outlined
@@ -448,6 +448,9 @@ export default {
     },
     serviceCardBool() {
       return this.dataReady && this.userInfo.accountType === 'BCSC';
+    },
+    genderReadOnly() {
+      return this.serviceCardBool && this.genders.filter(i =>i.label.toLowerCase().includes(this.userInfo.gender)).length > 0 ? true : false;
     },
     emailRules() {
       return [
