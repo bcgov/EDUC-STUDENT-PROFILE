@@ -5,7 +5,6 @@
       <ul class="pt-2">
         <li>This process can only be completed by the owner of the PEN</li>
         <li>This process can only be completed if you have already left high school. If you are still attending a K-12 school, request changes at your school</li>
-        <li>If your name and/or gender has been legally changed, proof of this change may be requested</li>
       </ul>
     </v-alert>
     <v-card-subtitle>

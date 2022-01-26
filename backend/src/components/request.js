@@ -35,6 +35,28 @@ function verifyRequest(requestType) {
     next();
   };
 }
+
+function verifyDocumentId(requestType) {
+  return function verifyDocumentIdHandler(req, res, next) {
+    const userInfo = getSessionUser(req);
+    if(!userInfo) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        status: HttpStatus.UNAUTHORIZED,
+        message: 'you are not authorized to access this page'
+      });
+    }
+
+    const documentID = req.params.documentId;
+    if(!req || !req.session || !req.session[`${requestType}DocumentIDs`] || !req.session[`${requestType}DocumentIDs`].includes(documentID)) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'documentID not found in session'
+      });
+    }
+
+    next();
+  };
+}
+
 function verifyPostCommentRequest(requestType) {
   return function getRequestHandler(req, res, next) {
     const userInfo = getSessionUser(req);
@@ -290,11 +312,19 @@ function submitRequest(requestType, verifyRequestStatus) {
           message: `Submit ${requestType} not allowed`
         });
       }
+
+      //attach documents
+      if(req?.session?.[`${requestType}DocumentIDs`]?.length > 0 && req.body?.documentIDs) {
+        req.body.documentIDs = req.body.documentIDs.filter(documentID => req.session[`${requestType}DocumentIDs`].includes(documentID));
+      }
+
       const correlationID = req.session?.correlationID;
 
       const resData = await postRequest(accessToken, req.body, userInfo._json, requestType, correlationID);
 
       req.session[requestType] = resData;
+      //clear documentIDs in session
+      req.session[`${requestType}DocumentIDs`] && (req.session[`${requestType}DocumentIDs`] = null);
       if(req.body.email && req.body.email !== req.body.recordedEmail) {
         sendVerificationEmail(accessToken, req.body.email, resData[`${requestType}ID`], req.session.digitalIdentityData.identityTypeLabel, requestType, correlationID).catch(e =>
           log.error('sendVerificationEmail Error', e.stack)
@@ -599,10 +629,50 @@ function uploadFile(requestType) {
   };
 }
 
+function uploadFileWithoutRequest(requestType) {
+  return async function uploadFileHandler(req, res) {
+    try{
+      const accessToken = getAccessToken(req);
+      if(!accessToken) {
+        return res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'No access token'
+        });
+      }
+
+      if(req.session[requestType] && [RequestStatuses.DRAFT, RequestStatuses.INITREV, RequestStatuses.RETURNED, RequestStatuses.SUBSREV].includes(req.session[requestType][`${requestType}StatusCode`])) {
+        return res.status(HttpStatus.CONFLICT).json({
+          message: `Upload ${requestType} file with request not allowed`
+        });
+      }
+
+      const endpoint = config.get(`${requestType}:apiEndpoint`);
+      const url = `${endpoint}/documents`;
+
+      const data = await postData(accessToken, req.body, url, req.session?.correlationID);
+
+      //save documentID to session
+      req.session[`${requestType}DocumentIDs`] = (req.session[`${requestType}DocumentIDs`] || []).concat(data.documentID);
+
+      return res.status(HttpStatus.OK).json(data);
+    } catch(e) {
+      log.error('uploadFileWithoutRequest Error', e.stack);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: `Upload ${requestType} file error`
+      });
+    }
+  };
+}
+
 async function getDocument(token, requestID, documentID, requestType, includeDocData = 'Y') {
   try {
     const endpoint = config.get(`${requestType}:apiEndpoint`);
-    return await getData(token, `${endpoint}/${requestID}/documents/${documentID}?includeDocData=${includeDocData}`);
+    let url;
+    if(requestID) {
+      url = `${endpoint}/${requestID}/documents/${documentID}?includeDocData=${includeDocData}`;
+    } else {
+      url = `${endpoint}/documents/${documentID}?includeDocData=${includeDocData}`;
+    }
+    return await getData(token, url);
   } catch (e) {
     throw new ServiceError('getDocument error', e);
   }
@@ -620,15 +690,20 @@ function deleteDocument(requestType) {
 
       let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'N');
 
-      if(!req.session[requestType] || resData.createDate <= req.session[requestType].statusUpdateDate ||
-        req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
+      if(req.params.id && (!req.session[requestType] || resData.createDate <= req.session[requestType].statusUpdateDate ||
+        req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED)) {
         return res.status(HttpStatus.CONFLICT).json({
           message: `Delete ${requestType} file not allowed`
         });
       }
 
       const endpoint = config.get(`${requestType}:apiEndpoint`);
-      const url = `${endpoint}/${req.params.id}/documents/${req.params.documentId}`;
+      let url;
+      if(req.params.id) {
+        url = `${endpoint}/${req.params.id}/documents/${req.params.documentId}`;
+      } else {
+        url = `${endpoint}/documents/${req.params.documentId}`;
+      }
 
       await deleteData(accessToken, url);
       return res.status(HttpStatus.OK).json();
@@ -682,5 +757,7 @@ module.exports = {
   verifyPostCommentRequest,
   deleteDocument,
   downloadFile,
-  uploadFile
+  uploadFile,
+  uploadFileWithoutRequest,
+  verifyDocumentId,
 };

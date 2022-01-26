@@ -2,7 +2,7 @@
 
 const passport = require('passport');
 const express = require('express');
-const { getCodes, postComment, submitRequest, getComments, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, verifyPostCommentRequest, deleteDocument, downloadFile, uploadFile } = require('../components/request');
+const { getCodes, postComment, submitRequest, getComments, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, verifyPostCommentRequest, deleteDocument, downloadFile, uploadFile, uploadFileWithoutRequest, verifyDocumentId } = require('../components/request');
 const { forwardGetReq } = require('../components/utils');
 const config = require('../config/index');
 const { verifyStudentRequestStatus, createStudentRequestCommentPayload, createStudentRequestCommentEvent } = require('../components/studentRequest');
@@ -26,6 +26,8 @@ const requestType = 'studentRequest';
 
 const verifyStudentRequest = verifyRequest(requestType);
 
+const verifyStudentRequestDocumentId = verifyDocumentId(requestType);
+
 router.post('/requests', passport.authenticate('jwt', {session: false}), isValidBackendToken, submitRequest(requestType, verifyStudentRequestStatus));
 
 router.get('/codes', passport.authenticate('jwt', {session: false}), isValidBackendToken, getCodes(requestType));
@@ -40,6 +42,8 @@ router.get('/file-requirements', passport.authenticate('jwt', {session: false}),
 
 router.post('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, uploadFile(requestType)]);
 
+router.post('/requests/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, uploadFileWithoutRequest(requestType));
+
 router.get('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, verifyStudentRequest,
   (req, res) => forwardGetReq(req, res, `${config.get('studentRequest:apiEndpoint')}/${req.params.id}/documents`)
 );
@@ -49,8 +53,10 @@ router.get('/requests/:id/documents/:documentId', passport.authenticate('jwt', {
 );
 // special case this does not use frontend axios, so need to refresh here to handle expired jwt.
 router.get('/requests/:id/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken, [verifyStudentRequest, downloadFile(requestType)]);
+router.get('/requests/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken, [verifyStudentRequestDocumentId, downloadFile(requestType)]);
 
 router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, deleteDocument(requestType)]);
+router.delete('/requests/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequestDocumentId, deleteDocument(requestType)]);
 
 router.get('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, getComments(requestType)]);
 

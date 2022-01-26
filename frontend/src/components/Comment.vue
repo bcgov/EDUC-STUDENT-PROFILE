@@ -13,14 +13,14 @@
         :placeholder="`${(unsubmittedComment && unsubmittedComment.content) || 'Enter text here. Attach document(s). Click Done'}`"
         maxlength="4000"
         required
-        :disabled="partialSubmitted || submitted || isSagaInProgress"
+        :disabled="submitted || isSagaInProgress"
       />
       <v-row>
         <v-col class="d-flex align-start flex-wrap py-0">
           <DocumentChip
             v-for="document in unsubmittedDocuments"
             :document="document"
-            :disabled="partialSubmitted || submitted || isSagaInProgress"
+            :disabled="submitted || isSagaInProgress"
             :key="document.documentID"
           ></DocumentChip>
           <v-dialog
@@ -32,7 +32,7 @@
             <template v-slot:activator="{ on }">
               <v-btn
                 rounded
-                :disabled="showConfirm || partialSubmitted || submitted || isSagaInProgress"
+                :disabled="showConfirm || submitted || isSagaInProgress"
                 class="ma-1 white--text order-first"
                 color="#0C7CBA"
                 v-on="on"
@@ -66,7 +66,6 @@
       dismissible
       v-model="alert"
       :class="alertType"
-      @input="dismissAlert"
     >
        {{ alertMessage }}
     </v-alert>
@@ -106,7 +105,6 @@
 import DocumentChip from './DocumentChip.vue';
 import DocumentUpload from './DocumentUpload';
 import { mapGetters } from 'vuex';
-import { RequestStatuses } from '@/utils/constants';
 import ApiService from '@/common/apiService';
 
 export default {
@@ -153,10 +151,7 @@ export default {
       }
     },
     replyEmpty() {
-      return this.reply === '' && !this.hasUnsubmittedDocuments && !this.partialSubmitted;
-    },
-    partialSubmitted() {
-      return !!this.unsubmittedComment;
+      return this.reply === '' && !this.hasUnsubmittedDocuments;
     },
     submitted() {
       return this.alertType && this.alertType.includes('success');
@@ -195,20 +190,11 @@ export default {
       this.alert = false;
       this.showConfirm = false;
     },
-    updateRequestStatus() {
-      return ApiService.updateRequestStatus(this.requestID, RequestStatuses.SUBSREV, this.requestType).then(statusRes => {
-        this.updatedRequest = statusRes.data;
-        this.setSuccessAlert();
-        this.showConfirm=false;
-      }).catch(() => {
-        this.setErrorAlert();
-      });
-    },
     submitComment() {
       if(!this.replyEmpty) {
         this.alert = false;
         this.submitting = true;
-        if(this.requestType ==='penRequest' || (this.requestType==='studentRequest' && !this.partialSubmitted)){
+        if(this.requestType ==='penRequest' || this.requestType==='studentRequest'){
           const messageToSend = {
             content: this.reply,
             myself: true,
@@ -222,21 +208,7 @@ export default {
           }).finally(() => {
             this.submitting = false;
           });
-        } else {
-          this.updateRequestStatus().finally(() => {
-            this.submitting = false;
-          });
         }
-
-      }
-    },
-    dismissAlert() {
-      if(this.submitted) {
-        this.reply = '';
-        this.setCommentSubmitted(this.unsubmittedDocuments);
-        this.setUnsubmittedDocuments();
-        this.setRequest(this.updatedRequest);
-        window.scrollTo(0,0);
       }
     },
   },

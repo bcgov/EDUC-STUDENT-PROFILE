@@ -34,7 +34,7 @@
 
 <script>
 import RequestStepper from '../RequestStepper';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import { PenRequestStatuses } from '@/utils/constants';
 import { pick, values } from 'lodash';
 export default {
@@ -68,10 +68,15 @@ export default {
       }
     },
   },
+  methods: {
+    ...mapMutations('studentRequest', ['setRequest', 'setUnsubmittedDocuments']),
+  },
   mounted() {
     if(!(this.isAuthenticated)){
       this.$router.push('home');
     }
+    this.setRequest();
+    this.setUnsubmittedDocuments();
   },
 };
 </script>

@@ -81,6 +81,11 @@ export default {
     Comments,
     SingleComment,
   },
+  props: {
+    commentDocuments: {
+      type: Array,
+    },
+  },
   data() {
     return {
       participants: [],
@@ -120,10 +125,11 @@ export default {
     }
   },
   created() {
+    this.getDocumentTypeCodes();
+    const documentPromise = this.commentDocuments ? Promise.resolve({data: this.commentDocuments}) : ApiService.getDocumentList(this.requestID, this.requestType);
     Promise.all([
-      ApiService.getDocumentList(this.requestID, this.requestType),
+      documentPromise,
       ApiService.getCommentList(this.requestID, this.requestType),
-      this.getDocumentTypeCodes()
     ]).then(([documentRes, commentRes]) => {
       this.participants = commentRes.data.participants;
 

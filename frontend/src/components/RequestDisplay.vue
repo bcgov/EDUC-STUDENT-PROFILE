@@ -32,7 +32,10 @@
       ></StatusCard>
     </v-row>
     <v-row>
-      <Chat v-if="status !== requestStatuses.DRAFT && status !== requestStatuses.INITREV && status !== requestStatuses.ABANDONED"></Chat>
+      <Chat 
+        v-if="status !== requestStatuses.DRAFT && status !== requestStatuses.INITREV && status !== requestStatuses.ABANDONED"
+        :commentDocuments = "commentDocuments"
+      ></Chat>
     </v-row>
     <v-row>
       <slot name="request" v-if="status !== requestStatuses.ABANDONED"></slot>
@@ -76,7 +79,10 @@ export default {
     newRequestText: {
       type: String,
       required: true
-    }
+    },
+    commentDocuments: {
+      type: Array,
+    },
   },
   data() {
     return {

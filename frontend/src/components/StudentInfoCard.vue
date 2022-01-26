@@ -29,6 +29,7 @@
           <p class="ml-2 mb-3"><strong>{{ genderLabel }}</strong></p>
         </v-col>
       </v-row>
+      <slot name="info"></slot>
       <v-row no-gutters>
         <p class="mb-0">
           <strong>
