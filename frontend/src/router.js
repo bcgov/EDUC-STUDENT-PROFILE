@@ -86,7 +86,8 @@ const router = new VueRouter({
               component: CurrentInfo,
               beforeEnter: checkStudentRequestExists,
               meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                notRefreshUserInfo: true
               },
             },
             {
@@ -95,7 +96,8 @@ const router = new VueRouter({
               component: StudentRequestForm,
               beforeEnter: checkStudentRequestExists,
               meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                notRefreshUserInfo: true
               },
             },
             {
@@ -104,7 +106,8 @@ const router = new VueRouter({
               component: StudentRequestSummary,
               beforeEnter: checkStudentRequestExists,
               meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                notRefreshUserInfo: true
               },
             },
             {
@@ -112,7 +115,8 @@ const router = new VueRouter({
               name: 'step4',
               component: StudentRequestSubmission,
               meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                notRefreshUserInfo: true
               },
             }
           ]
@@ -257,6 +261,8 @@ router.beforeEach((to, _from, next) => {
     store.dispatch('auth/getJwtToken').then(() => {
       if (!authStore.state.isAuthenticated) {
         next('/token-expired');
+      } else if(to.meta.notRefreshUserInfo) {
+        next();
       } else {
         store.dispatch('auth/getUserInfo').then(() => {
           next();

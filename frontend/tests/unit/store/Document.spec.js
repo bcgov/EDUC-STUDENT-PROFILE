@@ -26,6 +26,7 @@ describe('document.js', () => {
       }
     });
     store.commit('setRequestType', requestType);
+    store.commit('setDocumentTypeCodes', null);
   });
   afterEach(() => {
     spy.mockClear();

@@ -10,7 +10,7 @@
     </article>
   </v-container>
 
-  <v-container fluid class="full-height" v-else-if="isLoading">
+  <v-container fluid class="full-height" v-else-if="isLoading || (hasRequest && loadingDocuments)">
     <article id="progress-display-container" class="top-banner full-height">
       <v-row align="center" justify="center">
         <v-progress-circular
@@ -23,20 +23,49 @@
     </article>
   </v-container>
 
-  <v-container fluid class="full-height" v-else-if="isAuthenticated && hasRequest">
+  <v-container fluid class="full-height" v-else-if="isAuthenticated && hasRequest && !loadingDocuments">
     <article id="request-display-container" class="top-banner full-height">
         <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
+          <v-alert
+            dense
+            outlined
+            dismissible
+            v-model="alert"
+            class="bootstrap-error mb-5"
+            width="100%"
+          >
+            {{ alertMessage }}
+          </v-alert>
           <v-col class="pt-1 pt-sm-3" xs="11" sm="11" md="10" lg="8" xl="6">
             <RequestDisplay 
               :title="requestTitle"
               :can-create-request="canCreateRequest"
               :new-request-text="newRequestText"
+              :commentDocuments="commentDocuments"
             >
               <template v-slot:message>
                 <MessageCard></MessageCard>
               </template>
               <template v-slot:request>
-                <StudentInfoCard :request="request"></StudentInfoCard>
+                <StudentInfoCard :request="request">
+                  <template v-slot:info>
+                    <v-row no-gutters>
+                      <p class="mb-0">
+                        <strong>
+                          Attached Documents
+                        </strong>
+                      </p>
+                    </v-row>
+                    <v-row no-gutters class="mb-2">
+                      <DocumentChip
+                        v-for="document in initialDocuments"
+                        :document="document"
+                        :key="document.documentID"
+                        :undeletable="true"
+                      ></DocumentChip>
+                    </v-row>
+                  </template>
+                </StudentInfoCard>
               </template>
             </RequestDisplay>
           </v-col>
@@ -92,17 +121,32 @@ import RequestDisplay from '../RequestDisplay';
 import ModalJourney from '../ModalJourney';
 import MessageCard from './MessageCard';
 import StudentInfoCard from '../StudentInfoCard';
+import DocumentChip from '../DocumentChip.vue';
 import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
-import { mapGetters, mapMutations } from 'vuex';
-import { pick, values } from 'lodash';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
+import { pick, values, partition } from 'lodash';
+import ApiService from '@/common/apiService';
+
 export default {
-  name: 'home',
+  name: 'Ump',
   components: {
     Login,
     RequestDisplay,
     ModalJourney,
     MessageCard,
     StudentInfoCard,
+    DocumentChip,
+  },
+  data() {
+    return {
+      loadingDocuments: true,
+      initialDocuments: null,
+      commentDocuments: null,
+
+      alert: false,
+      alertMessage: 'Sorry, an unexpected error seems to have occurred. You can refresh the page later.',
+      requestType: 'studentRequest'
+    };
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'userInfo', 'isLoading']),
@@ -123,24 +167,49 @@ export default {
     },
     newRequestText() {
       return 'Create a new Request';
+    },
+    requestID() {
+      return this.request && this.request.studentRequestID;
     }
   },
   created() {
     this.setRequestType('studentRequest');
+    if(this.hasRequest) {
+      this.getInitialDocuments();
+    }
   },
   watch: {
     isLoading(val) {
       if(!val) {
         if(!this.hasRequest && !this.hasInflightGMPRequest) {
           this.$router.push({ name: 'step1' });
+        } else if(this.hasRequest) {
+          this.getInitialDocuments();
         }
       }
     }
   },
   methods: {
     ...mapMutations(['setRequestType']),
+    ...mapActions('studentRequest',['getDocumentTypeCodes']),
     canCreateRequest(status) {
       return status === StudentRequestStatuses.REJECTED || status === StudentRequestStatuses.COMPLETED || status === StudentRequestStatuses.ABANDONED;
+    },
+    getInitialDocuments() {
+      this.getDocumentTypeCodes();
+      ApiService.getDocumentList(this.requestID, this.requestType).then((documentRes) => {
+        if(this.request.studentRequestStatusCode === 'DRAFT') {
+          this.initialDocuments = documentRes.data;
+          this.commentDocuments = [];
+        } else {
+          [this.initialDocuments, this.commentDocuments] = partition(documentRes.data, doc => doc.createDate < this.request.initialSubmitDate);
+        }
+      }).catch(error => {
+        console.log(error);
+        this.alert = true;
+      }).finally(() => {
+        this.loadingDocuments = false;
+      });
     },
   }
 };

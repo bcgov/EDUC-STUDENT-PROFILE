@@ -16,7 +16,7 @@ export default {
     genderInfo: state => genderCode => find(state.genders, ['genderCode', genderCode]),
     statuses: state => state.statuses,
     request: state => state.request,
-    requestID: (state, getters, rootState, rootGetters) => state.request[`${rootGetters.requestType}ID`],
+    requestID: (state, getters, rootState, rootGetters) => state.request && state.request[`${rootGetters.requestType}ID`],
   },
   mutations: {
     setGenders: (state, genders) => {
@@ -25,7 +25,7 @@ export default {
     setStatuses: (state, statuses) => {
       state.statuses = statuses;
     },
-    setRequest: (state, request) => {
+    setRequest: (state, request = null) => {
       state.request = request;
     },
   },

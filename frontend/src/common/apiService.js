@@ -107,7 +107,13 @@ export default {
 
   async uploadFile(requestId, fileData, requestType){
     try{
-      return await apiAxios.post(`${ApiRoutes[requestType].REQUEST}/${requestId}/documents`, fileData);
+      let url;
+      if(requestId) {
+        url = `${ApiRoutes[requestType].REQUEST}/${requestId}/documents`;
+      } else {
+        url = `${ApiRoutes[requestType].REQUEST}/documents`;
+      }
+      return await apiAxios.post(url, fileData);
     } catch(e) {
       console.log(`Failed to post to Nodejs uploadFile API - ${e}`);
       throw e;
@@ -143,7 +149,11 @@ export default {
 
   async deleteDocument(requestId, documentId, requestType) {
     try{
-      return await apiAxios.delete(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
+      if(requestId) {
+        return await apiAxios.delete(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
+      } else {
+        return await apiAxios.delete(ApiRoutes[requestType].REQUEST + '/documents' + `/${documentId}`);
+      }
     } catch(e) {
       console.log(`Failed to deleteDocument from Nodejs API - ${e}`);
       throw e;

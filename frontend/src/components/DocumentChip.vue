@@ -128,7 +128,11 @@ export default {
       return this.document.createDate.replace(/T/, ', ').replace(/\..+/, '');
     },
     documentUrl() {
-      return `${ApiRoutes[this.requestType].REQUEST}/${this.requestID}/documents/${this.document.documentID}/download/${this.document.fileName}`;
+      if(this.requestID) {
+        return `${ApiRoutes[this.requestType].REQUEST}/${this.requestID}/documents/${this.document.documentID}/download/${this.document.fileName}`;
+      } else {
+        return `${ApiRoutes[this.requestType].REQUEST}/documents/${this.document.documentID}/download/${this.document.fileName}`;
+      }
     },
   },
   methods: {

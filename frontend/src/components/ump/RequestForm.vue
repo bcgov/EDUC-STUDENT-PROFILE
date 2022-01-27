@@ -15,7 +15,6 @@
       <ul class="pt-2">
         <li>This form can only be completed by the owner of the PEN</li>
         <li>This form can only be completed if you have already left high school. If you are still attending a K-12 school, request changes at your school</li>
-        <li>If your name and/or gender has been legally changed, proof of this change may be requested</li>
       </ul>
     </v-alert>
 
@@ -212,6 +211,45 @@
         </v-row>
       </v-container>
 
+      <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
+        <span>In order to complete this request to update your PEN information, an image of supporting legal identification is required.</span>
+      </v-alert>
+
+      <v-container fluid class="py-0">
+        <v-row>
+          <v-col class="d-flex align-start flex-wrap py-0">
+            <DocumentChip
+              v-for="document in unsubmittedDocuments"
+              :document="document"
+              :disabled="enableDisableForm.disabled"
+              :key="document.documentID"
+            ></DocumentChip>
+            <v-dialog
+              max-width="30rem"
+              max-height="50rem"
+              v-model="dialog"
+              xl="2" lg="2" md="2" xs="2" sm="2"
+            >
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  rounded
+                  :disabled="enableDisableForm.disabled"
+                  class="ma-1 white--text order-first"
+                  color="#0C7CBA"
+                  v-on="on"
+                >
+                  <v-icon left>fa-paperclip</v-icon>
+                  Upload
+                </v-btn>
+              </template>
+              <DocumentUpload
+                @close:form="() => dialog = false"
+              ></DocumentUpload>
+            </v-dialog>
+          </v-col>
+        </v-row>
+      </v-container>
+
       <v-card-subtitle class="mb-2">
         <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Contact Information</span>
       </v-card-subtitle>
@@ -328,7 +366,9 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import DocumentChip from '../DocumentChip.vue';
+import DocumentUpload from '../DocumentUpload';
+import { mapGetters, mapState, mapActions } from 'vuex';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, mapValues, pick } from 'lodash';
 
@@ -342,6 +382,10 @@ const { mapFields } = createHelpers({
 
 export default {
   name: 'requestForm',
+  components: {
+    DocumentChip,
+    DocumentUpload
+  },
   data() {
     return {
       localDate:LocalDate,
@@ -360,7 +404,8 @@ export default {
       enableDisableForm: {
         disabled: true
       },
-      acceptance: false
+      acceptance: false,
+      dialog: false,
     };
   },
   mounted() {
@@ -370,10 +415,10 @@ export default {
     this.request.dob = this.editBirthdate ? this.request.dob : this.recordedData.dob;
     this.request.genderLabel = this.editGenderLabel ? this.request.genderLabel : this.recordedData.genderLabel;
     this.request.email = (this.editEmail || !this.hasStudentRecord) ? this.request.email : this.recordedData.email;
-
+    this.getDocumentTypeCodes();
   },
   computed: {
-    ...mapGetters('studentRequest', ['genders', 'genderInfo']),
+    ...mapGetters('studentRequest', ['genders', 'genderInfo', 'unsubmittedDocuments']),
     ...mapGetters(['student']),
     ...mapState('ump', ['recordedData']),
     ...mapState('ump', { request: 'updateData' }),
@@ -434,6 +479,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions('studentRequest',['getDocumentTypeCodes']),
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,
@@ -458,8 +504,8 @@ export default {
     validate() {
       this.$refs.form.validate();
     },
-    setNoChangeErrorDialog() {
-      this.alertMessage = 'You must specify at least one change in order to submit a request.';
+    setErrorDialog(message) {
+      this.alertMessage = message;
       this.alert = true;
       window.scrollTo(0,0);
     },
@@ -473,14 +519,13 @@ export default {
         }
         if(isEqual(mapValues(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v=> v === null ? '' : v),
           mapValues(pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v => v === null ? '' : v))) {
-          this.setNoChangeErrorDialog();
-        } else {
+          this.setErrorDialog('You must specify at least one change in order to submit a request.');
+        } else if(this.unsubmittedDocuments.length === 0) {
+          this.setErrorDialog('You must upload an image of supporting legal identification to submit a request.');
+        } else{
           this.$emit('next');
         }
       }
-    },
-    closeDialog() {
-      this.dialog = false;
     },
     clickCheckbox() {
       this.validate();

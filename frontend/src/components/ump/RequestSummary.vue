@@ -14,7 +14,6 @@
       <h3>Guidance:</h3>
       <ul class="pt-2">
         <li>Please review your information below before completing the request. If requested updates are incorrect or need to be adjusted further, use the <strong>Back</strong> button to return to the UpdateMyPENInfo form</li>
-        <li>If your name and/or gender has been legally changed, proof of this change may be requested</li>
       </ul>
     </v-alert>
 
@@ -33,6 +32,23 @@
               My PEN Information should be changed to:
             </strong>
           </p>
+        </v-row>
+      </template>
+      <template v-slot:info>
+        <v-row no-gutters>
+          <p class="mb-0">
+            <strong>
+              Attached Documents
+            </strong>
+          </p>
+        </v-row>
+        <v-row v-for="document in unsubmittedDocuments" :key="document.documentID" no-gutters>
+          <v-col xl="2" lg="2" md="2" sm="3" xs="3">
+            <p class="mb-3">{{ documentType(document.documentTypeCode) }}:</p>
+          </v-col>
+          <v-col xl="9" lg="9" md="9" sm="8" xs="8">
+            <p class="ml-2 mb-3"><strong>{{ document.fileName }}</strong></p>
+          </v-col>
         </v-row>
       </template>
     </StudentInfoCard>
@@ -73,9 +89,9 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from 'vuex';
+import {mapActions, mapGetters, mapMutations} from 'vuex';
 import StudentInfoCard from '../StudentInfoCard';
-import {mapKeys, pick} from 'lodash';
+import {mapKeys, pick, find} from 'lodash';
 
 export default {
   name: 'requestSummary',
@@ -92,12 +108,14 @@ export default {
   },
   computed: {
     ...mapGetters('ump', ['recordedData', 'updateData']),
+    ...mapGetters('studentRequest', ['documentTypeCodes', 'unsubmittedDocuments']),
     emailChanged() {
       return this.recordedData.email !== this.updateData.email;
     },
   },
   methods: {
     ...mapActions('studentRequest', ['postRequest']),
+    ...mapMutations('studentRequest', ['setUnsubmittedDocuments']),
     setErrorAlert() {
       this.alertMessage = 'Sorry, an unexpected error seems to have occured. Please try again later.';
       this.alert = true;
@@ -109,7 +127,8 @@ export default {
       recorded = mapKeys(recorded, (_, key) => {
         return 'recorded' + key.slice(0,1).toUpperCase() + key.slice(1);
       });
-      return { ...request, ...recorded };
+      const documentIDs = this.unsubmittedDocuments.map(doc => doc.documentID);
+      return { ...request, ...recorded, documentIDs };
     },
     async submitRequest() {
       try {
@@ -122,6 +141,7 @@ export default {
         }
         const resData = await this.postRequest(data);
         if (resData) {
+          this.setUnsubmittedDocuments();
           if (this.emailChanged) {
             this.nextStep();
           } else {
@@ -142,7 +162,11 @@ export default {
     },
     previousStep() {
       this.$emit('back');
-    }
+    },
+    documentType(documentTypeCode) {
+      const typeCode = find(this.documentTypeCodes, ['documentTypeCode', documentTypeCode]);
+      return typeCode && typeCode.label;
+    },
   },
 };
 </script>
