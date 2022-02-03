@@ -8,12 +8,12 @@
     "serve": "node_modules/.bin/vue-cli-service serve --port 8081",
     "build": "node_modules/.bin/vue-cli-service build",
     "test:unit": "node_modules/.bin/vue-cli-service test:unit",
-    "lint:fix": "node_modules/.bin/vue-cli-service lint --fix",
     "lint": "node_modules/.bin/vue-cli-service lint --no-fix",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "lint:fix": "node_modules/.bin/vue-cli-service lint --fix",
     "purge": "rm -rf node_modules",
     "rebuild": "npm run clean && npm run build",
     "reinstall": "npm run purge && npm install",
-    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev"
   },
   "dependencies": {
@@ -22,7 +22,7 @@
     "@fortawesome/fontawesome-free": "5.11.2",
     "@js-joda/core": "^2.0.0",
     "axios": "^0.25.0",
-    "core-js": "^2.6.12",
+    "core-js": "^3.6.5",
     "cryptico-js": "^1.1.0",
     "dotenv": "^8.2.0",
     "faker": "4.1.0",
@@ -49,12 +49,14 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
+    "@babel/runtime-corejs2": "^7.17.0",
     "@vue/cli": "^4.5.15",
-    "@vue/cli-plugin-babel": "^3.12.1",
-    "@vue/cli-plugin-eslint": "^3.12.1",
+    "@vue/cli-plugin-babel": "^4.5.15",
+    "@vue/cli-plugin-eslint": "^4.5.15",
     "@vue/cli-plugin-unit-jest": "^4.5.15",
     "@vue/cli-service": "^4.5.15",
     "@vue/test-utils": "1.0.0-beta.29",
+    "axios-mock-adapter": "1.17.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^23.6.0",
@@ -70,14 +72,8 @@
     "vue-cli-plugin-vuetify": "^0.6.3",
     "vue-jest": "^3.0.7",
     "vue-template-compiler": "^2.6.12",
-    "vuetify-loader": "^1.6.0",
-    "axios-mock-adapter": "1.17.0"
+    "vuetify-loader": "^1.6.0"
   },
-  "browserslist": [
-    "> 1%",
-    "last 20 versions",
-    "not ie <= 8"
-  ],
   "eslintConfig": {
     "root": true,
     "env": {
@@ -119,6 +115,11 @@
       ]
     }
   },
+  "browserslist": [
+    "> 1%",
+    "last 20 versions",
+    "not ie <= 8"
+  ],
   "jest": {
     "reporters": [
       "default",
@@ -165,11 +166,11 @@
     ],
     "testResultsProcessor": "jest-sonar-reporter"
   },
-  "jestSonar": {
-    "reportPath": "coverage"
-  },
   "engines": {
     "node": ">= 6.0.0",
     "npm": ">= 3.0.0"
+  },
+  "jestSonar": {
+    "reportPath": "coverage"
   }
 }
