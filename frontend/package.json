@@ -5,7 +5,7 @@
   "description": "Student Profile UI.",
   "author": "Nathan Denny",
   "scripts": {
-    "serve": "node_modules/.bin/vue-cli-service serve --port 8081",
+    "serve": "node_modules/.bin/vue-cli-service serve",
     "build": "node_modules/.bin/vue-cli-service build",
     "test:unit": "node_modules/.bin/vue-cli-service test:unit",
     "lint": "node_modules/.bin/vue-cli-service lint --no-fix",
