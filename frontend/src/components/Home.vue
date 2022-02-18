@@ -35,7 +35,8 @@
 	</v-row>
     <v-row justify=center>
       <v-col cols="12" lg="6" class="px-8">
-        <v-card :class="{'px-16': $vuetify.breakpoint.lgAndUp }" class="px-4 py-4" style="height: 100%;">
+        <UserStudentCard v-if="hasBcscLinkageForStudent" class="px-4 py-4"></UserStudentCard>
+        <v-card v-else :class="{'px-16': $vuetify.breakpoint.lgAndUp }" class="px-4 py-4" style="height: 100%;">
           <p style="text-align:center">
             <router-link to="gmp">
               <img id="gmpLink" alt="Find PEN" src="@/assets/images/icon-find-pen.svg" style="display:block; float:initial; margin:auto" title="Find PEN">Get your Personal Education<br>Number (PEN)
@@ -68,6 +69,7 @@
 <script>
 import Login from './Login';
 import ModalJourney from './ModalJourney';
+import UserStudentCard from './UserStudentCard';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -75,9 +77,14 @@ export default {
   components: {
     Login,
     ModalJourney,
+    UserStudentCard,
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'isLoading']),
+    ...mapGetters('auth', ['isAuthenticated', 'isLoading', 'userInfo']),
+    ...mapGetters(['student']),
+    hasBcscLinkageForStudent() {
+      return this.userInfo?.accountType === 'BCSC' && this.student;
+    },
   },
 };
 </script>
