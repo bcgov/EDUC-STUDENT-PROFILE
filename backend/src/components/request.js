@@ -134,16 +134,16 @@ async function getLatestRequest(token, digitalID, requestType, setReplicateStatu
 }
 
 function getDefaultBcscInput(userInfo) {
-  let givenArray = (userInfo._json.givenNames).split(' ');
-  givenArray.shift();
-  let middleNames = givenArray.join(' ');
   return {
-    legalLastName: userInfo._json.surname,
-    legalFirstName: userInfo._json.givenName,
-    legalMiddleNames: middleNames,
+    legalLastName: userInfo._json.legalLastName,
+    legalFirstName: userInfo._json.legalFirstName,
+    legalMiddleNames: userInfo._json.legalMiddleNames,
+    usualLastName: userInfo._json.usualLastName,
+    usualFirstName: userInfo._json.usualFirstName,
+    usualMiddleNames: userInfo._json.usualMiddleNames,
     gender: userInfo._json.gender,
     email: userInfo._json.email,
-    dob: userInfo._json.birthDate
+    dob: userInfo._json.birthdate
   };
 }
 

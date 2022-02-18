@@ -263,7 +263,7 @@ describe('getDefaultBcscInput', () => {
   it('should return middleNames', async () => {
     const userInfo = {
       _json: {
-        givenNames: 'FirstName MiddleName',
+        legalMiddleNames: 'MiddleName',
       }
     };
 
@@ -277,6 +277,7 @@ describe('getDefaultBcscInput', () => {
     const userInfo = {
       _json: {
         givenNames: 'FirstName',
+        legalMiddleNames: '',
       }
     };
 
@@ -290,6 +291,7 @@ describe('getDefaultBcscInput', () => {
     const userInfo = {
       _json: {
         givenNames: '',
+        legalMiddleNames: '',
       }
     };
 
