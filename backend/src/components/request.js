@@ -134,7 +134,7 @@ async function getLatestRequest(token, digitalID, requestType, setReplicateStatu
 }
 
 function getDefaultBcscInput(userInfo) {
-  let middleNames;
+  let middleNames = '';
   if(userInfo._json.givenNames) {
     let givenArray = (userInfo._json.givenNames).split(' ');
     givenArray.shift();
