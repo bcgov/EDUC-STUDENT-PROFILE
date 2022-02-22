@@ -138,7 +138,7 @@ function getDefaultBcscInput(userInfo) {
   if(userInfo._json.givenNames) {
     let givenArray = (userInfo._json.givenNames).split(' ');
     givenArray.shift();
-    middleNames = givenArray?.join(' ');
+    middleNames = givenArray.join(' ');
   }
   return {
     legalLastName: userInfo._json.surname,
