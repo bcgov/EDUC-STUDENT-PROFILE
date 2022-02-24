@@ -168,7 +168,7 @@
               :rules="charRules"
             ></v-text-field>
           </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
+          <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               color="#003366"
               outlined
@@ -220,22 +220,6 @@
                 @change="save"
               ></v-date-picker>
             </v-menu>
-          </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-select
-              id='gender'
-              color="#003366"
-              :readonly="serviceCardBool"
-              v-model="genderLabel"
-              :rules="requiredRules(genderHint)"
-              outlined
-              :items="genderLabels"
-              :hint="genderHint"
-              label="Gender"
-              :disabled="enableDisableForm.disabled"
-              required
-              dense
-            ></v-select>
           </v-col>
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
@@ -392,8 +376,6 @@ export default {
   data() {
     return {
       localDate:LocalDate,
-      genderLabels: [],
-      genderHint: 'As listed on current Government Photo ID',
       legalLastNameHint: 'As shown on current Government Photo ID. Note, If you have ONE name only – enter it in Legal Last Name field and leave Legal First Name blank',
       emailHint: 'Valid Email Required',
       menu: false,
@@ -405,8 +387,6 @@ export default {
       nameLimit: 80,
       validForm: false,
       submitting: false,
-      apiGenderCodes: [],
-      genderLabel: null,
       acceptance: false,
       userPost: {
         digitalID: null,
@@ -438,7 +418,6 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('penRequest', ['genders', 'genderInfo']),
     ...mapGetters('gmp', ['requestData']),
     ...mapFields([
       'declared'
@@ -468,28 +447,18 @@ export default {
   },
   mounted() {
 
-    this.genderLabels = this.genders.map(a => a.label);
     //populate form if user is logged in with BCSC
     if (this.userInfo && this.userInfo.accountType === 'BCSC') {
       this.userPost.legalLastName = this.userInfo.legalLastName;
       this.userPost.legalFirstName = this.userInfo.legalFirstName;
       this.userPost.legalMiddleNames = this.userInfo.legalMiddleNames;
       this.userPost.email = this.userInfo.email;
-      if (this.userInfo.gender === 'male') {
-        this.genderLabel = 'Male';
-      } else if (this.userInfo.gender === 'female') {
-        this.genderLabel = 'Female';
-      } else if (this.userInfo.gender === 'unknown') {
-        this.genderLabel = 'Unknown';
-      }
       this.userPost.usualMiddleName = this.userInfo.usualMiddleNames;
       this.userPost.usualLastName = this.userInfo.usualLastName;
       this.userPost.usualFirstName = this.userInfo.usualFirstName;
       this.userPost.dob = this.userInfo.dob?(this.userInfo.dob).substr(0, 10):'';
     }
     Object.assign(this.userPost, this.requestData);
-    const gender = this.userPost.genderCode && this.genderInfo(this.userPost.genderCode);
-    gender && (this.genderLabel = gender.label);
   },
   methods: {
     ...mapMutations('gmp', ['setRequestData']),
@@ -517,8 +486,6 @@ export default {
     submitRequestForm() {
       this.validate();
       if (this.validForm) {
-        const code = this.genders.filter(it => (it.label === this.genderLabel));
-        this.userPost.genderCode = code[0].genderCode;
         this.setRequestData(this.userPost);
         this.$emit('next');
       }

@@ -135,7 +135,7 @@
               ></v-text-field>
             </v-container>
           </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
+          <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-container class="d-flex align-start pa-0" fluid>
               <v-checkbox
                 id="editBirthdateCheckbox"
@@ -181,31 +181,6 @@
                   @change="save"
                 ></v-date-picker>
               </v-menu>
-            </v-container>
-          </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-container class="d-flex align-start pa-0" fluid>
-              <v-checkbox
-                id="editGenderLabelCheckbox"
-                class="pt-0 pr-2 mt-0"
-                v-model="editGenderLabel"
-                label="Change"
-                dense
-                :disabled="enableDisableForm.disabled"
-              ></v-checkbox>
-              <v-select
-                id='gender'
-                color="#003366"
-                v-model="request.genderLabel"
-                outlined
-                :items="genderLabels"
-                :hint="genderHint"
-                :rules="genderRules()"
-                :persistent-hint="!enableDisableForm.disabled && editGenderLabel"
-                label="Current Gender"
-                :disabled="enableDisableForm.disabled || !editGenderLabel"
-                dense
-              ></v-select>
             </v-container>
           </v-col>
         </v-row>
@@ -389,8 +364,6 @@ export default {
   data() {
     return {
       localDate:LocalDate,
-      genderHint: 'As shown on current Government Photo ID',
-      genderRequiredHint: 'Valid Gender Required',
       legalLastNameHint: 'As shown on current Government Photo ID. Note, If you have ONE name only – enter it into the Legal Last Name field and leave Legal First Name blank',
       emailHint: 'Valid Email Required',
       dobHint: 'Valid Birthdate Required',
@@ -413,12 +386,11 @@ export default {
     this.request.legalFirstName = this.editLegalFirstName ? this.request.legalFirstName : this.recordedData.legalFirstName;
     this.request.legalMiddleNames = this.editLegalMiddleNames ? this.request.legalMiddleNames : this.recordedData.legalMiddleNames;
     this.request.dob = this.editBirthdate ? this.request.dob : this.recordedData.dob;
-    this.request.genderLabel = this.editGenderLabel ? this.request.genderLabel : this.recordedData.genderLabel;
     this.request.email = (this.editEmail || !this.hasStudentRecord) ? this.request.email : this.recordedData.email;
     this.getDocumentTypeCodes();
   },
   computed: {
-    ...mapGetters('studentRequest', ['genders', 'genderInfo', 'unsubmittedDocuments']),
+    ...mapGetters('studentRequest', ['unsubmittedDocuments']),
     ...mapGetters(['student']),
     ...mapState('ump', ['recordedData']),
     ...mapState('ump', { request: 'updateData' }),
@@ -427,7 +399,6 @@ export default {
       'isEditable.editLegalFirstName',
       'isEditable.editLegalMiddleNames',
       'isEditable.editBirthdate',
-      'isEditable.editGenderLabel',
       'isEditable.editEmail',
       'declared'
     ]),
@@ -445,9 +416,6 @@ export default {
         v => !(/[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u1100-\u11FF\u3040-\u309F\u30A0-\u30FF\u3130-\u318F\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF]/.test(v)) || 'Enter English characters only'
       ];
     },
-    genderLabels() {
-      return this.genders.map(a => a.label);
-    }
   },
   watch: {
     menu(val) {
@@ -465,9 +433,6 @@ export default {
     editBirthdate(val) {
       this.request.dob = val ? '' : this.recordedData.dob;
     },
-    editGenderLabel(val) {
-      this.request.genderLabel = val ? '' : this.recordedData.genderLabel;
-    },
     editEmail(val) {
       this.request.email = val ? '' : this.recordedData.email;
     },
@@ -483,12 +448,6 @@ export default {
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,
-        ...this.charRules
-      ];
-    },
-    genderRules() {
-      return [
-        v => !this.editGenderLabel || !!(v && v.trim()) || (this.request.genderLabel || '') === (this.recordedData.genderLabel || '') || this.genderRequiredHint,
         ...this.charRules
       ];
     },
@@ -511,14 +470,8 @@ export default {
     },
     validateRequestForm() {
       if (this.$refs.form.validate() && this.validForm) {
-        if(this.request.genderLabel) {
-          const code = this.genders.filter(it => (it.label === this.request.genderLabel));
-          this.request.genderCode = code[0].genderCode;
-        }else if(!this.editGenderLabel) {
-          this.request.genderCode = this.recordedData.genderCode;
-        }
-        if(isEqual(mapValues(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v=> v === null ? '' : v),
-          mapValues(pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode']), v => v === null ? '' : v))) {
+        if(isEqual(mapValues(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v=> v === null ? '' : v),
+          mapValues(pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v => v === null ? '' : v))) {
           this.setErrorDialog('You must specify at least one change in order to submit a request.');
         } else if(this.unsubmittedDocuments.length === 0) {
           this.setErrorDialog('You must upload an image of supporting legal identification to submit a request.');

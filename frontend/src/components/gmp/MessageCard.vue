@@ -79,14 +79,6 @@
           <p class="mb-2"><strong>{{ student.dob }}</strong></p>
         </v-col>
       </v-row>
-      <v-row no-gutters class="py-0 px-2">
-        <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-2">Gender:</p>
-        </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-2"><strong>{{ student.genderLabel }}</strong></p>
-        </v-col>
-      </v-row>
     </v-container>
     <p class="mb-2">{{ request.tomorrow ? 'As of tomorrow morning 8am PST, you may use your PEN to' : 'You now may wish to use your PEN to:' }}
       <ul>
@@ -117,7 +109,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('penRequest', ['request', 'genderInfo']),
+    ...mapGetters('penRequest', ['request']),
     ...mapGetters(['student']),
     ...mapGetters('config',['numDaysAllowedInDraftStatus']),
 
@@ -136,9 +128,6 @@ export default {
     timedout() {
       return Math.floor(new Date() - new Date(this.request.statusUpdateDate)) / (1000*60*60) > 24;
     },
-    genderLabel() {
-      return this.genderInfo(this.student.genderCodes).label;
-    }
   },
   async created(){
     await this.getNumDaysAllowedInDraftStatus();

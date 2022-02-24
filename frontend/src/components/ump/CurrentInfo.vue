@@ -84,7 +84,7 @@
               dense
             ></v-text-field>
           </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
+          <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='recordedDob'
               color="#003366"
@@ -133,30 +133,6 @@
                 @change="save"
               ></v-date-picker>
             </v-menu>
-          </v-col>
-          <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
-            <v-text-field
-              id='recordedGender'
-              color="#003366"
-              outlined
-              v-model="recordedData.genderLabel"
-              :hint="genderHint"
-              persistent-hint
-              readonly
-              dense
-              v-if="hasStudentRecord"
-            ></v-text-field>
-            <v-select
-              id='recordedGender'
-              color="#003366"
-              v-model="recordedData.genderLabel"
-              outlined
-              :items="genderLabels"
-              :hint="genderHint"
-              persistent-hint
-              dense
-              v-else
-            ></v-select>
           </v-col>
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3" v-if="hasStudentRecord">
             <v-text-field
@@ -225,7 +201,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('studentRequest', ['genders', 'genderInfo']),
     ...mapGetters(['student']),
     ...mapGetters('ump', { previousData: 'recordedData' }),
     hasStudentRecord() {
@@ -261,12 +236,6 @@ export default {
     birthdateHint() {
       return 'Recorded Birthdate';
     },
-    genderHint() {
-      return `Recorded Gender ${this.hasStudentRecord ? '' : '(optional)'}`;
-    },
-    genderLabels() {
-      return this.genders.map(a => a.label);
-    }
   },
   watch: {
     menu(val) {
@@ -275,11 +244,9 @@ export default {
   },
   mounted() {
     if (this.student) {
-      this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'genderCode', 'email', 'pen']);
+      this.recordedData = pick(this.student, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob', 'email', 'pen']);
     }
     Object.assign(this.recordedData, this.previousData);
-    const gender = this.recordedData.genderCode && this.genderInfo(this.recordedData.genderCode);
-    gender && (this.recordedData.genderLabel = gender.label);
   },
   methods: {
     ...mapMutations('ump', ['setRecordedData']),
@@ -310,10 +277,6 @@ export default {
     validateForm() {
       this.validate();
       if (this.validForm) {
-        if(this.recordedData.genderLabel) {
-          const code = this.genders.filter(it => (it.label === this.recordedData.genderLabel));
-          this.recordedData.genderCode = code[0].genderCode;
-        }
         return true;
       } else {
         return false;
