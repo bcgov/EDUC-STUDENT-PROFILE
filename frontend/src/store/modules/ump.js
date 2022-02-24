@@ -18,7 +18,6 @@ const getDefaultState = () => {
       editLegalFirstName: false,
       editLegalMiddleNames: false,
       editBirthdate: false,
-      editGenderLabel: false,
       editEmail: false
     }
   };

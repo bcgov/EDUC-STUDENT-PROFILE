@@ -325,25 +325,20 @@ describe('getServerSideCodes', () => {
     const result = await changeRequest.__get__('getServerSideCodes')('token');
 
     expect(result).toBeTruthy();
-    expect(result.genderCodes).toEqual(codes);
     expect(result.identityTypes).toEqual(codes);
-    expect(changeRequest.__get__('codes').genderCodes).toEqual(codes);
     expect(changeRequest.__get__('codes').identityTypes).toEqual(codes);
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenCalledWith('token', `${config.get('student:apiEndpoint')}/gender-codes`);
+    expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith('token', `${config.get('digitalID:apiEndpoint')}/identityTypeCodes`);
   });
 
   it('should not call getData if codes exist', async () => {
     changeRequest.__set__('codes', {
-      genderCodes: codes,
       identityTypes: codes
     });
 
     const result = await changeRequest.__get__('getServerSideCodes')('token');
 
     expect(result).toBeTruthy();
-    expect(result.genderCodes).toEqual(codes);
     expect(result.identityTypes).toEqual(codes);
     expect(spy).toHaveBeenCalledTimes(0);
   });
@@ -377,16 +372,6 @@ describe('getUserInfo', () => {
   };
 
   const codes = {
-    genderCodes: [
-      {
-        genderCodes: 'M',
-        label: 'Male',
-      },
-      {
-        genderCodes: 'F',
-        label: 'Female',
-      }
-    ],
     identityTypes: [
       {
         identityTypeCode: 'BCSC',
@@ -564,14 +549,12 @@ describe('getCodes', () => {
   });
 
   it('should return codes', async () => {
-    const response = await getCodes(req, res);
+    await getCodes(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith({
-      genderCodes: codes,
       statusCodes: codes,
     });
-    expect(response.data.json.genderCodes[0].displayOrder).toBe(1);
   });
 
   it('should return UNAUTHORIZED if no access token', async () => {

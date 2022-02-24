@@ -46,7 +46,7 @@
     <p class="mb-2 comment" v-if="request.completeComment && request.completeComment.length > 0">{{request.completeComment}}</p>
 
     <p class="mb-2">For your reference, your student record at the Ministry of Education has been updated as shown below</p>
-    <v-container class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
+    <v-container v-if="student" class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
       <v-row no-gutters class="py-0 px-2">
         <v-col xl="2" lg="2" md="2" sm="3" xs="3">
           <p class="mb-2">PEN:</p>

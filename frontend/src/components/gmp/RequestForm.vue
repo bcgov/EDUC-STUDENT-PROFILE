@@ -412,7 +412,6 @@ export default {
         'legalLastName',
         'legalFirstName',
         'legalMiddleNames',
-        'gender',
       ],
     };
   },

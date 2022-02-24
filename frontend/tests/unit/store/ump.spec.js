@@ -20,13 +20,6 @@ describe('Component initialized with namespaced Vuex module.', () => {
     postRequest: jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(false)
   };
 
-  let genderCodes = [
-    {label:'Male', genderCode:'M'},
-    {label:'Female', genderCode:'F'},
-    {label:'Gender Diverse', genderCode:'X'},
-    {label:'Unknown', genderCode:'U'},
-  ];
-
   beforeEach(() => {
     Component = {
       template: '<input id="editLegalLastName" v-model="editLegalLastName">',
@@ -44,7 +37,6 @@ describe('Component initialized with namespaced Vuex module.', () => {
           namespaced: true,
           actions,
           getters: {
-            genders: jest.fn().mockReturnValue(genderCodes),
           },
         },
         ump: {

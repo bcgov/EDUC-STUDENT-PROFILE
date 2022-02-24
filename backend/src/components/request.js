@@ -171,7 +171,7 @@ async function getUserInfo(req, res) {
 
     let student = null;
     if(userInfo?._json?.studentID) {
-      student = getStudent(userInfo);
+      // student = getStudent(userInfo);
     }
 
     if(req && req.session){
@@ -214,18 +214,11 @@ function getCodes(requestType) {
       const correlationID = req.session?.correlationID;
       const endpoint = config.get(`${requestType}:apiEndpoint`);
       const codeUrls = [
-        `${endpoint}/gender-codes`,
         `${endpoint}/statuses`,
       ];
 
-      let [genderCodes, statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url, correlationID)));
-      if(genderCodes){
-        // forcing sort if API did not return in sorted order.
-        const curDate = localDateTime.now();
-        genderCodes = genderCodes.filter(d => curDate.isAfter(localDateTime.parse(d.effectiveDate)) && curDate.isBefore(localDateTime.parse(d.expiryDate)));
-        genderCodes.sort((a,b)=> a.displayOrder - b.displayOrder);
-      }
-      return res.status(HttpStatus.OK).json({genderCodes, statusCodes});
+      let [statusCodes] = await Promise.all(codeUrls.map(url => getData(accessToken, url, correlationID)));
+      return res.status(HttpStatus.OK).json({statusCodes});
     } catch (e) {
       log.error('getCodes Error', e.stack);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
@@ -239,12 +232,11 @@ async function getServerSideCodes(accessToken, correlationID) {
   if(!codes) {
     try{
       const codeUrls = [
-        `${config.get('student:apiEndpoint')}/gender-codes`,
         `${config.get('digitalID:apiEndpoint')}/identityTypeCodes`
       ];
 
-      const [genderCodes, identityTypes] = await Promise.all(codeUrls.map(url => getData(accessToken, url), correlationID));
-      codes = {genderCodes, identityTypes};
+      const [identityTypes] = await Promise.all(codeUrls.map(url => getData(accessToken, url), correlationID));
+      codes = {identityTypes};
     } catch(e) {
       throw new ServiceError('getServerSideCodes error', e);
     }

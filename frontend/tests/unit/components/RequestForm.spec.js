@@ -17,19 +17,12 @@ describe('Component initialized with namespaced Vuex module.', () => {
     postRequest: jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(false)
   };
 
-  let genderCodes = [
-    {label:'Male', genderCode:'M'},
-    {label:'Female', genderCode:'F'},
-    {label:'Gender Diverse', genderCode:'X'},
-    {label:'Unknown', genderCode:'U'},
-  ];
-
   const recordedData = {
     pen: '123456',
     legalFirstName: 'Jimmy',
     legalMiddleNames: 'Wayne',
     legalLastName: 'Duke',
-    genderCode: 'M',
+    genderCode: null,
     dob: '1989-06-04',
     email: 'james@test.com'
   };
@@ -39,7 +32,6 @@ describe('Component initialized with namespaced Vuex module.', () => {
     legalFirstName: 'James',
     legalMiddleNames: 'Wayne',
     legalLastName: 'Duke',
-    genderLabel: 'Male',
     genderCode: 'M',
     dob: '1989-06-04'
   };
@@ -56,7 +48,6 @@ describe('Component initialized with namespaced Vuex module.', () => {
           namespaced: true,
           actions,
           getters: {
-            genders: jest.fn().mockReturnValue(genderCodes),
           },
         },
         ump: {
