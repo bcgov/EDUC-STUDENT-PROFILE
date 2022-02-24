@@ -276,11 +276,7 @@ export default {
     },
     validateForm() {
       this.validate();
-      if (this.validForm) {
-        return true;
-      } else {
-        return false;
-      }
+      return this.validForm;
     },
     checkDigit(pen) {
       const parsedPen = parseInt(pen);

@@ -93,7 +93,7 @@ async function getDigitalIdData(token, digitalID, correlationID) {
 }
 
 function getStudent(userInfo) {
-  const student = {
+  return {
     studentID: userInfo._json.studentID,
     pen: userInfo._json.pen,
     legalLastName: userInfo._json.legalLastName,
@@ -102,7 +102,6 @@ function getStudent(userInfo) {
     email: userInfo._json.email || null,
     dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
   };
-  return student;
 }
 
 async function getLatestRequest(token, digitalID, requestType, setReplicateStatus, correlationID) {
