@@ -171,7 +171,7 @@ async function getUserInfo(req, res) {
 
     let student = null;
     if(userInfo?._json?.studentID) {
-      // student = getStudent(userInfo);
+      student = getStudent(userInfo);
     }
 
     if(req && req.session){
