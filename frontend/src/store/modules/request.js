@@ -1,27 +1,19 @@
 import ApiService from '@/common/apiService';
-//import {getData} from '@/store/modules/helpers';
-import { find } from 'lodash';
 import document from '@/store/modules/document.js';
 import comment from '@/store/modules/comment.js';
 
 export default {
   namespaced: true,
   state: () => ({
-    genders: null,
     statuses: null,
     request: null,
   }),
   getters: {
-    genders: state => state.genders,
-    genderInfo: state => genderCode => find(state.genders, ['genderCode', genderCode]),
     statuses: state => state.statuses,
     request: state => state.request,
     requestID: (state, getters, rootState, rootGetters) => state.request && state.request[`${rootGetters.requestType}ID`],
   },
   mutations: {
-    setGenders: (state, genders) => {
-      state.genders = genders;
-    },
     setStatuses: (state, statuses) => {
       state.statuses = statuses;
     },
@@ -45,7 +37,6 @@ export default {
     },
     async getCodes({commit}, requestType) {
       const response = await ApiService.getCodes(requestType);
-      commit('setGenders', response.data.genderCodes);
       commit('setStatuses', response.data.statusCodes);
     },
     //getRequest: (_context, { requestId, requestType }) => getData(ApiService.getRequest, requestId),

@@ -10,7 +10,7 @@
     </article>
   </v-container>
 
-  <v-container fluid class="full-height" v-else-if="isLoading">
+  <v-container fluid class="full-height" v-else-if="isLoading || hasCompletedPenRequestButNoStudentLinkage">
     <article id="progress-display-container" class="top-banner full-height">
       <v-row align="center" justify="center">
         <v-progress-circular
@@ -126,7 +126,10 @@ export default {
     },
     hasCompletedStudentRequest() {
       return this.studentRequest && this.studentRequest.studentRequestStatusCode === StudentRequestStatuses.COMPLETED;
-    }
+    },
+    hasCompletedPenRequestButNoStudentLinkage() {
+      return this.request && this.request.penRequestStatusCode === PenRequestStatuses.MANUAL && !this.student;
+    },
   },
   created() {
     this.setRequestType('penRequest');
@@ -134,7 +137,7 @@ export default {
   watch: {
     isLoading(val) {
       if(!val) {
-        if(!this.hasPenRequest && !this.hasInflightStudentRequest) {
+        if((!this.hasPenRequest && !this.hasInflightStudentRequest) || this.hasCompletedPenRequestButNoStudentLinkage) {
           this.$router.push({ name: 'gmp-step1' });
         }
       }

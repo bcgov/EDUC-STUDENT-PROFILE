@@ -143,7 +143,7 @@ const router = new VueRouter({
           beforeEnter: (to, from, next) => {
             store.commit('gmp/clearGmpState');
             const hasInflightOrCompletedUMPRequest = store.getters['studentRequest/request'] && values(pick(StudentRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV', 'COMPLETED'])).some(status => status === store.getters['studentRequest/request'].studentRequestStatusCode);
-            if(authStore.state.isAuthenticated && !store.getters['penRequest/request'] && !hasInflightOrCompletedUMPRequest) {
+            if(authStore.state.isAuthenticated && ((!store.getters['penRequest/request'] && !hasInflightOrCompletedUMPRequest) || hasCompletedPenRequestButNoStudentLinkage())) {
               store.commit('setRequestType','penRequest');
               next('gmp/request');
             } else {
@@ -247,8 +247,12 @@ function checkStudentRequestExists(to, from, next) {
   }
 }
 
+function hasCompletedPenRequestButNoStudentLinkage() {
+  return store.getters['penRequest/request'] && store.getters['penRequest/request'].penRequestStatusCode === PenRequestStatuses.MANUAL && !store.getters['student'];
+}
+
 function checkPenRequestExists(to, from, next) {
-  if(authStore.state.isAuthenticated && (!store.getters['penRequest/request'] || ['ABANDONED', 'REJECTED'].includes(store.getters['penRequest/request'].penRequestStatusCode))) {
+  if(authStore.state.isAuthenticated && (!store.getters['penRequest/request'] || ['ABANDONED', 'REJECTED'].includes(store.getters['penRequest/request'].penRequestStatusCode) || hasCompletedPenRequestButNoStudentLinkage())) {
     store.commit('setRequestType','penRequest');
     next();
   } else {
