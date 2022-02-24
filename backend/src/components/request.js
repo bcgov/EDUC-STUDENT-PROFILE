@@ -92,23 +92,16 @@ async function getDigitalIdData(token, digitalID, correlationID) {
   }
 }
 
-function getStudent(userInfo, genderCodes) {
-  const student = {
+function getStudent(userInfo) {
+  return {
     studentID: userInfo._json.studentID,
     pen: userInfo._json.pen,
     legalLastName: userInfo._json.legalLastName,
     legalFirstName: userInfo._json.legalFirstName || null,
     legalMiddleNames: userInfo._json.legalMiddleNames || null,
     email: userInfo._json.email || null,
-    genderCode: userInfo._json.genderCode,
     dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
   };
-  const genderInfo = lodash.find(genderCodes, ['genderCode', student.genderCode]);
-  if (!genderInfo) {
-    throw new ServiceError(`Wrong genderCode: ${student.genderCode}`);
-  }
-  student.genderLabel = genderInfo.label;
-  return student;
 }
 
 async function getLatestRequest(token, digitalID, requestType, setReplicateStatus, correlationID) {
@@ -144,7 +137,6 @@ function getDefaultBcscInput(userInfo) {
     legalLastName: userInfo._json.surname,
     legalFirstName: userInfo._json.givenName,
     legalMiddleNames: middleNames,
-    gender: userInfo._json.gender,
     email: userInfo._json.email,
     dob: userInfo._json.birthDate
   };
@@ -179,7 +171,7 @@ async function getUserInfo(req, res) {
 
     let student = null;
     if(userInfo?._json?.studentID) {
-      student = getStudent(userInfo, codesData.genderCodes);
+      student = getStudent(userInfo);
     }
 
     if(req && req.session){

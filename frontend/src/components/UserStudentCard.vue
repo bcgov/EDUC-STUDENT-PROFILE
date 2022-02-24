@@ -50,14 +50,6 @@
         </v-col>
       </v-row>
       <v-row no-gutters>
-        <v-col xl="4" lg="4" md="4" sm="4">
-          <p class="mb-3">Gender:</p>
-        </v-col>
-        <v-col xl="4" lg="5" md="5" sm="5">
-          <p class="mb-3"><strong>{{ student.genderLabel }}</strong></p>
-        </v-col>
-      </v-row>
-      <v-row no-gutters>
         <p class="mb-1">
           <strong>
             Contact Information

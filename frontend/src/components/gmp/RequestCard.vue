@@ -77,14 +77,6 @@
     </v-row>
     <v-row no-gutters class="px-2">
       <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p>Gender:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p><strong>{{ genderLabel }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
         <p class="mb-2" color="green">Current BC School:</p>
       </v-col>
       <v-col cols="12" xl="6" lg="6" md="6" sm="6">
@@ -139,10 +131,6 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('penRequest', ['genderInfo']),
-    genderLabel() { 
-      return this.genderInfo(this.request.genderCode).label;
-    }
   },
 };
 </script>

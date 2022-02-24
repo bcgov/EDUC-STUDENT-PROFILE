@@ -21,14 +21,6 @@
           <p class="ml-2 mb-0"><strong>{{ request.dob ? moment(request.dob).format('MMMM D, YYYY'):'' }}</strong></p>
         </v-col>
       </v-row>
-      <v-row no-gutters>
-        <v-col xl="2" lg="2" md="2" sm="3" xs="3">
-          <p class="mb-3">Gender:</p>
-        </v-col>
-        <v-col xl="9" lg="9" md="9" sm="8" xs="8">
-          <p class="ml-2 mb-3"><strong>{{ genderLabel }}</strong></p>
-        </v-col>
-      </v-row>
       <slot name="info"></slot>
       <v-row no-gutters>
         <p class="mb-0">
@@ -50,7 +42,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 
 export default {
   name: 'studentInfoCard',
@@ -61,10 +52,6 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('studentRequest', ['genderInfo']),
-    genderLabel() { 
-      return this.request.genderCode && this.genderInfo(this.request.genderCode).label;
-    },
     fullName() {
       return [this.request.legalFirstName, this.request.legalMiddleNames, this.request.legalLastName].filter(Boolean).join(' ').toUpperCase();
     }

@@ -71,14 +71,6 @@
           <p class="mb-2"><strong>{{ student.dob ? moment(student.dob).format('MMMM D, YYYY'):'' }}</strong></p>
         </v-col>
       </v-row>
-      <v-row no-gutters class="py-0 px-2">
-        <v-col xl="2" lg="2" md="2" sm="3" xs="3">
-          <p class="mb-2">Gender:</p>
-        </v-col>
-        <v-col xl="9" lg="9" md="9" sm="8" xs="8">
-          <p class="mb-2"><strong>{{ student.genderLabel }}</strong></p>
-        </v-col>
-      </v-row>
     </v-container>
 
     <p class="mb-2"><strong>If any of this information is not current, please submit a new request or contact <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.</strong></p>
@@ -111,7 +103,7 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['userInfo']),
-    ...mapGetters('studentRequest', ['request', 'genderInfo']),
+    ...mapGetters('studentRequest', ['request']),
     ...mapGetters(['student']),
     ...mapGetters('config',['numDaysAllowedInDraftStatus']),
     isSagaInProgress() {
@@ -134,9 +126,6 @@ export default {
     },
     updatedFullName() {
       return this.fullName(this.student.legalFirstName, this.student.legalMiddleNames, this.student.legalLastName);
-    },
-    genderLabel() { 
-      return this.request.genderCode && this.genderInfo(this.request.genderCode).label;
     },
   },
   async created(){
