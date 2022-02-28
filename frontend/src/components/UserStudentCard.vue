@@ -64,6 +64,17 @@
           <p class="mb-1"><strong>{{ student.email }}</strong></p>
         </v-col>
       </v-row>
+      <v-row>
+        <v-sheet rounded outlined color="#d3d3d3" >
+          <v-col>
+            <strong>Not your information?</strong>
+            If the information above does not belong to you, please contact us right away at
+            <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.
+            If only a piece of this information is incorrect, please complete an
+            <router-link to="ump">Update my PEN request</router-link>.
+          </v-col>
+        </v-sheet>
+      </v-row>
     </v-container>
   </v-card>
 </template>
