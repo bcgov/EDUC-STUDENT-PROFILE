@@ -1,6 +1,6 @@
 'use strict';
 
-const { RequestStatuses } = require('./utils');
+const { RequestStatuses, getSessionUser } = require('./utils');
 const config = require('../config/index');
 const localDateTime = require('@js-joda/core').LocalDateTime;
 const ChronoUnit = require('@js-joda/core').ChronoUnit;
@@ -17,9 +17,12 @@ function setPenRequestReplicateStatus(penRequest) {
   return penRequest;
 }
 
-function verifyPenRequestStatus(penRequest) {
-  return penRequest.penRequestStatusCode !== PenRequestStatuses.REJECTED && 
-    penRequest.penRequestStatusCode !== PenRequestStatuses.ABANDONED;
+function verifyPenRequestStatus(req) {
+  const userInfo = getSessionUser(req);
+
+  return req.session['penRequest'].penRequestStatusCode !== PenRequestStatuses.REJECTED && 
+    req.session['penRequest'].penRequestStatusCode !== PenRequestStatuses.ABANDONED  
+    && !(req.session['penRequest'].penRequestStatusCode === PenRequestStatuses.MANUAL && !userInfo?._json?.studentID);
 }
 
 

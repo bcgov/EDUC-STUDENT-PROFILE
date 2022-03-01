@@ -294,7 +294,7 @@ function submitRequest(requestType, verifyRequestStatus) {
 
       const accessToken = userInfo.jwt;
 
-      if(req && req.session && req.session[requestType] && verifyRequestStatus(req.session[requestType])) {
+      if(req && req.session && req.session[requestType] && verifyRequestStatus(req)) {
         return res.status(HttpStatus.CONFLICT).json({
           message: `Submit ${requestType} not allowed`
         });
