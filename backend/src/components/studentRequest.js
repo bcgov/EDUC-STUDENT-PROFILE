@@ -17,10 +17,10 @@ function setStudentRequestReplicateStatus(request) {
   return request;
 }
 
-function verifyStudentRequestStatus(request) {
-  return request.studentRequestStatusCode !== StudentRequestStatuses.REJECTED && 
-    request.studentRequestStatusCode !== StudentRequestStatuses.ABANDONED && 
-    request.studentRequestStatusCode !== StudentRequestStatuses.COMPLETED;
+function verifyStudentRequestStatus(req) {
+  return req.session['studentRequest'].studentRequestStatusCode !== StudentRequestStatuses.REJECTED && 
+    req.session['studentRequest'].studentRequestStatusCode !== StudentRequestStatuses.ABANDONED && 
+    req.session['studentRequest'].studentRequestStatusCode !== StudentRequestStatuses.COMPLETED;
 }
 
 const StudentRequestStatuses = Object.freeze({
