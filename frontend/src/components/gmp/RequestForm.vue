@@ -40,7 +40,7 @@
             <v-text-field
               id='legalLastName'
               :readonly="serviceCardBool"
-              v-model="userPost.legalLastName"
+              v-model.trim="userPost.legalLastName"
               color="#003366"
               outlined
               class="touppercase"
@@ -58,7 +58,7 @@
             <v-text-field
               id='legalFirstName'
               :readonly="serviceCardBool"
-              v-model="userPost.legalFirstName"
+              v-model.trim="userPost.legalFirstName"
               color="#003366"
               hint="As shown on current Government Photo ID. Note, If you have ONE name only – enter it into the Legal Last Name field and leave Legal First Name blank"
               outlined
@@ -75,7 +75,7 @@
             <v-text-field
               id='legalMiddleNames'
               :readonly="serviceCardBool"
-              v-model="userPost.legalMiddleNames"
+              v-model.trim="userPost.legalMiddleNames"
               color="#003366"
               hint="As shown on current Government Photo ID"
               outlined
@@ -91,7 +91,7 @@
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='usualLastName'
-              v-model="userPost.usualLastName"
+              v-model.trim="userPost.usualLastName"
               color="#003366"
               outlined
               class="touppercase"
@@ -107,7 +107,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='usualFirstName'
-              v-model="userPost.usualFirstName"
+              v-model.trim="userPost.usualFirstName"
               color="#003366"
               outlined
               class="touppercase"
@@ -123,7 +123,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='usualMiddleNames'
-              v-model="userPost.usualMiddleName"
+              v-model.trim="userPost.usualMiddleName"
               color="#003366"
               outlined
               class="touppercase"
@@ -139,7 +139,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='maidenName'
-              v-model="userPost.maidenName"
+              v-model.trim="userPost.maidenName"
               color="#003366"
               class="touppercase"
               hint="List all previous Last names used separated with spaces"
@@ -155,7 +155,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='pastNames'
-              v-model="userPost.pastNames"
+              v-model.trim="userPost.pastNames"
               color="#003366"
               hint="List all previous names used separated with spaces"
               outlined
@@ -241,7 +241,7 @@
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='lastBCSchool'
-              v-model="userPost.lastBCSchool"
+              v-model.trim="userPost.lastBCSchool"
               color="#003366"
               hint="Last BC K-12 school or Post Secondary Institute attended"
               outlined
@@ -257,7 +257,7 @@
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='lastBCStudentNumber'
-              v-model="userPost.lastBCSchoolStudentNumber"
+              v-model.trim="userPost.lastBCSchoolStudentNumber"
               color="#003366"
               hint="School Issued Local ID"
               outlined
@@ -273,7 +273,7 @@
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='currentSchool'
-              v-model="userPost.currentSchool"
+              v-model.trim="userPost.currentSchool"
               color="#003366"
               hint="Current BC K-12 school or Post Secondary Institute"
               outlined

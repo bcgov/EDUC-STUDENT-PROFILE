@@ -39,7 +39,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='recordedLegalFirstName'
-              v-model="recordedData.legalFirstName"
+              v-model.trim="recordedData.legalFirstName"
               :rules="charRules"
               color="#003366"
               outlined
@@ -55,7 +55,7 @@
           <v-col cols="12" sm="6" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='recordedLegalMiddleNames'
-              v-model="recordedData.legalMiddleNames"
+              v-model.trim="recordedData.legalMiddleNames"
               :rules="charRules"
               color="#003366"
               outlined
@@ -71,7 +71,7 @@
           <v-col cols="12" class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3">
             <v-text-field
               id='recordedLegalLastName'
-              v-model="recordedData.legalLastName"
+              v-model.trim="recordedData.legalLastName"
               :rules="requiredRules(lastNameHint)"
               color="#003366"
               outlined
