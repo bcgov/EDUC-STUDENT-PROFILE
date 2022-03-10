@@ -66,7 +66,7 @@
               ></v-checkbox>
               <v-text-field
                 id='legalFirstName'
-                v-model="request.legalFirstName"
+                v-model.trim="request.legalFirstName"
                 color="#003366"
                 hint="As shown on current Government Photo ID"
                 :persistent-hint="!enableDisableForm.disabled && editLegalFirstName"
@@ -93,7 +93,7 @@
               ></v-checkbox>
               <v-text-field
                 id='legalMiddleNames'
-                v-model="request.legalMiddleNames"
+                v-model.trim="request.legalMiddleNames"
                 color="#003366"
                 hint="As shown on current Government Photo ID"
                 :persistent-hint="!enableDisableForm.disabled && editLegalMiddleNames"
@@ -120,7 +120,7 @@
               ></v-checkbox>
               <v-text-field
                 id='legalLastName'
-                v-model="request.legalLastName"
+                v-model.trim="request.legalLastName"
                 color="#003366"
                 outlined
                 :rules="charRules && requiredRules(lastNameHint)"
