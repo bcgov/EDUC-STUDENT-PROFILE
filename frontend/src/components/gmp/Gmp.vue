@@ -130,6 +130,9 @@ export default {
     hasCompletedPenRequestButNoStudentLinkage() {
       return this.request && this.request.penRequestStatusCode === PenRequestStatuses.MANUAL && !this.student;
     },
+    hasBcscLinkageForStudent() {
+      return this.userInfo?.accountType === 'BCSC' && this.student;
+    },
   },
   created() {
     this.setRequestType('penRequest');
@@ -137,7 +140,9 @@ export default {
   watch: {
     isLoading(val) {
       if(!val) {
-        if((!this.hasPenRequest && !this.hasInflightStudentRequest) || this.hasCompletedPenRequestButNoStudentLinkage) {
+        if(this.hasBcscLinkageForStudent) {
+          this.$router.push({ name: 'home' });
+        } else if((!this.hasPenRequest && !this.hasInflightStudentRequest) || this.hasCompletedPenRequestButNoStudentLinkage) {
           this.$router.push({ name: 'gmp-step1' });
         }
       }
