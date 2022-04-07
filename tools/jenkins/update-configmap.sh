@@ -135,17 +135,14 @@ fi
 
 if [ "$envValue" = "tools" ]
 then
-  HOST_ROUTE="dev.getmypen.gov.bc.ca"
   bannerEnvironment="DEV"
   bannerColor="#dba424"
 elif [ "$envValue" = "dev" ]
 then
-  HOST_ROUTE="test.getmypen.gov.bc.ca"
   bannerEnvironment="TEST"
   bannerColor="#8d28d7"
 elif [ "$envValue" = "test" ]
 then
-  HOST_ROUTE="uat.getmypen.gov.bc.ca"
   bannerEnvironment="UAT"
   bannerColor="#58fe01"
 fi
