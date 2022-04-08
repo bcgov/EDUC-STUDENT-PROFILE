@@ -32,17 +32,6 @@ TKN=$(curl -s \
   -d "grant_type=password" \
   "https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/protocol/openid-connect/token" | jq -r '.access_token')
 
-if [ "$envValue" = "tools" ]
-then
-  SERVER_FRONTEND="https://dev.getmypen.gov.bc.ca"
-elif [ "$envValue" = "dev" ]
-then
-  SERVER_FRONTEND="https://test.getmypen.gov.bc.ca"
-elif [ "$envValue" = "test" ]
-then
-  SERVER_FRONTEND="https://uat.getmypen.gov.bc.ca"
-fi
-
 echo
 echo Retrieving client ID for student-profile-soam
 studentProfileClientID=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
