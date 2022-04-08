@@ -133,18 +133,14 @@ else
     journey_builder_url="https://www2.gov.bc.ca/gov/content?id=74E29C67215B4988ABCD778F453A3129"
 fi
 
-if [ "$envValue" = "tools" ]
+if [ "$envValue" = "dev" ]
 then
   bannerEnvironment="DEV"
   bannerColor="#dba424"
-elif [ "$envValue" = "dev" ]
+elif [ "$envValue" = "test" ]
 then
   bannerEnvironment="TEST"
   bannerColor="#8d28d7"
-elif [ "$envValue" = "test" ]
-then
-  bannerEnvironment="UAT"
-  bannerColor="#58fe01"
 fi
 
 snowplow="
