@@ -6,7 +6,7 @@
     <v-container fluid class="pt-0 px-1">
       <v-row no-gutters>
         <p>
-          Below are the details of your student record at the Ministry of Education
+          Below are the details of your student record at the Ministry of Education and Child Care
         </p>
       </v-row>
       <v-row no-gutters>

@@ -322,7 +322,7 @@
               <p>
                 <a href="mailto:pens.coordinator@gov.bc.ca">PEN Coordinator</a><br/>
                 Data Management Unit, Student Data & Educational Resource Services Branch<br/>
-                B.C. Ministry of Education<br/>
+                B.C. Ministry of Education and Child Care<br/>
                 PO Box 9886 Stn Prov Govt<br/>
                 Victoria BC V8W 9T6<br/>
                 OR through Enquiry BC (Victoria): (250) 387-6121
