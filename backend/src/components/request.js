@@ -143,7 +143,6 @@ function getDefaultBcscInput(userInfo) {
 }
 
 async function getUserInfo(req, res) {
-  console.log(req);
   const userInfo = getSessionUser(req);
   const correlationID = req.session?.correlationID;
   if(!userInfo || !userInfo.jwt || !userInfo._json || !userInfo._json.digitalIdentityID) {
