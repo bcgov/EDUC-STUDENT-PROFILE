@@ -13,7 +13,7 @@
     <v-alert outlined class="pa-3 mb-3 mx-3 bootstrap-warning">
       <p><strong>You are almost finished. To complete your request for the changes below, you must verify the email address you provided by completing the following steps:</strong></p>
       <ol class="pt-2">
-        <li>Go to your email for {{request.email}} and look for an email from the Ministry of Education.  You may need to check your spam folder</li>
+        <li>Go to your email for {{request.email}} and look for an email from the Ministry of Education and Child Care.  You may need to check your spam folder</li>
         <li>Within 24 hours you must click on the link in the email to complete your request</li>
       </ol>
       <br/>
