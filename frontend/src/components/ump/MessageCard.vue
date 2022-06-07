@@ -23,7 +23,7 @@
   <v-alert outlined height="100%" width="100%" class="pa-3 bootstrap-warning" v-else-if="status === requestStatuses.DRAFT && ! timedout">
     <p class="mb-2"><strong>You are almost finished. To complete your request for the changes below, you must verify the email address you provided by completing the following steps:</strong></p>
     <ol>
-      <li>Go to your email for {{request.email}} and look for an email from the Ministry of Education and Child Care.  You may need to check your spam folder</li>
+      <li>Go to your email for {{request.email}} and look for an email from the Ministry of Education.  You may need to check your spam folder</li>
       <li>Within 24 hours you must click on the link in the email to complete your request</li>
     </ol>
     <br/>
@@ -45,7 +45,7 @@
     <p class="mb-2"><strong>Your request to update your PEN information is complete</strong></p>
     <p class="mb-2 comment" v-if="request.completeComment && request.completeComment.length > 0">{{request.completeComment}}</p>
 
-    <p class="mb-2">For your reference, your student record at the Ministry of Education and Child Care has been updated as shown below</p>
+    <p class="mb-2">For your reference, your student record at the Ministry of Education has been updated as shown below</p>
     <v-container v-if="student" class="pen-info pt-0 pb-2 px-0 px-sm-3" justify="center">
       <v-row no-gutters class="py-0 px-2">
         <v-col xl="2" lg="2" md="2" sm="3" xs="3">
@@ -113,7 +113,7 @@ export default {
       return this.request.studentRequestStatusCode;
     },
     ministry() {
-      return 'the Ministry of Education and Child Care';
+      return 'the Ministry of Education';
     },
     requestStatuses() {
       return StudentRequestStatuses;

@@ -92,7 +92,7 @@ export default {
       return AuthRoutes;
     },
     ministry() {
-      return 'Ministry of Education and Child Care';
+      return 'Ministry of Education';
     },
   },
   methods: {
