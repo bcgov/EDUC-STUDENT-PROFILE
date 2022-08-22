@@ -1,4 +1,4 @@
-FROM docker-remote.artifacts.developer.gov.bc.ca/node:14-alpine
+FROM artifacts.developer.gov.bc.ca/docker-remote/node:lts-alpine3.13
 
 WORKDIR /opt/app-root/src
 
