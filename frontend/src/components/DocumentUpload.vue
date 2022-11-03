@@ -137,6 +137,7 @@ export default {
       this.$refs.form.reset();
       this.fileInputError = [];
       this.alert = false;
+      this.alertMessage = null;
       this.active = false;
     },
     setSuccessAlert() {
