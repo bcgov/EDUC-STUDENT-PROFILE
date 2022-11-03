@@ -131,13 +131,13 @@ export default {
     },
     closeForm() {
       this.resetForm();
-      this.alertMessage = null;
       this.$emit('close:form');
     },
     resetForm() {
       this.$refs.form.reset();
       this.fileInputError = [];
       this.alert = false;
+      this.alertMessage = null;
       this.active = false;
     },
     setSuccessAlert() {
