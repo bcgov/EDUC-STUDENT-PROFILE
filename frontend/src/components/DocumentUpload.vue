@@ -131,6 +131,7 @@ export default {
     },
     closeForm() {
       this.resetForm();
+      this.alertMessage = null;
       this.$emit('close:form');
     },
     resetForm() {
