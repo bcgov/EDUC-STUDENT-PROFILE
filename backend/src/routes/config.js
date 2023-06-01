@@ -12,7 +12,6 @@ router.get('/', passport.authenticate('jwt', {session: false}),isValidBackendTok
 
 
 async function getConfig(req, res) {
-  const disallowedConfigKeys = ['secret', 'key', 'pwd', 'password'];
   const accessToken = getAccessToken(req);
   if (!accessToken) {
     return res.status(HttpStatus.UNAUTHORIZED).json({
@@ -22,8 +21,7 @@ async function getConfig(req, res) {
   const configName = req.query.configName;
   log.silly(`query param for config is ${configName}`);
   if (configName) {
-    const isBadConfigName = (element) => configName.includes(element);
-    if (disallowedConfigKeys.some(isBadConfigName)) {
+    if (configName !== 'scheduler:numDaysAllowedInDraftStatus') {
       return res.status(HttpStatus.BAD_REQUEST).json();
     }
     const resJson = {
