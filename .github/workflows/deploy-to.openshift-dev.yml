@@ -30,16 +30,13 @@ env:
   REPO_NAME: "educ-student-profile"
   BRANCH: "master"
   APP_NAME_BACKEND: "student-profile-backend-master"
-  APP_NAME_FRONTEND: "student-profile-frontend"
-#  TODO check APP_NAME_FULL
-#  APP_NAME_FULL: "student-profile-master"
+  APP_NAME_FRONTEND: "student-profile-frontend-master"
   NAMESPACE: ${{ secrets.PEN_NAMESPACE_NO_ENV }}
-  NAMESPACE_TOOLS: ${{ secrets.EDX_NAMESPACE_NO_ENV }}-tools
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   TAG: "latest"
   MIN_REPLICAS_DEV: "1"
   MAX_REPLICAS_DEV: "1"
-  MIN_CPU: "150m"
+  MIN_CPU: "10m"
   MAX_CPU: "300m"
   MIN_MEM: "250Mi"
   MAX_MEM: "500Mi"
@@ -187,7 +184,9 @@ jobs:
           oc project ${{ env.OPENSHIFT_NAMESPACE_DEV }}
           # Cancel any rollouts in progress
           oc rollout cancel dc/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
-          || true && echo "No rollout in progress"
+          || true && echo "No backend rollout in progress"
+          oc rollout cancel dc/${{ env.APP_NAME_FRONTEND }} 2> /dev/null \
+          || true && echo "No frontend rollout in progress"
           
           # Create the image stream if it doesn't exist
           oc create imagestream ${{ env.REPO_NAME }}-backend-${{ env.BRANCH }} 2> /dev/null || true && echo "Backend image stream in place"
@@ -211,10 +210,12 @@ jobs:
           || true && echo "Rollout in progress"
           oc logs -f dc/${{ env.APP_NAME_BACKEND }}
                
-          oc rollout latest dc/${{ env.APP_NAME_FRONTEND_MASTER }} 2> /dev/null \
+          oc rollout latest dc/${{ env.APP_NAME_FRONTEND }} 2> /dev/null \
           || true && echo "Rollout in progress"
+          
           # Get status, returns 0 if rollout is successful
           oc rollout status dc/${{ env.APP_NAME_BACKEND }}
+          oc rollout status dc/${{ env.APP_NAME_FRONTEND }}
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.3.0
         with:
