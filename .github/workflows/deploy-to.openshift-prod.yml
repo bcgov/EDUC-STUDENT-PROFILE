@@ -29,8 +29,8 @@ env:
   NAMESPACE: ${{ secrets.PEN_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   TAG: "latest"
-  MIN_REPLICAS_TEST: "2"
-  MAX_REPLICAS_TEST: "2"
+  MIN_REPLICAS: "3"
+  MAX_REPLICAS: "3"
   MIN_CPU_BACKEND: "20m"
   MAX_CPU_BACKEND: "400m"
   MIN_MEM_BACKEND: "500Mi"
@@ -123,11 +123,11 @@ jobs:
           oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-frontend-static:${{ env.TAG }} ${{ env.NAMESPACE }}-prod/${{ env.REPO_NAME }}-frontend-static:${{ env.TAG }}
 
           # Process and apply backend deployment template
-          oc process -f tools/openshift/backend.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_PROD }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_TEST }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_TEST }} -p MIN_CPU=${{ env.MIN_CPU_BACKEND }} -p MAX_CPU=${{ env.MAX_CPU_BACKEND }} -p MIN_MEM=${{ env.MIN_MEM_BACKEND }} -p MAX_MEM=${{ env.MAX_MEM_BACKEND }} -p HOST_ROUTE=${{ env.HOST_ROUTE }}\
+          oc process -f tools/openshift/backend.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_PROD }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU_BACKEND }} -p MAX_CPU=${{ env.MAX_CPU_BACKEND }} -p MIN_MEM=${{ env.MIN_MEM_BACKEND }} -p MAX_MEM=${{ env.MAX_MEM_BACKEND }} -p HOST_ROUTE=${{ env.HOST_ROUTE }}\
           | oc apply -f -
           
           # Process and apply frontend deployment template
-          oc process -f tools/openshift/frontend-static.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_PROD }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_TEST }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_TEST }} -p MIN_CPU=${{ env.MIN_CPU_FRONTEND }} -p MAX_CPU=${{ env.MAX_CPU_FRONTEND }} -p MIN_MEM=${{ env.MIN_MEM_FRONTEND }} -p MAX_MEM=${{ env.MAX_MEM_FRONTEND }} -p HOST_ROUTE=${{ env.HOST_ROUTE }} -p CA_CERT="${{ env.CA_CERT }}" -p CERTIFICATE="${{ env.CERTIFICATE }}" -p PRIVATE_KEY="${{ env.PRIVATE_KEY }}"\
+          oc process -f tools/openshift/frontend-static.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_PROD }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU_FRONTEND }} -p MAX_CPU=${{ env.MAX_CPU_FRONTEND }} -p MIN_MEM=${{ env.MIN_MEM_FRONTEND }} -p MAX_MEM=${{ env.MAX_MEM_FRONTEND }} -p HOST_ROUTE=${{ env.HOST_ROUTE }} -p CA_CERT="${{ env.CA_CERT }}" -p CERTIFICATE="${{ env.CERTIFICATE }}" -p PRIVATE_KEY="${{ env.PRIVATE_KEY }}"\
           | oc apply -f -
           
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin prod ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.SPLUNK_TOKEN }}
