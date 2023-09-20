@@ -41,9 +41,6 @@ env:
   MAX_MEM_FRONTEND: "500Mi"
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
@@ -95,6 +92,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
+      - name: Get latest tag
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+
       - name: Install oc
         uses: redhat-actions/openshift-tools-installer@v1
         with:
@@ -119,8 +120,8 @@ jobs:
           oc create imagestream ${{ env.REPO_NAME }}-backend-${{ env.BRANCH }} 2> /dev/null || true && echo "Backend image stream in place"
           oc create imagestream ${{ env.REPO_NAME }}-frontend-static 2> /dev/null || true && echo "Frontend image stream in place"
           
-          oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-backend-${{ env.BRANCH }}:${{ env.TAG }} ${{ env.NAMESPACE }}-prod/${{ env.REPO_NAME }}-backend-${{ env.BRANCH }}:${{ env.TAG }}
-          oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-frontend-static:${{ env.TAG }} ${{ env.NAMESPACE }}-prod/${{ env.REPO_NAME }}-frontend-static:${{ env.TAG }}
+          oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-backend-${{ env.BRANCH }}:${{ steps.get-latest-tag.outputs.tag }} ${{ env.NAMESPACE }}-prod/${{ env.REPO_NAME }}-backend-${{ env.BRANCH }}:${{ steps.get-latest-tag.outputs.tag }}
+          oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-frontend-static:${{ steps.get-latest-tag.outputs.tag }} ${{ env.NAMESPACE }}-prod/${{ env.REPO_NAME }}-frontend-static:${{ steps.get-latest-tag.outputs.tag }}
 
           # Process and apply backend deployment template
           oc process -f tools/openshift/backend.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_PROD }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU_BACKEND }} -p MAX_CPU=${{ env.MAX_CPU_BACKEND }} -p MIN_MEM=${{ env.MIN_MEM_BACKEND }} -p MAX_MEM=${{ env.MAX_MEM_BACKEND }} -p HOST_ROUTE=${{ env.HOST_ROUTE }}\
