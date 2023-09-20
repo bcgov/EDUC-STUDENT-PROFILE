@@ -39,6 +39,8 @@ env:
   MAX_CPU_FRONTEND: "400m"
   MIN_MEM_FRONTEND: "250Mi"
   MAX_MEM_FRONTEND: "500Mi"
+  # SITE_URL should have no scheme or port. It will be prepended with https://
+  HOST_ROUTE: ${{ secrets.SITE_URL }}
 
 on:
   workflow_dispatch:
