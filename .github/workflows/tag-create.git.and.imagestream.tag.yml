@@ -60,5 +60,5 @@ jobs:
         oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
         oc project ${{ env.OPENSHIFT_NAMESPACE }}
         
-        oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}:latest ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}:${{ github.event.inputs.version }}
+        oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-backend:latest ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}:${{ github.event.inputs.version }}
         oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-frontend-static:latest ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-frontend-static:${{ github.event.inputs.version }}
