@@ -115,10 +115,10 @@ jobs:
           || true && echo "No frontend rollout in progress"
           
           # Create the image stream if it doesn't exist
-          oc create imagestream ${{ env.REPO_NAME }}-backend-${{ env.BRANCH }} 2> /dev/null || true && echo "Backend image stream in place"
+          oc create imagestream ${{ env.REPO_NAME }}-backend 2> /dev/null || true && echo "Backend image stream in place"
           oc create imagestream ${{ env.REPO_NAME }}-frontend-static 2> /dev/null || true && echo "Frontend image stream in place"
           
-          oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-backend-${{ env.BRANCH }}:${{ env.TAG }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}-backend-${{ env.BRANCH }}:${{ env.TAG }}
+          oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-backend:${{ env.TAG }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}-backend:${{ env.TAG }}
           oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-frontend-static:${{ env.TAG }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}-frontend-static:${{ env.TAG }}
 
           # Process and apply backend deployment template
