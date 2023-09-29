@@ -28,7 +28,7 @@ env:
   APP_NAME_FRONTEND: "student-profile-frontend-master"
   NAMESPACE: ${{ secrets.PEN_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
-  TAG: ${{ github.event.inputs.version }}
+  TAG: ${{ github.event.inputs.tag }}
   MIN_REPLICAS_TEST: "2"
   MAX_REPLICAS_TEST: "2"
   MIN_CPU_BACKEND: "10m"
@@ -49,7 +49,7 @@ on:
         description: 'Please input the tag, latest or release ex. 1.2.3'
         type: string
         required: true
-        default: 'latest'
+        default: "latest"
 
 jobs:
   build-and-deploy-test:
