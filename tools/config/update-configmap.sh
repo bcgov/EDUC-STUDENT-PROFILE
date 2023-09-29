@@ -50,7 +50,7 @@ echo Removing student-profile-soam if exists
 curl -sX DELETE "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$studentProfileClientID" \
   -H "Authorization: Bearer $TKN"
 
-if [ "$studentProfileServiceClientSecret" != "" ] && [ "$envValue" = "tools" ]
+if [ "$studentProfileServiceClientSecret" != "" ] && [ "$envValue" = "dev" ]
 then
   echo
   echo Creating client student-profile-soam with secret
@@ -98,7 +98,7 @@ studentProfileServiceClientSecret=$(curl -sX GET "https://$SOAM_KC/auth/admin/re
   | jq -r '.value')
 
 echo Generating private and public keys
-ssh-keygen -b 4096 -t rsa -f tempPenBackendkey -q -N ""
+ssh-keygen -b 4096 -t rsa -f tempPenBackendkey -m pem -q -N ""
 UI_PRIVATE_KEY_VAL="$(cat tempPenBackendkey)"
 UI_PUBLIC_KEY_VAL="$(ssh-keygen -f tempPenBackendkey -e -m pem)"
 echo Removing key files
