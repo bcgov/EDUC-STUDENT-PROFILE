@@ -28,7 +28,7 @@ env:
   APP_NAME_FRONTEND: "student-profile-frontend-master"
   NAMESPACE: ${{ secrets.PEN_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
-  TAG: ${{ github.inputs.tag }}
+  TAG: ${{ github.event.inputs.version }}
   MIN_REPLICAS_TEST: "2"
   MAX_REPLICAS_TEST: "2"
   MIN_CPU_BACKEND: "10m"
