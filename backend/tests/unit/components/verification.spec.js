@@ -2,7 +2,6 @@
 // const lodash = require('lodash');
 const config = require('../../../src/config/index');
 
-jest.mock('@js-joda/core');
 const LocalDateTime = require('@js-joda/core').LocalDateTime;
 jest.mock('../../../src/components/utils');
 const utils = require('../../../src/components/utils');

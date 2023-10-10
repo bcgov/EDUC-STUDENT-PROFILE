@@ -644,7 +644,7 @@ describe('postRequest', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/', correlationID);
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint'), correlationID);
   });
 
   it('should return request data with autoMatchResults if accountType is BCSC', async () => {
@@ -666,7 +666,7 @@ describe('postRequest', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/', correlationID);
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint'), correlationID);
   });
 
   it('should return request data with ZEROMATCHES if accountType is BCSC and no autoMatchResults', async () => {
@@ -689,7 +689,7 @@ describe('postRequest', () => {
       emailVerified: utils.EmailVerificationStatuses.NOT_VERIFIED,
       digitalID: userInfo.digitalIdentityID
     };
-    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint') + '/', correlationID);
+    expect(spy).toHaveBeenCalledWith('token', requst, config.get('studentRequest:apiEndpoint'), correlationID);
   });
 
   it('should throw ServiceError if postData is failed', async () => {
