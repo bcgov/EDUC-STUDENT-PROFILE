@@ -267,7 +267,7 @@ async function sendVerificationEmail(accessToken, emailAddress, requestId, ident
 
 async function postRequest(accessToken, reqData, userInfo, requestType, correlationID) {
   try{
-    const url = config.get(`${requestType}:apiEndpoint`) + '/';
+    const url = config.get(`${requestType}:apiEndpoint`);
 
     if(!reqData.emailVerified){
       reqData.emailVerified = EmailVerificationStatuses.NOT_VERIFIED;
