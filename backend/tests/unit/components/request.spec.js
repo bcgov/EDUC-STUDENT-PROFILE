@@ -148,7 +148,7 @@ describe('getLatestRequest', () => {
     expect(result).toBeTruthy();
     expect(result.statusUpdateDate).toEqual('2020-03-05T07:05:59');
     expect(result.digitalID).toBeNull();
-    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `/?digitalID=${digitalID}`, correlationID);
+    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `?digitalID=${digitalID}`, correlationID);
   });
 
   it('should return null if no requests', async () => {
@@ -157,7 +157,7 @@ describe('getLatestRequest', () => {
     const result = await changeRequest.__get__('getLatestRequest')('token', digitalID, requestType, setReplicateStatus, correlationID);
 
     expect(result).toBeNull();
-    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `/?digitalID=${digitalID}`, correlationID);
+    expect(spy).toHaveBeenCalledWith('token', config.get('studentRequest:apiEndpoint') + `?digitalID=${digitalID}`, correlationID);
   });
 
   it('should return null if getData return NOT_FOUND', async () => {
