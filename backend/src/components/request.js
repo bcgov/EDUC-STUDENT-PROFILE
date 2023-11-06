@@ -109,7 +109,7 @@ async function getLatestRequest(token, digitalID, requestType, setReplicateStatu
   let sagaInProgress = false;
   const url = config.get(`${requestType}:apiEndpoint`);
   try {
-    let data = await getData(token, `${url}/?digitalID=${digitalID}`, correlationID);
+    let data = await getData(token, `${url}?digitalID=${digitalID}`, correlationID);
     request = lodash.maxBy(data, 'statusUpdateDate') || null;
     if(request) {
       sagaInProgress = await redisUtil.isSagaInProgressForDigitalID(request.digitalID);
