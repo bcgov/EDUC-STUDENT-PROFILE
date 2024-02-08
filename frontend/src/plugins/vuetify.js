@@ -1,13 +1,10 @@
 import '@fortawesome/fontawesome-free/css/all.css';
-import Vue from 'vue';
-import Vuetify from 'vuetify/lib';
+import { createVuetify } from 'vuetify';
 
-Vue.use(Vuetify);
-
-export default new Vuetify({
+export default new createVuetify({
   theme: {
     light: true,
-    dark: false 
+    dark: false
   },
   icons: {
     iconfont: 'fa',

@@ -1,7 +1,9 @@
-import ApiService from '@/common/apiService';
-import AuthService from '@/common/authService';
-// import router from '@/router';
-// import { AuthRoutes } from '@/utils/constants';
+import { defineStore } from 'pinia';
+import { useStudentRequestStore, usePenRequestStore } from './request';
+import { useRootStore } from './root';
+
+import ApiService from '../common/apiService';
+import AuthService from '../common/authService';
 
 function isFollowUpVisit({jwtToken}) {
   return !!jwtToken;
@@ -40,9 +42,8 @@ async function getInitialToken({commit}) {
   }
 }
 
-export default {
-  namespaced: true,
-  state: {
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
     acronyms: [],
     isAuthenticated: false,
     userInfo: null,
@@ -50,65 +51,52 @@ export default {
     isLoading: true,
     loginError: false,
     jwtToken: localStorage.getItem('jwtToken'),
-  },
-  getters: {
-    acronyms: state => state.acronyms,
-    isAuthenticated: state => state.isAuthenticated,
-    jwtToken: state => state.jwtToken,
-    userInfo: state => state.userInfo,
-    loginError: state => state.loginError,
-    error: state => state.error,
-    isLoading: state => state.isLoading
-  },
-  mutations: {
-    //sets Json web token and determines whether user is authenticated
-    setJwtToken: (state, token = null) => {
+  }),
+  actions: {
+    setJwtToken(token = null) {
       if (token) {
-        state.isAuthenticated = true;
-        state.jwtToken = token;
+        this.isAuthenticated = true;
+        this.jwtToken = token;
         localStorage.setItem('jwtToken', token);
       } else {
-        state.isAuthenticated = false;
-        state.jwtToken = null;
+        this.isAuthenticated = false;
+        this.jwtToken = null;
         localStorage.removeItem('jwtToken');
       }
     },
-
-    setUserInfo: (state, userInfo) => {
+    setUserInfo(userInfo) {
       if(userInfo){
-        state.userInfo = userInfo;
+        this.userInfo = userInfo;
       } else {
-        state.userInfo = null;
+        this.userInfo = null;
       }
     },
-
-    setLoginError: (state) => {
-      state.loginError = true;
+    setLoginError() {
+      this.loginError = true;
     },
-
-    setError: (state, error) => {
-      state.error = error;
+    setError(error) {
+      this.error = error;
     },
-
-    setLoading: (state, isLoading) => {
-      state.isLoading = isLoading;
-    }
-  },
-  actions: {
-    loginErrorRedirect(context){
-      context.commit('setLoginError');
+    setLoading(isLoading) {
+      this.isLoading = isLoading;
     },
-    logout(context) {
-      context.commit('setJwtToken');
-      context.commit('setUserInfo');
-      // router.push(AuthRoutes.LOGOUT);
+    loginErrorRedirect(){
+      this.setLoginError();
     },
-    async getUserInfo({commit}){
+    logout() {
+      this.setJwtToken();
+      this.setUserInfo();
+    },
+    async getUserInfo(){
+      const studentRequest = useStudentRequestStore();
+      const penRequest = usePenRequestStore();
+      const rootStore = useRootStore();
       const userInfoRes = await ApiService.getUserInfo();
-      commit('setUserInfo', userInfoRes.data);
-      commit('studentRequest/setRequest', userInfoRes.data.studentRequest, { root: true });
-      commit('penRequest/setRequest', userInfoRes.data.penRequest, { root: true });
-      commit('setStudent', userInfoRes.data.student, { root: true });
+
+      this.setUserInfo(userInfoRes.data);
+      studentRequest.setRequest(userInfoRes.data.studentRequest);
+      penRequest.setRequest(userInfoRes.data.penRequest);
+      rootStore.setStudent(userInfoRes.data.student);
     },
     //retrieves the json web token from local storage. If not in local storage, retrieves it from API
     async getJwtToken(context) {
@@ -120,4 +108,4 @@ export default {
       }
     },
   }
-};
+});

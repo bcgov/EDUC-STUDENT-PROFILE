@@ -1,13 +1,13 @@
-import Vue from 'vue';
-import vuetify from '@/plugins/vuetify';
+import { createApp } from 'vue';
+import { createMetaManager } from 'vue-meta';
+import vuetify from 'plugins/vuetify';
+import moment from 'moment';
 import App from './App';
 import router from './router';
-import store from './store';
+import { createPinia } from 'pinia';
 
-Vue.config.productionTip = false;
-new Vue({
-  vuetify,
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app');
+const app = createApp(App);
+const pinia = createPinia();
+
+app.provide('$moment', moment);
+app.use(router).use(createMetaManager()).use(pinia).use(vuetify);
