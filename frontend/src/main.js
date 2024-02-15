@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import { createMetaManager } from 'vue-meta';
-import vuetify from 'plugins/vuetify';
+import vuetify from 'vuetify';
 import moment from 'moment';
 import App from './App';
 import router from './router';

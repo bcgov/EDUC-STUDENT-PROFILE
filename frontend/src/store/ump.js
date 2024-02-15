@@ -13,13 +13,11 @@ export const useUmpStore = defineStore('ump', {
     },
     declared: false,
     acceptance: false,
-    isEditable: {
-      editLegalLastName: false,
-      editLegalFirstName: false,
-      editLegalMiddleNames: false,
-      editBirthdate: false,
-      editEmail: false
-    }
+    canEditLegalLastName: false,
+    canEditLegalFirstName: false,
+    canEditLegalMiddleNames: false,
+    canEditBirthdate: false,
+    canEditEmail: false
   }),
   actions: {
     setRecordedData(recordedData) {

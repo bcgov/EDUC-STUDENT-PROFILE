@@ -1,35 +1,51 @@
 <template>
-  <v-container class="blue-back" fluid>
-      <v-row align="center" justify="center">
-        <v-col xs="4" sm="4" md="4" lg="4" xl="4">
+  <v-container
+    class="blue-back"
+    fluid
+  >
+    <v-row
+      align="center"
+      justify="center"
+    >
+      <v-col
+        xs="4"
+        sm="4"
+        md="4"
+        lg="4"
+        xl="4"
+      >
         <v-card class="error-card">
           <v-card-title class="gov-header">
-            <h4 id="error_text">System Error</h4>
+            <h4 id="error_text">
+              System Error
+            </h4>
           </v-card-title>
           <v-card-text id="error_message">
             You have encountered a System Error. Close your Web browser, open a new session, then try again.
           </v-card-text>
         </v-card>
-        </v-col>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapState } from 'pinia';
+import { useRootStore } from '../store/root';
+
 export default {
   data() {
     return {
       errorMessage: this.$route.query.message
     };
   },
-  methods: {
-    ...mapActions('auth', ['loginErrorRedirect'])
-  },
   async created(){
     if(this.errorMessage === 'Unable_to_authenticate'){
       this.loginErrorRedirect();
     }
+  },
+  methods: {
+    ...mapState(useRootStore, ['loginErrorRedirect'])
   }
 };
 </script>

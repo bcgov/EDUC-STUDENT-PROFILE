@@ -1,6 +1,5 @@
 <template>
   <v-card class="document-upload">
-
     <v-card-title><h3>Document Upload</h3></v-card-title>
     <!-- <v-card-text> -->
     <v-form
@@ -8,15 +7,15 @@
       v-model="validForm"
     >
       <v-select
-        color="#003366"
         v-model="documentTypeCode"
+        color="#003366"
         required
         :rules="requiredRules"
         outlined
         :eager="eager"
         :items="documentTypes"
         label="Document Type"
-      ></v-select>
+      />
       <v-file-input
         color="#003366"
         :rules="fileRules"
@@ -24,51 +23,50 @@
         placeholder="Select your file"
         :error-messages="fileInputError"
         @change="selectFile"
-      ></v-file-input>
-      <p class="bottom-text">{{fileFormats}} files supported</p>
-
-
-      </v-form>
-      <v-alert
-        dense
-        outlined
-        dismissible
-        v-model="alert"
-        :class="alertType"
-        class="mb-3"
+      />
+      <p class="bottom-text">
+        {{ fileFormats }} files supported
+      </p>
+    </v-form>
+    <v-alert
+      v-model="alert"
+      dense
+      outlined
+      dismissible
+      :class="alertType"
+      class="mb-3"
+    >
+      {{ alertMessage }}
+    </v-alert>
+    <v-card-actions>
+      <v-spacer />
+      <v-btn
+        id="upload_form"
+        :key="buttonKey"
+        color="#003366"
+        class="white--text"
+        :disabled="!dataReady"
+        :loading="active"
+        @click="submitRequest"
       >
-         {{ alertMessage }}
-      </v-alert>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-          color="#003366"
-          class="white--text"
-          id="upload_form"
-          @click="submitRequest"
-          :disabled="!dataReady"
-          :loading="active"
-          :key="buttonKey"
-        >
-          Upload
-        </v-btn>
-        <v-btn
-          color="#003366"
-          class="white--text"
-          @click="closeForm"
-        >
-          Close
-        </v-btn>
-      </v-card-actions>
-
-
+        Upload
+      </v-btn>
+      <v-btn
+        color="#003366"
+        class="white--text"
+        @click="closeForm"
+      >
+        Close
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
 <script>
-import { humanFileSize, getFileNameWithMaxNameLength } from '@/utils/file';
-import ApiService from '@/common/apiService';
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useRootStore } from '../store/root';
+import { humanFileSize, getFileNameWithMaxNameLength } from '../utils/file';
+import ApiService from '../common/apiService';
 import { sortBy } from 'lodash';
 
 export default {
@@ -78,6 +76,7 @@ export default {
       default: false
     },
   },
+  emits: ['close:form'],
   data() {
     return {
       fileRules: [ ],
@@ -97,20 +96,8 @@ export default {
 
     };
   },
-  created() {
-    this.getFileRules().catch(e => {
-      console.log(e);
-      this.setErrorAlert('Sorry, an unexpected error seems to have occured. You can upload files later.');
-    });
-  },
-  watch: {
-    dataReady() {
-      //force re-renders of the button to solve the color issue
-      this.buttonKey += 1;
-    },
-  },
   computed: {
-    ...mapGetters(['requestType']),
+    ...mapState(useRootStore, ['requestType']),
     documentTypeCodes() {
       return this.$store.getters[`${this.requestType}/documentTypeCodes`];
     },
@@ -124,6 +111,18 @@ export default {
       return sortBy(this.documentTypeCodes, ['displayOrder']).map(code =>
         ({text: code.label, value: code.documentTypeCode}));
     }
+  },
+  watch: {
+    dataReady() {
+      //force re-renders of the button to solve the color issue
+      this.buttonKey += 1;
+    },
+  },
+  created() {
+    this.getFileRules().catch(e => {
+      console.log(e);
+      this.setErrorAlert('Sorry, an unexpected error seems to have occured. You can upload files later.');
+    });
   },
   methods: {
     setUploadedDocument(document) {

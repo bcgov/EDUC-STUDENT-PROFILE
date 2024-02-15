@@ -1,11 +1,15 @@
 <template>
   <div style="display: none">
-    <a id="journey_href" :href='journeyBuilder'/>
+    <a
+      id="journey_href"
+      :href="journeyBuilder"
+    />
   </div>
 </template>
 
 <script>
-import StaticConfig from '@/common/staticConfig';
+import StaticConfig from '../common/staticConfig';
+
 export default {
   name: 'ModalJourney',
   data(){

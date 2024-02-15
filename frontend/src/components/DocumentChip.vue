@@ -6,7 +6,7 @@
     transition="scale-transition"
     origin="top left"
   >
-    <template v-slot:activator="{ on }">
+    <template #activator="{ on }">
       <v-chip
         class="chip-overflow ma-1 px-2 align-self-center"
         close
@@ -22,7 +22,10 @@
       </v-chip>
     </template>
 
-    <v-card width="380px" class="pa-1 pa-sm-2">
+    <v-card
+      width="380px"
+      class="pa-1 pa-sm-2"
+    >
       <v-list>
         <v-list-item class="pa-0 pa-sm-0">
           <v-list-item-avatar>
@@ -39,7 +42,12 @@
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>
-              <router-link :to="{ path: documentUrl }" target="_blank">{{ document.fileName }}</router-link>
+              <router-link
+                :to="{ path: documentUrl }"
+                target="_blank"
+              >
+                {{ document.fileName }}
+              </router-link>
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -63,25 +71,47 @@
         </v-list-item>
       </v-list>
 
-      <v-alert dense outlined dismissible v-model="alert" :class="alertType" class="mx-3 my-1">
+      <v-alert
+        v-model="alert"
+        dense
+        outlined
+        dismissible
+        :class="alertType"
+        class="mx-3 my-1"
+      >
         {{ alertMessage }}
       </v-alert>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="#003366" @click.stop="deleteDocument()" class="white--text" id="delete-document"
-               :loading="deleting" v-if="!undeletable">Delete
+        <v-spacer />
+        <v-btn
+          v-if="!undeletable"
+          id="delete-document"
+          color="#003366"
+          class="white--text"
+          :loading="deleting"
+          @click.stop="deleteDocument()"
+        >
+          Delete
         </v-btn>
-        <v-btn id="documentUploadCancel" color="#003366" @click="menu = false" class="white--text">Cancel</v-btn>
+        <v-btn
+          id="documentUploadCancel"
+          color="#003366"
+          class="white--text"
+          @click="menu = false"
+        >
+          Cancel
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-menu>
 </template>
 
 <script>
-import {humanFileSize} from '@/utils/file';
-import {mapGetters} from 'vuex';
-import {ApiRoutes} from '@/utils/constants';
+import {mapState} from 'pinia';
+import {useRootStore} from '../store/root';
+import {humanFileSize} from '../utils/file';
+import {ApiRoutes} from '../utils/constants';
 import {find} from 'lodash';
 
 export default {
@@ -110,7 +140,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['requestType']),
+    ...mapState(useRootStore, ['requestType']),
     documentTypeCodes() {
       return this.$store.getters[`${this.requestType}/documentTypeCodes`];
     },

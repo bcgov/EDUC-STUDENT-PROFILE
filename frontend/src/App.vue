@@ -1,44 +1,43 @@
 <template>
   <v-app id="app">
-    <MsieBanner v-if="isIE"/>
-    <Header/>
-    <v-app-bar v-if="bannerColor !== ''"
-               style="color:white;"
-               :color="bannerColor"
-               sticky
-               dense
-    ><div><h3>{{ bannerEnvironment }} Environment</h3></div></v-app-bar>
-    <ModalIdle v-if="isAuthenticated"/>
-    <router-view/>
-    <Footer/>
+    <MsieBanner v-if="isIE" />
+    <HeaderToolbar />
+    <v-app-bar
+      v-if="bannerColor !== ''"
+      style="color:white;"
+      :color="bannerColor"
+      sticky
+      dense
+    >
+      <div><h3>{{ bannerEnvironment }} Environment</h3></div>
+    </v-app-bar>
+    <ModalIdle v-if="isAuthenticated" />
+    <router-view />
+    <FooterComponent />
   </v-app>
 </template>
 
 <script>
-import { mapActions, mapMutations, mapGetters } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useAuthStore } from './store/auth';
+import { useStudentRequestStore, usePenRequestStore } from './store/request';
 import HttpStatus from 'http-status-codes';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import HeaderToolbar from './components/HeaderToolbar';
+import FooterComponent from './components/FooterComponent';
 import ModalIdle from './components/ModalIdle';
 import MsieBanner from './components/MsieBanner';
 import StaticConfig from './common/staticConfig';
 
 export default {
-  name: 'app',
+  name: 'App',
   components: {
-    Header,
-    Footer,
+    HeaderToolbar,
+    FooterComponent,
     ModalIdle,
     MsieBanner
   },
   metaInfo: {
     meta: StaticConfig.VUE_APP_META_DATA
-  },
-  computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'loginError', 'isLoading']),
-    isIE() {
-      return /Trident\/|MSIE/.test(window.navigator.userAgent);
-    }
   },
   data() {
     return {
@@ -46,11 +45,11 @@ export default {
       bannerColor: StaticConfig.BANNER_COLOR
     };
   },
-  methods: {
-    ...mapMutations('auth', ['setLoading']),
-    ...mapActions('auth', ['getJwtToken', 'getUserInfo', 'logout']),
-    ...mapActions('studentRequest', { getStudentRequestCodes: 'getCodes'}),
-    ...mapActions('penRequest', { getPenRequestCodes: 'getCodes'}),
+  computed: {
+    ...mapState(useAuthStore, ['isAuthenticated', 'loginError', 'isLoading']),
+    isIE() {
+      return /Trident\/|MSIE/.test(window.navigator.userAgent);
+    }
   },
   async created() {
     this.setLoading(true);
@@ -64,6 +63,11 @@ export default {
     }).finally(() => {
       this.setLoading(false);
     });
+  },
+  methods: {
+    ...mapActions(useAuthStore, ['setLoading', 'getJwtToken', 'getUserInfo', 'logout']),
+    ...mapActions(useStudentRequestStore, { getStudentRequestCodes: 'getCodes'}),
+    ...mapActions(usePenRequestStore, { getPenRequestCodes: 'getCodes'}),
   }
 };
 </script>

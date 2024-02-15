@@ -1,45 +1,71 @@
 <template>
-  <v-toolbar class="toolbar_header" dense width="100%">
+  <v-toolbar
+    class="toolbar_header"
+    dense
+    width="100%"
+  >
     <!-- Navbar content -->
-      <img
-              src="@/assets/images/bc-gov-logo.svg"
-              class="img-theme"
-              alt="B.C. Government Logo"
-      >
+    <img
+      src="../assets/images/bc-gov-logo.svg"
+      class="img-theme"
+      alt="B.C. Government Logo"
+    >
     <v-toolbar-title><span class="span-title">{{ appTitle }}</span></v-toolbar-title>
 
-    <v-spacer></v-spacer>
+    <v-spacer />
     <div v-if="isAuthenticated && dataReady">
-      <v-menu name="user_options" offset-y>
-        <template v-slot:activator="{ on }">
-          <v-chip tabindex="0" v-on="on" pill color="#003366" dark>
-            <v-avatar left color="info">
+      <v-menu
+        name="user_options"
+        offset-y
+      >
+        <template #activator="{ on }">
+          <v-chip
+            tabindex="0"
+            pill
+            color="#003366"
+            dark
+            v-on="on"
+          >
+            <v-avatar
+              left
+              color="info"
+            >
               {{ userInfo.displayName[0] }}
             </v-avatar>
             <span class="display-name">{{ userInfo.displayName }}</span>
           </v-chip>
         </template>
-        <v-list dark color="#003366">
-          <v-list-item style="min-height: 4vh" id="home_button" :href='authRoutes.LOGIN'>
+        <v-list
+          dark
+          color="#003366"
+        >
+          <v-list-item
+            id="home_button"
+            style="min-height: 4vh"
+            :href="authRoutes.LOGIN"
+          >
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item>
-          <v-list-item style="min-height: 4vh" id="logout_button" :href='authRoutes.LOGOUT'>
+          <v-list-item
+            id="logout_button"
+            style="min-height: 4vh"
+            :href="authRoutes.LOGOUT"
+          >
             <v-list-item-title>Logout</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
-
     </div>
     <div v-else-if="isAuthenticated && !dataReady">
-      <v-skeleton-loader type="chip">
-      </v-skeleton-loader>
+      <v-skeleton-loader type="chip" />
     </div>
   </v-toolbar>
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
-import {AuthRoutes} from '@/utils/constants';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../store/auth';
+import { AuthRoutes } from '../utils/constants';
 
 export default {
   data() {
@@ -49,8 +75,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated']),
-    ...mapGetters('auth', ['userInfo']),
+    ...mapState(useAuthStore, ['isAuthenticated']),
     dataReady: function () {
       return this.userInfo;
     }

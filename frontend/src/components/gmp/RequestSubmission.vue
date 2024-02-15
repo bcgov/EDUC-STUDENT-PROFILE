@@ -1,11 +1,14 @@
 <template>
-  <div v-if="request" class="px-6">
+  <div
+    v-if="request"
+    class="px-6"
+  >
     <v-row>
       <v-alert
+        v-model="alert"
         dense
         outlined
         dismissible
-        v-model="alert"
         width="100%"
         :class="`pa-3 mb-3 ${alertType}`"
       >
@@ -14,23 +17,30 @@
     </v-row>
 
     <v-row class="pb-5">
-      <MessageCard></MessageCard>
+      <MessageCard />
     </v-row>
     <v-row>
       <StatusCard
         @success-alert="setSuccessAlert" 
         @error-alert="setErrorAlert"
-      ></StatusCard>
+      />
     </v-row>
     <v-row>
-      <RequestCard :request="request"></RequestCard>
+      <RequestCard :request="request" />
     </v-row>
-    <v-row justify="end" class="py-1">
-      <v-col cols="12" sm="2" class="d-flex justify-end align-self-center py-0 px-0 pr-4 pt-3">
+    <v-row
+      justify="end"
+      class="py-1"
+    >
+      <v-col
+        cols="12"
+        sm="2"
+        class="d-flex justify-end align-self-center py-0 px-0 pr-4 pt-3"
+      >
         <v-btn
+          id="Home"
           color="#003366"
           class="white--text align-self-center"
-          id="Home"
           to="home"
         >
           Home
@@ -41,13 +51,14 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { usePenRequestStore } from '../../store/request';
 import StatusCard from '../StatusCard';
 import MessageCard from './MessageCard';
 import RequestCard from './RequestCard';
 
 export default {
-  name: 'requestSubmission',
+  name: 'RequestSubmission',
   components: {
     StatusCard,
     MessageCard,
@@ -61,7 +72,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('penRequest', ['request']),
+    ...mapState(usePenRequestStore, ['request']),
   },
   methods: {
     setSuccessAlert(alertMessage) {

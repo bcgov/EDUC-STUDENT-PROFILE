@@ -1,32 +1,46 @@
 <template>
-    <div :class="commentObject.color" :style="highlight ? {backgroundColor: '#fef4dd'} : {}">
-      <v-row>
-        <v-col class="pa-0 iconCol" md="auto">
-          <v-icon :size="iconSize">{{ commentObject.icon }}</v-icon>
-        </v-col>
-        <v-col class="pa-0 header-col">
-          <p class="username mb-0" href="#">
-            <strong>{{ commentObject.name }}</strong> at {{ commentObject.timestamp}}
-          </p>
-        </v-col>
-      </v-row>
-      <v-row class="ml-6 ml-sm-7 mr-1">
-        <v-col class="content-col">
+  <div
+    :class="commentObject.color"
+    :style="highlight ? {backgroundColor: '#fef4dd'} : {}"
+  >
+    <v-row>
+      <v-col
+        class="pa-0 iconCol"
+        md="auto"
+      >
+        <v-icon :size="iconSize">
+          {{ commentObject.icon }}
+        </v-icon>
+      </v-col>
+      <v-col class="pa-0 header-col">
+        <p
+          class="username mb-0"
+          href="#"
+        >
+          <strong>{{ commentObject.name }}</strong> at {{ commentObject.timestamp }}
+        </p>
+      </v-col>
+    </v-row>
+    <v-row class="ml-6 ml-sm-7 mr-1">
+      <v-col class="content-col">
         <v-row class="mb-1">
-          <span :class="{commentContent: comment.content && comment.content.length > 0}" :style="highlight ? {fontWeight: 'bold'} : {}">{{ commentObject.content }}</span>
+          <span
+            :class="{commentContent: comment.content && comment.content.length > 0}"
+            :style="highlight ? {fontWeight: 'bold'} : {}"
+          >{{ commentObject.content }}</span>
         </v-row>
         <v-row>
-            <DocumentChip
-              v-for="document in comment.documents"
-              :document="document"
-              :key="document.documentID"
-              :undeletable="true"
-              :disabled="document.fileSize===0"
-            ></DocumentChip>
+          <DocumentChip
+            v-for="document in comment.documents"
+            :key="document.documentID"
+            :document="document"
+            :undeletable="true"
+            :disabled="document.fileSize===0"
+          />
         </v-row>
-        </v-col>
-      </v-row>
-    </div>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script>

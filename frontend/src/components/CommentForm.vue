@@ -2,72 +2,79 @@
   <div class="comments">
     <div class="reply px-1">
       <v-col class="pa-2">
-      <v-textarea
-        type="text"
-        rows=3
-        solo
-        flat
-        auto-grow
-        v-model.trim="reply"
-        class="reply--text"
-        :placeholder="`${(unsubmittedComment && unsubmittedComment.content) || 'Enter text here. Attach document(s). Click Done'}`"
-        maxlength="4000"
-        required
-        :disabled="submitted || isSagaInProgress"
-      />
-      <v-row>
-        <v-col class="d-flex align-start flex-wrap py-0">
-          <DocumentChip
-            v-for="document in unsubmittedDocuments"
-            :document="document"
-            :disabled="submitted || isSagaInProgress"
-            :key="document.documentID"
-          ></DocumentChip>
-          <v-dialog
-            max-width="30rem"
-            max-height="50rem"
-            v-model="dialog"
-            xl="2" lg="2" md="2" xs="2" sm="2"
-          >
-            <template v-slot:activator="{ on }">
-              <v-btn
-                rounded
-                :disabled="showConfirm || submitted || isSagaInProgress"
-                class="ma-1 white--text order-first"
-                color="#0C7CBA"
-                v-on="on"
-              >
-                <v-icon left>fa-paperclip</v-icon>
-                Upload
-              </v-btn>
-            </template>
-            <DocumentUpload
-              @close:form="() => dialog = false"
-            ></DocumentUpload>
-          </v-dialog>
-        </v-col>
-        <v-col class="d-flex flex-grow-0 justify-end py-0">
-          <v-btn
-            rounded
-            :disabled="replyEmpty || showConfirm || submitted || isSagaInProgress"
-            color="#0C7CBA"
-            class="ma-1 white--text"
-            @click="showConfirm=true"
-          >
-            Done
-          </v-btn>
-        </v-col>
-      </v-row>
+        <v-textarea
+          v-model.trim="reply"
+          type="text"
+          rows="3"
+          solo
+          flat
+          auto-grow
+          class="reply--text"
+          :placeholder="`${(unsubmittedComment && unsubmittedComment.content)
+            || 'Enter text here. Attach document(s). Click Done'}`"
+          maxlength="4000"
+          required
+          :disabled="submitted || isSagaInProgress"
+        />
+        <v-row>
+          <v-col class="d-flex align-start flex-wrap py-0">
+            <DocumentChip
+              v-for="document in unsubmittedDocuments"
+              :key="document.documentID"
+              :document="document"
+              :disabled="submitted || isSagaInProgress"
+            />
+            <v-dialog
+              v-model="dialog"
+              max-width="30rem"
+              max-height="50rem"
+              xl="2"
+              lg="2"
+              md="2"
+              xs="2"
+              sm="2"
+            >
+              <template #activator="{ on }">
+                <v-btn
+                  rounded
+                  :disabled="showConfirm || submitted || isSagaInProgress"
+                  class="ma-1 white--text order-first"
+                  color="#0C7CBA"
+                  v-on="on"
+                >
+                  <v-icon left>
+                    fa-paperclip
+                  </v-icon>
+                  Upload
+                </v-btn>
+              </template>
+              <DocumentUpload
+                @close:form="() => dialog = false"
+              />
+            </v-dialog>
+          </v-col>
+          <v-col class="d-flex flex-grow-0 justify-end py-0">
+            <v-btn
+              rounded
+              :disabled="replyEmpty || showConfirm || submitted || isSagaInProgress"
+              color="#0C7CBA"
+              class="ma-1 white--text"
+              @click="showConfirm=true"
+            >
+              Done
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-col>
     </div>
     <v-alert
+      v-model="alert"
       dense
       outlined
       dismissible
-      v-model="alert"
       :class="alertType"
     >
-       {{ alertMessage }}
+      {{ alertMessage }}
     </v-alert>
     <v-card
       :class="`slider ${showConfirm ? 'open' : 'closed'}`"
@@ -102,10 +109,11 @@
 </template>
 
 <script>
+import { mapState } from 'pinia';
+import { useRootStore } from '../store/root';
 import DocumentChip from './DocumentChip.vue';
 import DocumentUpload from './DocumentUpload';
-import { mapGetters } from 'vuex';
-import ApiService from '@/common/apiService';
+import ApiService from '../common/apiService';
 
 export default {
   components: {
@@ -133,7 +141,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['requestType']),
+    ...mapState(useRootStore, ['requestType']),
     requestID() {
       return this.$store.getters[`${this.requestType}/requestID`];
     },

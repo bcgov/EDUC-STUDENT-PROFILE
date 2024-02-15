@@ -1,89 +1,122 @@
 <template>
-  <v-container class="pa-0" fluid>
+  <v-container
+    class="pa-0"
+    fluid
+  >
     <!-- <v-row class="pb-5" v-if="requestComment"> -->
-      <v-card class="mb-5" v-if="status === requestStatuses.RETURNED">
-        <v-toolbar flat color="#036" class="white--text" height="45rem">
-          <v-toolbar-title>Request</v-toolbar-title>
-        </v-toolbar>
-        <div>
-          <v-progress-linear
-            indeterminate
-            absolute
-            top
-            color="indigo darken-2"
-            v-if="loading"
-          ></v-progress-linear>
-          <SingleComment
-            v-for="comment in requestComments"
-            :comment="comment"
-            :myself="myself"
-            :participants="participants"
-            :key="comment.id"
-            :highlight="true"
-          ></SingleComment>
-        </div>
-      </v-card>
+    <v-card
+      v-if="status === requestStatuses.RETURNED"
+      class="mb-5"
+    >
+      <v-toolbar
+        flat
+        color="#036"
+        class="white--text"
+        height="45rem"
+      >
+        <v-toolbar-title>Request</v-toolbar-title>
+      </v-toolbar>
+      <div>
+        <v-progress-linear
+          v-if="loading"
+          indeterminate
+          absolute
+          top
+          color="indigo darken-2"
+        />
+        <SingleComment
+          v-for="comment in requestComments"
+          :key="comment.id"
+          :comment="comment"
+          :myself="myself"
+          :participants="participants"
+          :highlight="true"
+        />
+      </div>
+    </v-card>
     <!-- </v-row> -->
     <!-- <v-row class="pb-5"> -->
-      <v-card class="mb-5" v-if="status === requestStatuses.RETURNED">
-        <v-toolbar flat color="#036" class="white--text" height="45rem">
-          <v-toolbar-title>Respond Here</v-toolbar-title>
-        </v-toolbar>
-        <div id="comments-outer" class="comments-outside">
-          <v-progress-linear
-            indeterminate
-            absolute
-            top
-            color="indigo darken-2"
-            v-if="loading"
-          ></v-progress-linear>
-          <Comments 
-            :unsubmittedDocuments="unsubmittedDocuments"
-          ></Comments>
-        </div>
-      </v-card>
+    <v-card
+      v-if="status === requestStatuses.RETURNED"
+      class="mb-5"
+    >
+      <v-toolbar
+        flat
+        color="#036"
+        class="white--text"
+        height="45rem"
+      >
+        <v-toolbar-title>Respond Here</v-toolbar-title>
+      </v-toolbar>
+      <div
+        id="comments-outer"
+        class="comments-outside"
+      >
+        <v-progress-linear
+          v-if="loading"
+          indeterminate
+          absolute
+          top
+          color="indigo darken-2"
+        />
+        <CommentForm
+          :unsubmitted-documents="unsubmittedDocuments"
+        />
+      </div>
+    </v-card>
     <!-- </v-row> -->
     <!-- <v-row class="pb-5"> -->
-      <v-card class="mb-5" v-if="hasHistory">
-        <v-toolbar flat color="#036" class="white--text" height="45rem">
-          <v-toolbar-title>Discussion History</v-toolbar-title>
-        </v-toolbar>
-        <div>
-          <v-progress-linear
-            indeterminate
-            absolute
-            top
-            color="indigo darken-2"
-            v-if="loading"
-          ></v-progress-linear>
-          <SingleComment 
-            v-for="comment in commentHistory"
-            :comment="comment"
-            :myself="myself"
-            :participants="participants"
-            :key="comment.id"
-          ></SingleComment>
-        </div>
-      </v-card>
+    <v-card
+      v-if="hasHistory"
+      class="mb-5"
+    >
+      <v-toolbar
+        flat
+        color="#036"
+        class="white--text"
+        height="45rem"
+      >
+        <v-toolbar-title>Discussion History</v-toolbar-title>
+      </v-toolbar>
+      <div>
+        <v-progress-linear
+          v-if="loading"
+          indeterminate
+          absolute
+          top
+          color="indigo darken-2"
+        />
+        <SingleComment 
+          v-for="comment in commentHistory"
+          :key="comment.id"
+          :comment="comment"
+          :myself="myself"
+          :participants="participants"
+        />
+      </div>
+    </v-card>
     <!-- </v-row> -->
   </v-container>
 </template>
 <script>
+import { mapState } from 'pinia';
+import { useRootStore } from '../store/root';
+import { useAuthStore } from '../store/auth';
 import SingleComment from './SingleComment.vue';
-import Comments from './Comment.vue';
-import ApiService from '@/common/apiService';
-import { mapGetters } from 'vuex';
+import CommentForm from './CommentForm.vue';
+import ApiService from '../common/apiService';
 import { groupBy, sortBy, findLastIndex } from 'lodash';
-import { RequestStatuses } from '@/utils/constants';
+import { RequestStatuses } from '../utils/constants';
 
 export default {
   components: {
-    Comments,
+    CommentForm,
     SingleComment,
   },
   props: {
     commentDocuments: {
       type: Array,
+      default: () => []
     },
   },
   data() {
@@ -94,8 +127,8 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['userInfo']),
-    ...mapGetters(['requestType']),
+    ...mapState(useAuthStore, ['userInfo']),
+    ...mapState(useRootStore, ['requestType']),
     request() {
       return this.$store.getters[`${this.requestType}/request`];
     },
@@ -195,9 +228,8 @@ export default {
         if(lastMessage.myself) {
           this.setUnsubmittedComment(lastMessage);
           unsubmittedDocuments = (unsubmittedDocuments || []).concat(lastMessage.documents || []);
-          messages = messages.slice(0, messages.length - 1);          
+          messages = messages.slice(0, messages.length - 1);
         }
-        
         const historyIndex = findLastIndex(messages, ['myself', true]);
         requestIndex = historyIndex + 1;
         this.setRequestComments(messages.slice(requestIndex));
@@ -254,26 +286,25 @@ hr {
   color: #333;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track
-{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 10px;
-    background-color: #fff;
+.custom-scrollbar::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  background-color: #fff;
 }
-.custom-scrollbar::-webkit-scrollbar
-{
-    width: 0.8rem;
-    background-color: #fff;
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 0.8rem;
+  background-color: #fff;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb
-{
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #555;
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  -moz-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #555;
 }
 
 .v-toolbar /deep/ .v-toolbar__content {

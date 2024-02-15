@@ -1,14 +1,30 @@
 <template>
-  <v-container fluid class="full-height" v-if="isAuthenticated && !hasPen">
+  <v-container
+    v-if="isAuthenticated && !hasPen"
+    fluid
+    class="full-height"
+  >
     <!-- pen request form -->
-    <article id="request-form-container" class="top-banner full-height">
-      <v-row align="center" justify="center">
-        <v-col xs="8" sm="8" md="8" lg="8" xl="8">
+    <article
+      id="request-form-container"
+      class="top-banner full-height"
+    >
+      <v-row
+        align="center"
+        justify="center"
+      >
+        <v-col
+          xs="8"
+          sm="8"
+          md="8"
+          lg="8"
+          xl="8"
+        >
           <RequestStepper
             :steps="steps"
             :titles="titles"
-            stepRoutePrefix="gmp-"
-          ></RequestStepper>
+            step-route-prefix="gmp-"
+          />
         </v-col>
       </v-row>
     </article>
@@ -17,9 +33,11 @@
 
 <script>
 import RequestStepper from '../RequestStepper';
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../../store/auth';
+
 export default {
-  name: 'request-page',
+  name: 'RequestPage',
   components: {
     RequestStepper,
   },
@@ -30,7 +48,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'userInfo']),
+    ...mapState(useAuthStore, ['isAuthenticated', 'userInfo']),
     hasPen() {
       return !!this.userInfo && !!this.userInfo.pen;
     },

@@ -1,20 +1,27 @@
 <template>
-    <v-container class="login-cards" style="padding-bottom: 1vh">
-      <v-row justify=center align=center>
-          <v-card>
-            <v-card-text>
-            You are not logged in. Redirecting to the login page...
-            </v-card-text>
-          </v-card>
-      </v-row>
-    </v-container>
+  <v-container
+    class="login-cards"
+    style="padding-bottom: 1vh"
+  >
+    <v-row
+      justify="center"
+      align="center"
+    >
+      <v-card>
+        <v-card-text>
+          You are not logged in. Redirecting to the login page...
+        </v-card-text>
+      </v-card>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import { AuthRoutes } from '@/utils/constants';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../store/auth';
+import { AuthRoutes } from '../utils/constants';
+
 export default {
-  name: 'Login',
   data() {
     return {
       appTitle: process.env.VUE_APP_TITLE,
@@ -22,7 +29,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated']),
+    ...mapState(useAuthStore, ['isAuthenticated']),
   },
   methods: {
     clearStorage() {

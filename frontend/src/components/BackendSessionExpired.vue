@@ -1,12 +1,15 @@
 <template>
   <div style="display: none">
-    <a id="logout_href" :href='routes.SESSION_EXPIRED'/>
+    <a
+      id="logout_href"
+      :href="routes.SESSION_EXPIRED"
+    />
   </div>
 </template>
 
 <script>
-
 import {AuthRoutes} from '@/utils/constants';
+
 export default {
   name: 'BackendSessionExpired',
   data() {

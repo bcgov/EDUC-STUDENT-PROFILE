@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 
 export const useGmpStore = defineStore('gmp', {
-  namespaced: true,
   state: () => ({
     requestData: {},
     declared: false,

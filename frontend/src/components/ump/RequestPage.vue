@@ -1,31 +1,79 @@
 <template>
-  <v-container fluid class="full-height" v-if="isAuthenticated && hasInflightGMPRequest">
-    <article id="request-display-container" class="top-banner full-height">
-        <v-row align="center" justify="center" style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;">
-          <v-col class="pt-1 pt-sm-3" xs="10" sm="8" md="6" lg="5" xl="3">
-            <v-card class="student-request-card">
-              <v-card-text>
-                <p class="ma-0"><strong>You have a PEN request in progress. Please wait for it to be completed before requesting updates to you PEN information.</strong></p>
-              </v-card-text>
-              <v-card-actions>
-                <v-row align="center" justify="center">
-                  <v-btn id="home-button" @click="$router.push('home')" class="mb-2" dark color="#003366">Home</v-btn>
-                </v-row>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
+  <v-container
+    v-if="isAuthenticated && hasInflightGMPRequest"
+    fluid
+    class="full-height"
+  >
+    <article
+      id="request-display-container"
+      class="top-banner full-height"
+    >
+      <v-row
+        align="center"
+        justify="center"
+        style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;"
+      >
+        <v-col
+          class="pt-1 pt-sm-3"
+          xs="10"
+          sm="8"
+          md="6"
+          lg="5"
+          xl="3"
+        >
+          <v-card class="student-request-card">
+            <v-card-text>
+              <p class="ma-0">
+                <strong>You have a PEN request in progress. Please wait for it to be completed before requesting
+                  updates to you PEN information.</strong>
+              </p>
+            </v-card-text>
+            <v-card-actions>
+              <v-row
+                align="center"
+                justify="center"
+              >
+                <v-btn
+                  id="home-button"
+                  class="mb-2"
+                  dark
+                  color="#003366"
+                  @click="$router.push('home')"
+                >
+                  Home
+                </v-btn>
+              </v-row>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
     </article>
   </v-container>
-  <v-container fluid class="full-height" v-else-if="isAuthenticated">
+  <v-container
+    v-else-if="isAuthenticated"
+    fluid
+    class="full-height"
+  >
     <!-- request form -->
-    <article id="request-form-container" class="top-banner full-height">
-      <v-row align="center" justify="center">
-        <v-col xs="10" sm="10" md="10" lg="10" xl="10">
-        <RequestStepper
-          :steps="steps"
-          :titles="titles"
-        ></RequestStepper>
+    <article
+      id="request-form-container"
+      class="top-banner full-height"
+    >
+      <v-row
+        align="center"
+        justify="center"
+      >
+        <v-col
+          xs="10"
+          sm="10"
+          md="10"
+          lg="10"
+          xl="10"
+        >
+          <RequestStepper
+            :steps="steps"
+            :titles="titles"
+          />
         </v-col>
       </v-row>
     </article>
@@ -34,29 +82,39 @@
 
 <script>
 import RequestStepper from '../RequestStepper';
-import { mapGetters, mapMutations } from 'vuex';
-import { PenRequestStatuses } from '@/utils/constants';
+import { mapState, mapActions } from 'pinia';
+import { useAuthStore } from '../../store/auth';
+import { usePenRequestStore, useStudentRequestStore } from '../../store/request';
+import { useUmpStore } from '../../store/ump';
+import { PenRequestStatuses } from '../../utils/constants';
 import { pick, values } from 'lodash';
+
 export default {
-  name: 'requestPage',
+  name: 'RequestPage',
   components: {
     RequestStepper,
   },
   data() {
     return {
       steps: 3,
-      titles: ['Current Student Information', 'Requested Changes to Student Information', 'Confirm Changes', 'Submit Changes'],
+      titles: [
+        'Current Student Information',
+        'Requested Changes to Student Information',
+        'Confirm Changes',
+        'Submit Changes'
+      ],
     };
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'userInfo']),
-    ...mapGetters('penRequest', {penRequest: 'request'}),
-    ...mapGetters('ump', ['recordedData', 'updateData']),
+    ...mapState(useAuthStore, ['isAuthenticated', 'userInfo']),
+    ...mapState(usePenRequestStore, {penRequest: 'request'}),
+    ...mapState(useUmpStore, ['recordedData', 'updateData']),
     hasPen() {
       return !!this.userInfo && !!this.userInfo.pen;
     },
     hasInflightGMPRequest() {
-      return this.penRequest && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === this.penRequest.penRequestStatusCode);
+      return this.penRequest && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV']))
+        .some(status => status === this.penRequest.penRequestStatusCode);
     },
   },
   watch: {
@@ -68,9 +126,6 @@ export default {
       }
     },
   },
-  methods: {
-    ...mapMutations('studentRequest', ['setRequest', 'setUnsubmittedDocuments']),
-  },
   mounted() {
     if(!(this.isAuthenticated)){
       this.$router.push('home');
@@ -78,6 +133,9 @@ export default {
     this.setRequest();
     this.setUnsubmittedDocuments();
   },
+  methods: {
+    ...mapActions(useStudentRequestStore, ['setRequest', 'setUnsubmittedDocuments']),
+  }
 };
 </script>
 

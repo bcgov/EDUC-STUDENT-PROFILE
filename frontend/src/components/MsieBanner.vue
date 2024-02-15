@@ -5,7 +5,8 @@
     type="error"
     dismissible
   >
-    Your current web browser, Microsoft Internet Explorer, is not supported for this service. Use one of these web browsers: Microsoft Edge, Mozilla Firefox, Google Chrome, or Apple Safari.
+    Your current web browser, Microsoft Internet Explorer, is not supported for this service. Use one of these web
+    browsers: Microsoft Edge, Mozilla Firefox, Google Chrome, or Apple Safari.
   </v-alert>
 </template>
 

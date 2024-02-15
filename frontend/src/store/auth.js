@@ -5,41 +5,11 @@ import { useRootStore } from './root';
 import ApiService from '../common/apiService';
 import AuthService from '../common/authService';
 
-function isFollowUpVisit({jwtToken}) {
-  return !!jwtToken;
-}
-
 function isExpiredToken(jwtToken) {
   const now = Date.now().valueOf() / 1000;
   const jwtPayload = jwtToken.split('.')[1];
   const payload = JSON.parse(window.atob(jwtPayload));
   return payload.exp <= now;
-}
-
-async function refreshToken({getters, commit, dispatch}) {
-  if (isExpiredToken(getters.jwtToken)) {
-    dispatch('logout');
-    return;
-  }
-
-  const response = await AuthService.refreshAuthToken(getters.jwtToken);
-  if (response.jwtFrontend) {
-    commit('setJwtToken', response.jwtFrontend);
-    ApiService.setAuthHeader(response.jwtFrontend);
-  } else {
-    throw 'No jwtFrontend';
-  }
-}
-
-async function getInitialToken({commit}) {
-  const response = await AuthService.getAuthToken();
-
-  if (response.jwtFrontend) {
-    commit('setJwtToken', response.jwtFrontend);
-    ApiService.setAuthHeader(response.jwtFrontend);
-  } else {
-    throw 'No jwtFrontend';
-  }
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -55,6 +25,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     setJwtToken(token = null) {
       if (token) {
+        ApiService.setAuthHeader(token);
         this.isAuthenticated = true;
         this.jwtToken = token;
         localStorage.setItem('jwtToken', token);
@@ -98,14 +69,26 @@ export const useAuthStore = defineStore('auth', {
       penRequest.setRequest(userInfoRes.data.penRequest);
       rootStore.setStudent(userInfoRes.data.student);
     },
-    //retrieves the json web token from local storage. If not in local storage, retrieves it from API
-    async getJwtToken(context) {
-      context.commit('setError', false);
-      if (isFollowUpVisit(context.getters)) {
-        await refreshToken(context);
-      } else {  //inital login and redirect
-        await getInitialToken(context);
-      }
+    async getInitialToken() {
+      const { jwtFrontend } = await AuthService.getAuthToken();
+
+      if (jwtFrontend) { return this.setJwtToken(jwtFrontend); }
+      throw 'No jwtFrontend';
+    },
+    async refreshToken() {
+      if (isExpiredToken(this.jwtToken)) { return this.logout(); }
+
+      const { jwtFrontend } = await AuthService.refreshAuthToken(this.jwtToken);
+
+      if (jwtFrontend) { return this.setJwtToken(jwtFrontend); }
+      throw 'No jwtFrontend';
+    },
+    async getJwtToken() {
+      this.setError(false);
+
+      // initial login and redirect
+      if (this.jwtToken) { return this.refreshToken(); }
+      return this.getInitialToken();
     },
   }
 });
