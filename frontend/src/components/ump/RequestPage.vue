@@ -81,13 +81,14 @@
 </template>
 
 <script>
-import RequestStepper from '../RequestStepper';
 import { mapState, mapActions } from 'pinia';
 import { useAuthStore } from '../../store/auth';
 import { usePenRequestStore, useStudentRequestStore } from '../../store/request';
 import { useUmpStore } from '../../store/ump';
 import { PenRequestStatuses } from '../../utils/constants';
 import { pick, values } from 'lodash';
+
+import RequestStepper from '../RequestStepper.vue';
 
 export default {
   name: 'RequestPage',

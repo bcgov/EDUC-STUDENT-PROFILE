@@ -137,8 +137,9 @@
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
 import { find } from 'lodash';
-import { RequestStatuses } from '@/utils/constants';
-import ApiService from '@/common/apiService';
+
+import { RequestStatuses } from '../utils/constants';
+import ApiService from '../common/apiService';
 
 export default {
   props: {

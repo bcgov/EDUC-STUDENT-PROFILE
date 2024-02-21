@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import {AuthRoutes} from '@/utils/constants';
+import { AuthRoutes } from '../utils/constants';
 
 export default {
   name: 'BackendSessionExpired',

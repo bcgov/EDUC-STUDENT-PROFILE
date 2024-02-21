@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import EmailVerification from '../EmailVerification';
+import EmailVerification from '../EmailVerification.vue';
 
 export default {
   name: 'StudentRequestVerification',

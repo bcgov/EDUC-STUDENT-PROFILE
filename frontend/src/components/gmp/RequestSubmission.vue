@@ -53,9 +53,10 @@
 <script>
 import { mapState } from 'pinia';
 import { usePenRequestStore } from '../../store/request';
-import StatusCard from '../StatusCard';
-import MessageCard from './MessageCard';
-import RequestCard from './RequestCard';
+
+import StatusCard from '../StatusCard.vue';
+import MessageCard from './MessageCard.vue';
+import RequestCard from './RequestCard.vue';
 
 export default {
   name: 'RequestSubmission',

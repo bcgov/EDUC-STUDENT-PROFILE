@@ -109,11 +109,12 @@
 </template>
 
 <script>
+import ApiService from '../common/apiService';
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
+
 import DocumentChip from './DocumentChip.vue';
-import DocumentUpload from './DocumentUpload';
-import ApiService from '../common/apiService';
+import DocumentUpload from './DocumentUpload.vue';
 
 export default {
   components: {

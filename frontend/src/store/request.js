@@ -1,4 +1,4 @@
-import ApiService from '@/common/apiService';
+import ApiService from '../common/apiService';
 import { useRootStore } from './root';
 import { defineStore } from 'pinia';
 

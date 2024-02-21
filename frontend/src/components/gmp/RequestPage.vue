@@ -32,9 +32,10 @@
 </template>
 
 <script>
-import RequestStepper from '../RequestStepper';
 import { mapState } from 'pinia';
 import { useAuthStore } from '../../store/auth';
+
+import RequestStepper from '../RequestStepper.vue';
 
 export default {
   name: 'RequestPage',
@@ -61,7 +62,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .container{
   padding: 0px;

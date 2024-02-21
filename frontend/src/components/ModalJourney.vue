@@ -14,7 +14,7 @@ export default {
   name: 'ModalJourney',
   data(){
     return{
-      journeyBuilder:StaticConfig.VUE_APP_JOURNEY_BUILDER
+      journeyBuilder: StaticConfig.VUE_APP_JOURNEY_BUILDER
     };
   },
   mounted() {

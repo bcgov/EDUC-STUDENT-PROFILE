@@ -78,11 +78,12 @@
 </template>
 
 <script>
+import ApiService from '../../common/apiService';
 import { useRootStore } from '../../store/root';
 import { useStudentRequestStore } from '../../store/request';
 import { mapState } from 'pinia';
-import ApiService from '../../common/apiService';
-import StudentInfoCard from '../StudentInfoCard';
+
+import StudentInfoCard from '../StudentInfoCard.vue';
 
 export default {
   name: 'RequestSubmission',

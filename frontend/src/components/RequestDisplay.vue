@@ -76,9 +76,10 @@
 <script>
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
-import { RequestStatuses } from '@/utils/constants';
-import ChatBox from './ChatBox';
-import StatusCard from './StatusCard';
+import { RequestStatuses } from '../utils/constants';
+
+import ChatBox from './ChatBox.vue';
+import StatusCard from './StatusCard.vue';
 
 export default {
   components: {

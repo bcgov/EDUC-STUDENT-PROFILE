@@ -1,4 +1,3 @@
-<!--suppress ALL -->
 <template>
   <v-container
     v-if="!isAuthenticated && !isLoading"
@@ -98,7 +97,7 @@
               <img
                 id="gmpLink"
                 alt="Find PEN"
-                src="@/assets/images/icon-find-pen.svg"
+                src="../assets/images/icon-find-pen.svg"
                 style="display:block; float:initial; margin:auto"
                 title="Find PEN"
               >Get your Personal Education<br>Number (PEN)
@@ -149,12 +148,13 @@
 </template>
 
 <script>
-import LoginRedirect from './LoginRedirect';
-import ModalJourney from './ModalJourney';
-import UserStudentCard from './UserStudentCard';
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
 import { useAuthStore } from '../store/auth';
+
+import LoginRedirect from './LoginRedirect.vue';
+import ModalJourney from './ModalJourney.vue';
+import UserStudentCard from './UserStudentCard.vue';
 
 export default {
   components: {

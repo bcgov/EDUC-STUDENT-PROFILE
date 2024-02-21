@@ -464,7 +464,7 @@ export default {
         + ' Last Name field and leave Legal First Name blank',
       emailHint: 'Valid Email Required',
       menu: false,
-      appTitle: process.env.VUE_APP_TITLE,
+      appTitle: import.meta.env.VUE_APP_TITLE,
       entries: [],
       isLoading: false,
       model: null,

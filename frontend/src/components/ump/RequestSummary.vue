@@ -128,8 +128,9 @@
 import { mapState, mapActions } from 'pinia';
 import { useUmpStore } from '../../store/ump';
 import { useStudentRequestStore } from '../../store/request';
-import StudentInfoCard from '../StudentInfoCard';
 import {mapKeys, pick, find} from 'lodash';
+
+import StudentInfoCard from '../StudentInfoCard.vue';
 
 export default {
   components: {

@@ -438,15 +438,15 @@
 </template>
 
 <script>
-import DocumentChip from '../DocumentChip.vue';
-import DocumentUpload from '../DocumentUpload';
 import { mapState, mapWritableState, mapActions } from 'pinia';
 import { useRootStore } from '../../store/root';
 import { useStudentRequestStore } from '../../store/request';
 import { useUmpStore } from '../../store/ump';
-
 import { LocalDate } from '@js-joda/core';
 import { isEqual, mapValues, pick } from 'lodash';
+
+import DocumentChip from '../DocumentChip.vue';
+import DocumentUpload from '../DocumentUpload.vue';
 
 
 export default {

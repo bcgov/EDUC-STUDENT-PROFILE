@@ -1,4 +1,3 @@
-<!--suppress ALL -->
 <template>
   <v-container
     v-if="!isAuthenticated && !isLoading"
@@ -211,19 +210,20 @@
 </template>
 
 <script>
-import LoginRedirect from '../LoginRedirect';
-import RequestDisplay from '../RequestDisplay';
-import ModalJourney from '../ModalJourney';
-import MessageCard from './MessageCard';
-import StudentInfoCard from '../StudentInfoCard';
-import DocumentChip from '../DocumentChip.vue';
 import { PenRequestStatuses, StudentRequestStatuses } from '../../utils/constants';
 import { mapState, mapActions } from 'pinia';
 import { useRootStore } from '../../store/root';
 import { useAuthStore } from '../../store/auth';
 import { useStudentRequestStore, usePenRequestStore } from '../../store/request';
 import { pick, values, partition } from 'lodash';
-import ApiService from '@/common/apiService';
+import ApiService from '../../common/apiService';
+
+import LoginRedirect from '../LoginRedirect.vue';
+import RequestDisplay from '../RequestDisplay.vue';
+import ModalJourney from '../ModalJourney.vue';
+import MessageCard from './MessageCard.vue';
+import StudentInfoCard from '../StudentInfoCard.vue';
+import DocumentChip from '../DocumentChip.vue';
 
 export default {
   components: {

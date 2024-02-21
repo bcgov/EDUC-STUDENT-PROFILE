@@ -1,12 +1,8 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import VueMeta from 'vue-meta';
-
-import moment from 'moment';
+import { createRouter, createWebHistory } from 'vue-router';
 
 import HomePage from './components/HomePage.vue';
-import LogoutContainer from './components/LogoutContainer';
-import SessionExpired from './components/SessionExpired';
+import LogoutContainer from './components/LogoutContainer.vue';
+import SessionExpired from './components/SessionExpired.vue';
 import PenRequestPage from './components/gmp/RequestPage.vue';
 import StudentRequestPage from './components/ump/RequestPage.vue';
 import PenRequestVerification from './components/gmp/Verification.vue';
@@ -16,30 +12,25 @@ import LoginError from './components/LoginError.vue';
 import RouterView from './components/RouterView.vue';
 import UmpContainer from './components/ump/UmpContainer.vue';
 import GmpContainer from './components/gmp/GmpContainer.vue';
-import CurrentInfo from './components/ump/CurrentInfo';
-import StudentRequestForm from './components/ump/RequestForm';
-import StudentRequestSummary from './components/ump/RequestSummary';
-import StudentRequestSubmission from './components/ump/RequestSubmission';
-import PenRequestForm from './components/gmp/RequestForm';
-import PenRequestSummary from './components/gmp/RequestSummary';
-import PenRequestSubmission from './components/gmp/RequestSubmission';
-import {pick, values} from 'lodash';
+import CurrentInfo from './components/ump/CurrentInfo.vue';
+import StudentRequestForm from './components/ump/RequestForm.vue';
+import StudentRequestSummary from './components/ump/RequestSummary.vue';
+import StudentRequestSubmission from './components/ump/RequestSubmission.vue';
+import PenRequestForm from './components/gmp/RequestForm.vue';
+import PenRequestSummary from './components/gmp/RequestSummary.vue';
+import PenRequestSubmission from './components/gmp/RequestSubmission.vue';
+import { pick, values } from 'lodash';
 import { PenRequestStatuses, StudentRequestStatuses } from './utils/constants';
 import LoginRedirect from './components/LoginRedirect.vue';
-import BackendSessionExpired from './components/BackendSessionExpired';
+import BackendSessionExpired from './components/BackendSessionExpired.vue';
 import { useAuthStore } from './store/auth';
 import { useUmpStore } from './store/ump';
 import { useGmpStore } from './store/gmp';
 import { usePenRequestStore, useStudentRequestStore } from './store/request';
 import { useRootStore } from './store/root';
 
-Vue.prototype.moment = moment;
-
-Vue.use(VueRouter);
-Vue.use(VueMeta);
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -242,7 +233,7 @@ const router = new VueRouter({
       component: LoginRedirect
     },
     {
-      path: '*',
+      path: '/:catchAll(.*)',
       name: 'notfound',
       redirect: '/',
       meta: {
@@ -313,4 +304,5 @@ router.beforeEach((to, _from, next) => {
     next();
   }
 });
+
 export default router;

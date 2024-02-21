@@ -89,7 +89,8 @@
 import { mapState, mapActions } from 'pinia';
 import { useGmpStore } from '../../store/gmp';
 import { usePenRequestStore } from '../../store/request';
-import StudentInfoCard from '../StudentInfoCard';
+
+import StudentInfoCard from '../StudentInfoCard.vue';
 
 export default {
   components: {

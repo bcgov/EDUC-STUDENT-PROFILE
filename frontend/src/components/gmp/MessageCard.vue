@@ -283,7 +283,7 @@ import { useRootStore } from '../../store/root';
 import { useAuthStore } from '../../store/auth';
 import { usePenRequestStore } from '../../store/request';
 import { useConfigStore } from '../../store/config';
-import { PenRequestStatuses } from '@/utils/constants';
+import { PenRequestStatuses } from '../../utils/constants';
 
 export default {
   name: 'MessageCard',

@@ -22,11 +22,12 @@ import { mapState, mapActions } from 'pinia';
 import { useAuthStore } from './store/auth';
 import { useStudentRequestStore, usePenRequestStore } from './store/request';
 import HttpStatus from 'http-status-codes';
-import HeaderToolbar from './components/HeaderToolbar';
-import FooterComponent from './components/FooterComponent';
-import ModalIdle from './components/ModalIdle';
-import MsieBanner from './components/MsieBanner';
 import StaticConfig from './common/staticConfig';
+
+import HeaderToolbar from './components/HeaderToolbar.vue';
+import FooterComponent from './components/FooterComponent.vue';
+import ModalIdle from './components/ModalIdle.vue';
+import MsieBanner from './components/MsieBanner.vue';
 
 export default {
   name: 'App',
