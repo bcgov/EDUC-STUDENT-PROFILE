@@ -36,9 +36,6 @@ export default {
     ModalIdle,
     MsieBanner
   },
-  metaInfo: {
-    meta: StaticConfig.VUE_APP_META_DATA
-  },
   data() {
     return {
       bannerEnvironment: StaticConfig.BANNER_ENVIRONMENT,

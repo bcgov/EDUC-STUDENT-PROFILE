@@ -24,7 +24,6 @@
     "prom-client": "^15.1.0",
     "vue": "^3.4.15",
     "vue-clipboard2": "^0.3.3",
-    "vue-meta": "^2.4.0",
     "vue-router": "^4.2.5",
     "vuetify": "^3.5.2"
   },
