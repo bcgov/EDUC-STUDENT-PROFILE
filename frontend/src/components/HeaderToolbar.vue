@@ -2,7 +2,6 @@
   <v-toolbar
     class="toolbar_header"
     dense
-    width="100%"
   >
     <!-- Navbar content -->
     <img
@@ -16,18 +15,17 @@
     <div v-if="isAuthenticated && dataReady">
       <v-menu
         name="user_options"
-        offset-y
       >
-        <template #activator="{ on }">
+        <template #activator="{ props }">
           <v-chip
             tabindex="0"
             pill
             color="#003366"
-            dark
-            v-on="on"
+            theme="dark"
+            v-bind="props"
           >
             <v-avatar
-              left
+              start
               color="info"
             >
               {{ userInfo.displayName[0] }}

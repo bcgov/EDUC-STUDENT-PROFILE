@@ -157,7 +157,7 @@
       <v-row>
         <v-sheet
           rounded
-          outlined
+          variant="outlined"
           color="#d3d3d3"
         >
           <v-col>

@@ -2,16 +2,16 @@
   <div v-if="request">
     <v-alert
       v-model="alert"
-      dense
-      outlined
-      dismissible
+      density="compact"
+      variant="outlined"
+      closable
       :class="`pa-3 mb-3 mx-3 ${alertType}`"
     >
       {{ alertMessage }}
     </v-alert>
 
     <v-alert
-      outlined
+      variant="outlined"
       class="pa-3 mb-3 mx-3 bootstrap-warning"
     >
       <p>

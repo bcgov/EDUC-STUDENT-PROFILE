@@ -11,7 +11,7 @@
         color="#003366"
         required
         :rules="requiredRules"
-        outlined
+        variant="outlined"
         :eager="eager"
         :items="documentTypes"
         label="Document Type"
@@ -30,9 +30,9 @@
     </v-form>
     <v-alert
       v-model="alert"
-      dense
-      outlined
-      dismissible
+      density="compact"
+      variant="outlined"
+      closable
       :class="alertType"
       class="mb-3"
     >
@@ -44,7 +44,7 @@
         id="upload_form"
         :key="buttonKey"
         color="#003366"
-        class="white--text"
+        class="text-white"
         :disabled="!dataReady"
         :loading="active"
         @click="submitRequest"
@@ -53,7 +53,7 @@
       </v-btn>
       <v-btn
         color="#003366"
-        class="white--text"
+        class="text-white"
         @click="closeForm"
       >
         Close

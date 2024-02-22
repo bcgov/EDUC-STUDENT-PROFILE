@@ -95,7 +95,7 @@
         >
           <v-btn
             color="#38598a"
-            dark
+            theme="dark"
             class="ml-2 text-none"
             @click.stop="$router.push({ path: 'request', append: true })"
           >
@@ -120,7 +120,7 @@
         >
           <v-btn
             color="#38598a"
-            dark
+            theme="dark"
             class="ml-2 text-none"
             :loading="sending"
             @click.stop="resendVerificationEmail"

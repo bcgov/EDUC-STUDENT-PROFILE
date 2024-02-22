@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-alert
-      outlined
+      variant="outlined"
       class="pa-3 mb-3 mx-3 bootstrap-warning"
     >
       <h3>Guidance:</h3>
@@ -38,13 +38,13 @@
               v-model="recordedData.pen"
               :rules="penRules"
               color="#003366"
-              outlined
+              variant="outlined"
               :hint="penHint"
               persistent-hint
               :readonly="hasStudentRecord"
               maxlength="9"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              dense
+              density="compact"
             />
           </v-col>
         </v-row>
@@ -59,14 +59,14 @@
               v-model.trim="recordedData.legalFirstName"
               :rules="charRules"
               color="#003366"
-              outlined
+              variant="outlined"
               class="touppercase"
               :hint="firstNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
               maxlength="25"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              dense
+              density="compact"
             />
           </v-col>
           <v-col
@@ -79,14 +79,14 @@
               v-model.trim="recordedData.legalMiddleNames"
               :rules="charRules"
               color="#003366"
-              outlined
+              variant="outlined"
               class="touppercase"
               :hint="middleNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
               maxlength="25"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              dense
+              density="compact"
             />
           </v-col>
           <v-col
@@ -98,14 +98,14 @@
               v-model.trim="recordedData.legalLastName"
               :rules="requiredRules(lastNameHint)"
               color="#003366"
-              outlined
+              variant="outlined"
               class="touppercase"
               :hint="lastNameHint"
               persistent-hint
               :readonly="hasStudentRecord"
               maxlength="25"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              dense
+              density="compact"
             />
           </v-col>
           <v-col
@@ -116,12 +116,12 @@
               v-if="hasStudentRecord"
               id="recordedDob"
               color="#003366"
-              outlined
-              :value="moment(recordedData.dob).format('MMMM D, YYYY')"
+              variant="outlined"
+              :model-value="moment(recordedData.dob).format('MMMM D, YYYY')"
               :hint="birthdateHint"
               persistent-hint
               readonly
-              dense
+              density="compact"
             />
             <v-menu
               v-else
@@ -132,20 +132,20 @@
               offset-y
               min-width="290px"
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <v-text-field
                   id="birthdate"
                   ref="birthdate"
                   color="#003366"
-                  outlined
-                  :value="recordedData.dob ? moment(recordedData.dob).format('MMMM D, YYYY'):''"
+                  variant="outlined"
+                  :model-value="recordedData.dob ? moment(recordedData.dob).format('MMMM D, YYYY'):''"
                   :rules="requiredRules(birthdateHint)"
                   :hint="birthdateHint"
                   persistent-hint
                   readonly
                   autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-                  dense
-                  v-on="on"
+                  density="compact"
+                  v-bind="props"
                   @keyup="focusBirthdateField"
                 />
               </template>
@@ -170,12 +170,12 @@
               id="recordedEmail"
               v-model="recordedData.email"
               color="#003366"
-              outlined
+              variant="outlined"
               class="touppercase"
               hint="Recorded E-mail Address"
               persistent-hint
               readonly
-              dense
+              density="compact"
             />
           </v-col>
         </v-row>
@@ -190,7 +190,7 @@
               id="cancelButton"
               to="home"
               color="#003366"
-              class="white--text align-self-center"
+              class="text-white align-self-center"
             >
               Cancel
             </v-btn>
@@ -204,7 +204,7 @@
               <v-btn
                 id="next-step"
                 color="#003366"
-                class="white--text align-self-center"
+                class="text-white align-self-center"
                 @click="nextStep"
               >
                 Next

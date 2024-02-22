@@ -1,21 +1,21 @@
 <template>
   <v-menu
     v-model="menu"
-    bottom
-    right
+    location="bottom right"
+    
     transition="scale-transition"
     origin="top left"
   >
-    <template #activator="{ on }">
+    <template #activator="{ props }">
       <v-chip
         class="chip-overflow ma-1 px-2 align-self-center"
-        close
+        closable
         :close-icon="disabled ? '' : 'fa-chevron-down' "
         :color="disabled ? 'black' : '#0C7CBA' "
         :disabled="disabled"
         label
-        outlined
-        v-on="on"
+        variant="outlined"
+        v-bind="props"
         @click:close="menu = true"
       >
         {{ document.fileName }}
@@ -27,55 +27,47 @@
       class="pa-1 pa-sm-2"
     >
       <v-list>
-        <v-list-item class="pa-0 pa-sm-0">
-          <v-list-item-avatar>
-            <v-icon>fa-id-card</v-icon>
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>{{ documentType }}</v-list-item-title>
-          </v-list-item-content>
+        <v-list-item
+          class="pa-0 pa-sm-0"
+          prepend-icon="fa-id-card"
+        >
+          <v-list-item-title>{{ documentType }}</v-list-item-title>
         </v-list-item>
 
-        <v-list-item class="px-0 pa-sm-0">
-          <v-list-item-avatar>
-            <v-icon>fa-file</v-icon>
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>
-              <router-link
-                :to="{ path: documentUrl }"
-                target="_blank"
-              >
-                {{ document.fileName }}
-              </router-link>
-            </v-list-item-title>
-          </v-list-item-content>
+        <v-list-item
+          class="px-0 pa-sm-0"
+          prepend-icon="fa-file"
+        >
+          <v-list-item-title>
+            <router-link
+              :to="{ path: documentUrl }"
+              target="_blank"
+            >
+              {{ document.fileName }}
+            </router-link>
+          </v-list-item-title>
         </v-list-item>
 
-        <v-list-item class="px-0 pa-sm-0">
-          <v-list-item-avatar>
-            <v-icon>fa-hdd</v-icon>
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>{{ fileSize }}</v-list-item-title>
-          </v-list-item-content>
+        <v-list-item
+          class="px-0 pa-sm-0"
+          prepend-icon="fa-hdd"
+        >
+          <v-list-item-title>{{ fileSize }}</v-list-item-title>
         </v-list-item>
 
-        <v-list-item class="px-0 pa-sm-0">
-          <v-list-item-avatar>
-            <v-icon>fa-clock</v-icon>
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title>{{ humanCreateDate }}</v-list-item-title>
-          </v-list-item-content>
+        <v-list-item
+          class="px-0 pa-sm-0"
+          prepend-icon="fa-clock"
+        >
+          <v-list-item-title>{{ humanCreateDate }}</v-list-item-title>
         </v-list-item>
       </v-list>
 
       <v-alert
         v-model="alert"
-        dense
-        outlined
-        dismissible
+        density="compact"
+        variant="outlined"
+        closable
         :class="alertType"
         class="mx-3 my-1"
       >
@@ -88,7 +80,7 @@
           v-if="!undeletable"
           id="delete-document"
           color="#003366"
-          class="white--text"
+          class="text-white"
           :loading="deleting"
           @click.stop="deleteDocument()"
         >
@@ -97,7 +89,7 @@
         <v-btn
           id="documentUploadCancel"
           color="#003366"
-          class="white--text"
+          class="text-white"
           @click="menu = false"
         >
           Cancel

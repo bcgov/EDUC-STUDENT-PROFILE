@@ -6,7 +6,7 @@
     <v-toolbar
       flat
       color="#036"
-      class="white--text"
+      class="text-white"
     >
       <v-toolbar-title>Data Submitted</v-toolbar-title>
     </v-toolbar>

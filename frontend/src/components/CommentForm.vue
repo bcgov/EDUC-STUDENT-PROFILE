@@ -6,7 +6,7 @@
           v-model.trim="reply"
           type="text"
           rows="3"
-          solo
+          variant="solo"
           flat
           auto-grow
           class="reply--text"
@@ -34,15 +34,15 @@
               xs="2"
               sm="2"
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <v-btn
                   rounded
                   :disabled="showConfirm || submitted || isSagaInProgress"
-                  class="ma-1 white--text order-first"
+                  class="ma-1 text-white order-first"
                   color="#0C7CBA"
-                  v-on="on"
+                  v-bind="props"
                 >
-                  <v-icon left>
+                  <v-icon start>
                     fa-paperclip
                   </v-icon>
                   Upload
@@ -58,7 +58,7 @@
               rounded
               :disabled="replyEmpty || showConfirm || submitted || isSagaInProgress"
               color="#0C7CBA"
-              class="ma-1 white--text"
+              class="ma-1 text-white"
               @click="showConfirm=true"
             >
               Done
@@ -69,9 +69,9 @@
     </div>
     <v-alert
       v-model="alert"
-      dense
-      outlined
-      dismissible
+      density="compact"
+      variant="outlined"
+      closable
       :class="alertType"
     >
       {{ alertMessage }}
@@ -88,7 +88,7 @@
           <v-btn
             rounded
             color="#0C7CBA"
-            class="ma-1 white--text"
+            class="ma-1 text-white"
             @click="reenter"
           >
             No
@@ -96,7 +96,7 @@
           <v-btn
             rounded
             color="#0C7CBA"
-            class="ma-1 white--text"
+            class="ma-1 text-white"
             :loading="submitting"
             @click="submitComment"
           >

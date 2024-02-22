@@ -7,8 +7,8 @@
       <v-row class="card-row">
         <v-text-field
           id="penContainer"
-          :value="student.pen"
-          outlined
+          :model-value="student.pen"
+          variant="outlined"
           readonly
           append-icon="$copy"
           color="#003366"

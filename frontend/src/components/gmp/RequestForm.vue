@@ -61,7 +61,7 @@
               v-model.trim="userPost.legalLastName"
               :readonly="serviceCardBool"
               color="#003366"
-              outlined
+              variant="outlined"
               class="touppercase"
               :rules="requiredRules(legalLastNameHint)"
               :hint="legalLastNameHint"
@@ -70,7 +70,7 @@
               required
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
-              dense
+              density="compact"
             />
           </v-col>
           <v-col
@@ -85,13 +85,13 @@
               color="#003366"
               :hint="'As shown on current Government Photo ID. Note, If you have ONE name only – enter it into the '
                 + 'Legal Last Name field and leave Legal First Name blank'"
-              outlined
+              variant="outlined"
               class="touppercase"
               label="Legal First Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -106,13 +106,13 @@
               :readonly="serviceCardBool"
               color="#003366"
               hint="As shown on current Government Photo ID"
-              outlined
+              variant="outlined"
               class="touppercase"
               label="Legal Middle Name(s) (provide if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -124,14 +124,14 @@
               id="usualLastName"
               v-model.trim="userPost.usualLastName"
               color="#003366"
-              outlined
+              variant="outlined"
               class="touppercase"
               hint="Only if different from Legal Last Name"
               label="Usual Last Name (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -144,14 +144,14 @@
               id="usualFirstName"
               v-model.trim="userPost.usualFirstName"
               color="#003366"
-              outlined
+              variant="outlined"
               class="touppercase"
               hint="Only if different from Legal First Name"
               label="Usual First Name(s) (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -164,14 +164,14 @@
               id="usualMiddleNames"
               v-model.trim="userPost.usualMiddleName"
               color="#003366"
-              outlined
+              variant="outlined"
               class="touppercase"
               hint="Only if different from Legal Middle Name"
               label="Usual Middle Name(s) (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -186,12 +186,12 @@
               color="#003366"
               class="touppercase"
               hint="List all previous Last names used separated with spaces"
-              outlined
+              variant="outlined"
               label="Maiden Name (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="40"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -205,13 +205,13 @@
               v-model.trim="userPost.pastNames"
               color="#003366"
               hint="List all previous names used separated with spaces"
-              outlined
+              variant="outlined"
               class="touppercase"
               label="Past Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="255"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -224,13 +224,13 @@
               id="birthdate"
               v-model="userPost.dob"
               color="#003366"
-              outlined
+              variant="outlined"
               label="Birthdate"
               readonly
               required
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-              dense
+              density="compact"
             />
             <v-menu
               v-else
@@ -241,21 +241,21 @@
               offset-y
               min-width="290px"
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <v-text-field
                   id="birthdate"
                   ref="birthdate"
                   v-model="userPost.dob"
                   color="#003366"
-                  outlined
+                  variant="outlined"
                   label="Birthdate"
                   readonly
                   :rules="requiredRules()"
                   :disabled="enableDisableForm.disabled"
                   required
                   autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-                  dense
-                  v-on="on"
+                  density="compact"
+                  v-bind="props"
                   @keyup="focusBirthdateField"
                 />
               </template>
@@ -282,13 +282,13 @@
               color="#003366"
               :hint="emailHint"
               class="touppercase"
-              outlined
+              variant="outlined"
               label="E-mail Address"
               :disabled="enableDisableForm.disabled"
               required
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="255"
-              dense
+              density="compact"
             />
           </v-col>
           <v-col
@@ -300,13 +300,13 @@
               v-model.trim="userPost.lastBCSchool"
               color="#003366"
               hint="Last BC K-12 school or Post Secondary Institute attended"
-              outlined
+              variant="outlined"
               class="touppercase"
               label="Last B.C. School Attended (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="255"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -319,13 +319,13 @@
               v-model.trim="userPost.lastBCSchoolStudentNumber"
               color="#003366"
               hint="School Issued Local ID"
-              outlined
+              variant="outlined"
               class="touppercase"
               label="School Student ID Number (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="12"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -338,13 +338,13 @@
               v-model.trim="userPost.currentSchool"
               color="#003366"
               hint="Current BC K-12 school or Post Secondary Institute"
-              outlined
+              variant="outlined"
               class="touppercase"
               label="Current B.C. School Attending (optional)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="255"
-              dense
+              density="compact"
               :rules="charRules"
             />
           </v-col>
@@ -385,7 +385,7 @@
               height="100%"
               width="100%"
               elevation="2"
-              class="black--text pa-4"
+              class="text-black pa-4"
             >
               <p><strong>Collection Notice:</strong></p>
               <p>
@@ -420,7 +420,7 @@
               id="cancelButton"
               to="home"
               color="#003366"
-              class="white--text align-self-center"
+              class="text-white align-self-center"
             >
               Cancel
             </v-btn>
@@ -434,7 +434,7 @@
               <v-btn
                 id="submit_form"
                 color="#003366"
-                class="white--text align-self-center"
+                class="text-white align-self-center"
                 :disabled="!validForm"
                 :loading="submitting"
                 @click="submitRequestForm"

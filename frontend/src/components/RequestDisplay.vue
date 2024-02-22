@@ -6,7 +6,7 @@
         width="100%"
         elevation="0"
         color="#036"
-        class="white--text"
+        class="text-white"
       >
         <v-card-title class="request-display-header px-1 px-sm-5">
           <h1>{{ title }}</h1>
@@ -16,9 +16,9 @@
     <v-row>
       <v-alert
         v-model="alert"
-        dense
-        outlined
-        dismissible
+        density="compact"
+        variant="outlined"
+        closable
         :class="alertType"
         class="mb-5"
         width="100%"
@@ -63,7 +63,7 @@
         <v-btn
           id="Home"
           color="#003366"
-          class="white--text align-self-center"
+          class="text-white align-self-center"
           to="home"
         >
           Home

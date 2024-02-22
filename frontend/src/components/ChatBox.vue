@@ -11,7 +11,7 @@
       <v-toolbar
         flat
         color="#036"
-        class="white--text"
+        class="text-white"
         height="45rem"
       >
         <v-toolbar-title>Request</v-toolbar-title>
@@ -21,8 +21,8 @@
           v-if="loading"
           indeterminate
           absolute
-          top
-          color="indigo darken-2"
+          location="top"
+          color="indigo-darken-2"
         />
         <SingleComment
           v-for="comment in requestComments"
@@ -43,7 +43,7 @@
       <v-toolbar
         flat
         color="#036"
-        class="white--text"
+        class="text-white"
         height="45rem"
       >
         <v-toolbar-title>Respond Here</v-toolbar-title>
@@ -56,8 +56,8 @@
           v-if="loading"
           indeterminate
           absolute
-          top
-          color="indigo darken-2"
+          location="top"
+          color="indigo-darken-2"
         />
         <CommentForm
           :unsubmitted-documents="unsubmittedDocuments"
@@ -73,7 +73,7 @@
       <v-toolbar
         flat
         color="#036"
-        class="white--text"
+        class="text-white"
         height="45rem"
       >
         <v-toolbar-title>Discussion History</v-toolbar-title>
@@ -83,8 +83,8 @@
           v-if="loading"
           indeterminate
           absolute
-          top
-          color="indigo darken-2"
+          location="top"
+          color="indigo-darken-2"
         />
         <SingleComment 
           v-for="comment in commentHistory"

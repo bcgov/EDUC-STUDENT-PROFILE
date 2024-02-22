@@ -2,16 +2,16 @@
   <div v-if="requestData">
     <v-alert
       v-model="alert"
-      dense
-      outlined
-      dismissible
+      density="compact"
+      variant="outlined"
+      closable
       class="pa-3 mb-3 mx-3 bootstrap-error"
     >
       {{ alertMessage }}
     </v-alert>
 
     <v-alert
-      outlined
+      variant="outlined"
       class="pa-3 mb-3 mx-3 bootstrap-warning"
     >
       <h3>Guidance:</h3>
@@ -51,7 +51,7 @@
           id="cancelButton"
           to="home"
           color="#003366"
-          class="white--text align-self-center"
+          class="text-white align-self-center"
         >
           Cancel
         </v-btn>
@@ -65,7 +65,7 @@
           <v-btn
             id="previous-step"
             color="#003366"
-            class="white--text align-self-center"
+            class="text-white align-self-center"
             @click="previousStep"
           >
             Back
@@ -73,7 +73,7 @@
           <v-btn
             id="next-step"
             color="#003366"
-            class="white--text align-self-center"
+            class="text-white align-self-center"
             :loading="submitting"
             @click="submitRequest"
           >

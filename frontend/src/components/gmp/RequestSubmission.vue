@@ -6,9 +6,9 @@
     <v-row>
       <v-alert
         v-model="alert"
-        dense
-        outlined
-        dismissible
+        density="compact"
+        variant="outlined"
+        closable
         width="100%"
         :class="`pa-3 mb-3 ${alertType}`"
       >
@@ -40,7 +40,7 @@
         <v-btn
           id="Home"
           color="#003366"
-          class="white--text align-self-center"
+          class="text-white align-self-center"
           to="home"
         >
           Home

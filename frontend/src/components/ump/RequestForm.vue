@@ -2,16 +2,16 @@
   <div>
     <v-alert
       v-model="alert"
-      dense
-      outlined
-      dismissible
+      density="compact"
+      variant="outlined"
+      closable
       class="pa-3 mb-3 mx-3 bootstrap-error"
     >
       {{ alertMessage }}
     </v-alert>
 
     <v-alert
-      outlined
+      variant="outlined"
       class="pa-3 mb-3 mx-3 bootstrap-warning"
     >
       <h3>Guidance:</h3>
@@ -53,7 +53,7 @@
     </v-container>
 
     <v-alert
-      outlined
+      variant="outlined"
       class="pa-3 mb-3 mx-3 bootstrap-warning"
     >
       <span>
@@ -100,13 +100,13 @@
                 color="#003366"
                 hint="As shown on current Government Photo ID"
                 :persistent-hint="!enableDisableForm.disabled && canEditLegalFirstName"
-                outlined
+                variant="outlined"
                 class="touppercase"
                 label="Current Legal First Name(s); leave blank if you do not have a first name"
                 :disabled="enableDisableForm.disabled || !canEditLegalFirstName"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="25"
-                dense
+                density="compact"
                 :rules="charRules"
               />
             </v-container>
@@ -134,13 +134,13 @@
                 color="#003366"
                 hint="As shown on current Government Photo ID"
                 :persistent-hint="!enableDisableForm.disabled && canEditLegalMiddleNames"
-                outlined
+                variant="outlined"
                 class="touppercase"
                 label="Current Legal Middle Name(s)"
                 :disabled="enableDisableForm.disabled || !canEditLegalMiddleNames"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="25"
-                dense
+                density="compact"
                 :rules="charRules"
               />
             </v-container>
@@ -165,7 +165,7 @@
                 id="legalLastName"
                 v-model.trim="request.legalLastName"
                 color="#003366"
-                outlined
+                variant="outlined"
                 :rules="charRules && requiredRules(lastNameHint)"
                 class="touppercase"
                 :hint="legalLastNameHint"
@@ -174,7 +174,7 @@
                 :disabled="enableDisableForm.disabled || !canEditLegalLastName"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="25"
-                dense
+                density="compact"
               />
             </v-container>
           </v-col>
@@ -202,20 +202,20 @@
                 offset-y
                 min-width="290px"
               >
-                <template #activator="{ on }">
+                <template #activator="{ props }">
                   <v-text-field
                     id="birthdate"
                     ref="birthdate"
                     color="#003366"
-                    outlined
-                    :value="request.dob ? moment(request.dob).format('MMMM D, YYYY'):''"
+                    variant="outlined"
+                    :model-value="request.dob ? moment(request.dob).format('MMMM D, YYYY'):''"
                     :rules="requiredRules(dobHint)"
                     label="Birthdate"
                     readonly
                     :disabled="enableDisableForm.disabled || !canEditBirthdate"
                     autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
-                    dense
-                    v-on="on"
+                    density="compact"
+                    v-bind="props"
                     @keyup="focusBirthdateField"
                   />
                 </template>
@@ -236,7 +236,7 @@
       </v-container>
 
       <v-alert
-        outlined
+        variant="outlined"
         class="pa-3 mb-3 mx-3 bootstrap-warning"
       >
         <span>In order to complete this request to update your PEN information, an image of supporting legal
@@ -265,15 +265,15 @@
               xs="2"
               sm="2"
             >
-              <template #activator="{ on }">
+              <template #activator="{ props }">
                 <v-btn
                   rounded
                   :disabled="enableDisableForm.disabled"
-                  class="ma-1 white--text order-first"
+                  class="ma-1 text-white order-first"
                   color="#0C7CBA"
-                  v-on="on"
+                  v-bind="props"
                 >
-                  <v-icon left>
+                  <v-icon start>
                     fa-paperclip
                   </v-icon>
                   Upload
@@ -320,12 +320,12 @@
                 color="#003366"
                 :hint="emailHint"
                 class="touppercase"
-                outlined
+                variant="outlined"
                 label="E-mail Address"
                 :disabled="enableDisableForm.disabled || (!canEditEmail && hasStudentRecord)"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="255"
-                dense
+                density="compact"
               />
             </v-container>
           </v-col>
@@ -366,7 +366,7 @@
               height="100%"
               width="100%"
               elevation="2"
-              class="black--text pa-4"
+              class="text-black pa-4"
             >
               <p><strong>Collection Notice:</strong></p>
               <p>
@@ -401,7 +401,7 @@
               id="cancelButton"
               to="home"
               color="#003366"
-              class="white--text align-self-center"
+              class="text-white align-self-center"
             >
               Cancel
             </v-btn>
@@ -415,7 +415,7 @@
               <v-btn
                 id="previous-step"
                 color="#003366"
-                class="white--text align-self-center"
+                class="text-white align-self-center"
                 @click="previousStep"
               >
                 Back
@@ -423,7 +423,7 @@
               <v-btn
                 id="next-step"
                 color="#003366"
-                class="white--text align-self-center"
+                class="text-white align-self-center"
                 :disabled="!validForm"
                 @click="validateRequestForm"
               >

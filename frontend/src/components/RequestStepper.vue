@@ -14,7 +14,7 @@
         width="100%"
         elevation="0"
         color="#036"
-        class="white--text"
+        class="text-white"
       >
         <v-card-title class="py-3 pl-5">
           <h1>{{ titles[stepCount-1] }}</h1>

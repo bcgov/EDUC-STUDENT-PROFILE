@@ -55,9 +55,9 @@
       >
         <v-alert
           v-model="alert"
-          dense
-          outlined
-          dismissible
+          density="compact"
+          variant="outlined"
+          closable
           class="bootstrap-error mb-5"
           width="100%"
         >

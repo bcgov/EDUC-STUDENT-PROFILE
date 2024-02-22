@@ -1,7 +1,7 @@
 <template>
   <v-alert
     v-if="isSagaInProgress"
-    outlined
+    variant="outlined"
     height="100%"
     width="100%"
     class="pa-3 bootstrap-success"
@@ -12,7 +12,7 @@
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.INITREV || status === requestStatuses.SUBSREV"
-    outlined
+    variant="outlined"
     height="100%"
     width="100%"
     class="pa-3 bootstrap-success"
@@ -47,7 +47,7 @@
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.DRAFT && timedout"
-    outlined
+    variant="outlined"
     height="100%"
     width="100%"
     class="pa-3 bootstrap-warning"
@@ -67,7 +67,7 @@
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.DRAFT && ! timedout"
-    outlined
+    variant="outlined"
     height="100%"
     width="100%"
     class="pa-3 bootstrap-warning"
@@ -92,7 +92,7 @@
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.RETURNED"
-    outlined
+    variant="outlined"
     height="100%"
     width="100%"
     class="pa-3 bootstrap-warning"
@@ -103,7 +103,7 @@
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.REJECTED"
-    outlined
+    variant="outlined"
     height="100%"
     width="100%"
     class="pa-3 bootstrap-warning"
@@ -120,7 +120,7 @@
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.COMPLETED"
-    outlined
+    variant="outlined"
     height="100%"
     width="100%"
     class="pa-3 bootstrap-success"
@@ -250,7 +250,7 @@
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.ABANDONED"
-    outlined
+    variant="outlined"
     height="100%"
     width="100%"
     class="pa-3 bootstrap-warning"

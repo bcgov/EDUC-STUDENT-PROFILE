@@ -30,7 +30,7 @@
                 v-if="status === verificationResults.OK"
                 height="100%"
                 width="100%"
-                outlined
+                variant="outlined"
                 color="#C3F1E8"
                 class="pa-3"
               >
@@ -51,7 +51,7 @@
                 v-else-if="status === verificationResults.EXPIRED"
                 height="100%"
                 width="100%"
-                outlined
+                variant="outlined"
                 color="#FFECA9"
                 class="pa-3"
               >
@@ -69,7 +69,7 @@
                 v-else-if="status === verificationResults.TOKEN_ERROR"
                 height="100%"
                 width="100%"
-                outlined
+                variant="outlined"
                 color="#FFECA9"
                 class="pa-3"
               >
@@ -94,7 +94,7 @@
                 v-else
                 height="100%"
                 width="100%"
-                outlined
+                variant="outlined"
                 color="#FFECA9"
                 class="pa-3"
               >
@@ -127,7 +127,7 @@
                   id="login-button"
                   :href="authRoutes.LOGIN"
                   class="ma-2"
-                  dark
+                  theme="dark"
                   color="#003366"
                   @click="clearStorage"
                 >
