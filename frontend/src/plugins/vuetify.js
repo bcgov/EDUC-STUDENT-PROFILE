@@ -1,4 +1,27 @@
 import '@fortawesome/fontawesome-free/css/all.css';
+import {
+  VApp,
+  VAvatar,
+  VSpacer,
+  VList,
+  VListItem,
+  VListItemTitle,
+  VMenu,
+  VSkeletonLoader,
+  VBtn,
+  VLayout,
+  VChip,
+  VToolbarTitle,
+  VCard,
+  VCardText,
+  VCardTitle,
+  VAppBar,
+  VFooter,
+  VCol,
+  VRow,
+  VToolbar,
+  VContainer
+} from 'vuetify/components';
 import { createVuetify } from 'vuetify';
 
 export default new createVuetify({
@@ -23,5 +46,28 @@ export default new createVuetify({
       info2: 'fas fa-info-circle fa-10x',
       question: 'fas fa-question-circle fa-10x'
     }
+  },
+  components: {
+    VApp,
+    VAvatar,
+    VSpacer,
+    VList,
+    VListItem,
+    VListItemTitle,
+    VMenu,
+    VSkeletonLoader,
+    VBtn,
+    VLayout,
+    VChip,
+    VToolbarTitle,
+    VCard,
+    VCardText,
+    VCardTitle,
+    VAppBar,
+    VFooter,
+    VCol,
+    VRow,
+    VToolbar,
+    VContainer
   }
 });
