@@ -9,6 +9,7 @@
 
 <script>
 import { AuthRoutes } from '../utils/constants';
+import { useAuthStore } from '../store/auth';
 
 export default {
   name: 'BackendSessionExpired',
@@ -22,7 +23,8 @@ export default {
   },
   methods: {
     logout() {
-      this.$store.commit('auth/setJwtToken');
+      const authStore = useAuthStore();
+      authStore.setJwtToken();
     }
   }
 };

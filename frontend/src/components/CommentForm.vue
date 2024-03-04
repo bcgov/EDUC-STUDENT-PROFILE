@@ -112,6 +112,7 @@
 import ApiService from '../common/apiService';
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
+import { getRequestStore } from '../store/request';
 
 import DocumentChip from './DocumentChip.vue';
 import DocumentUpload from './DocumentUpload.vue';
@@ -144,10 +145,10 @@ export default {
   computed: {
     ...mapState(useRootStore, ['requestType']),
     requestID() {
-      return this.$store.getters[`${this.requestType}/requestID`];
+      return getRequestStore().requestID;
     },
     unsubmittedComment() {
-      return this.$store.getters[`${this.requestType}/unsubmittedComment`];
+      return getRequestStore().unsubmittedComment;
     },
     iconSize() {
       switch (this.$vuetify.breakpoint.name) {
@@ -174,24 +175,26 @@ export default {
   },
   methods: {
     postComment(commentData) {
-      return this.$store.dispatch(`${this.requestType}/postComment`, commentData);
+      return getRequestStore().postComment(commentData);
     },
     setUnsubmittedDocuments(unsubmittedDocuments) {
-      this.$store.commit(`${this.requestType}/setUnsubmittedDocuments`, unsubmittedDocuments);
+      getRequestStore().setUnsubmittedDocuments(unsubmittedDocuments);
     },
     setCommentSubmitted(documents) {
-      this.$store.commit(`${this.requestType}/setCommentSubmitted`, documents);
+      getRequestStore().setCommentSubmitted(documents);
     },
     setRequest(request) {
-      this.$store.commit(`${this.requestType}/setRequest`, request);
+      getRequestStore().setRequest(request);
     },
     setSuccessAlert() {
-      this.alertMessage = 'Your request has been submitted. It will be reviewed during business hours in the order received.';
+      this.alertMessage = 'Your request has been submitted.'
+        + ' It will be reviewed during business hours in the order received.';
       this.alertType = 'bootstrap-success';
       this.alert = true;
     },
     setErrorAlert() {
-      this.alertMessage = 'Sorry, an unexpected error seems to have occurred. You can click on the submit button again later.';
+      this.alertMessage = 'Sorry, an unexpected error seems to have occurred. '
+        + 'You can click on the submit button again later.';
       this.alertType = 'bootstrap-error';
       this.alert = true;
     },
@@ -200,10 +203,10 @@ export default {
       this.showConfirm = false;
     },
     submitComment() {
-      if(!this.replyEmpty) {
+      if (!this.replyEmpty) {
         this.alert = false;
         this.submitting = true;
-        if(this.requestType ==='penRequest' || this.requestType==='studentRequest'){
+        if (this.requestType ==='penRequest' || this.requestType==='studentRequest') {
           const messageToSend = {
             content: this.reply,
             myself: true,
@@ -219,8 +222,8 @@ export default {
           });
         }
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

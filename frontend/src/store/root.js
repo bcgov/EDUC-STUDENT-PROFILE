@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useRootStore = defineStore('root', {
   state: {
     student: null,
-    requestType: null,
+    requestType: null
   },
   actions: {
     setStudent(student) {
@@ -11,6 +11,6 @@ export const useRootStore = defineStore('root', {
     },
     setRequestType(requestType) {
       this.requestType = requestType;
-    },
-  },
+    }
+  }
 });

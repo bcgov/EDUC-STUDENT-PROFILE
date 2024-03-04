@@ -9,6 +9,7 @@
 
 <script>
 import StaticConfig from '../common/staticConfig';
+import { useAuthStore } from '../store/auth';
 
 export default {
   name: 'ModalJourney',
@@ -23,7 +24,7 @@ export default {
   },
   methods: {
     logout() {
-      this.$store.commit('auth/setJwtToken');
+      useAuthStore().setJwtToken();
     }
   }
 

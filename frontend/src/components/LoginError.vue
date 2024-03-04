@@ -53,6 +53,7 @@
 
 <script>
 import { AuthRoutes } from '../utils/constants';
+import { useAuthStore } from '../store/auth';
 
 export default {
   name: 'LoginError',
@@ -63,11 +64,11 @@ export default {
     };
   },
   mounted() {
-    this.$store.commit('auth/setJwtToken');
+    useAuthStore().setJwtToken();
   },
   methods: {
     clearStorage() {
-      this.$store.commit('auth/setJwtToken');
+      useAuthStore().setJwtToken();
     }
   }
 };

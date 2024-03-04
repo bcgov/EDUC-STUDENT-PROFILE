@@ -65,6 +65,7 @@
 <script>
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
+import { getRequestStore } from '../store/request';
 import { humanFileSize, getFileNameWithMaxNameLength } from '../utils/file';
 import ApiService from '../common/apiService';
 import { sortBy } from 'lodash';
@@ -99,10 +100,10 @@ export default {
   computed: {
     ...mapState(useRootStore, ['requestType']),
     documentTypeCodes() {
-      return this.$store.getters[`${this.requestType}/documentTypeCodes`];
+      return getRequestStore().documentTypeCodes;
     },
     requestID() {
-      return this.$store.getters[`${this.requestType}/requestID`];
+      return getRequestStore().requestID;
     },
     dataReady () {
       return this.validForm && this.file;

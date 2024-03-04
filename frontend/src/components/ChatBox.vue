@@ -86,7 +86,7 @@
           location="top"
           color="indigo-darken-2"
         />
-        <SingleComment 
+        <SingleComment
           v-for="comment in commentHistory"
           :key="comment.id"
           :comment="comment"
@@ -99,14 +99,16 @@
   </v-container>
 </template>
 <script>
+import { groupBy, sortBy, findLastIndex } from 'lodash';
+import { RequestStatuses } from '../utils/constants';
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
 import { useAuthStore } from '../store/auth';
+import { getRequestStore } from '../store/request';
+
 import SingleComment from './SingleComment.vue';
 import CommentForm from './CommentForm.vue';
 import ApiService from '../common/apiService';
-import { groupBy, sortBy, findLastIndex } from 'lodash';
-import { RequestStatuses } from '../utils/constants';
 
 export default {
   components: {
@@ -130,16 +132,16 @@ export default {
     ...mapState(useAuthStore, ['userInfo']),
     ...mapState(useRootStore, ['requestType']),
     request() {
-      return this.$store.getters[`${this.requestType}/request`];
+      return getRequestStore().request;
     },
     unsubmittedDocuments() {
-      return this.$store.getters[`${this.requestType}/unsubmittedDocuments`];
+      return getRequestStore().unsubmittedDocuments;
     },
     commentHistory() {
-      return this.$store.getters[`${this.requestType}/commentHistory`];
+      return getRequestStore().commentHistory;
     },
     requestComments() {
-      return this.$store.getters[`${this.requestType}/requestComments`];
+      return getRequestStore().requestComments;
     },
     myself() {
       return { name: this.userInfo.displayName, id: '1' };
@@ -159,7 +161,9 @@ export default {
   },
   created() {
     this.getDocumentTypeCodes();
-    const documentPromise = this.commentDocuments ? Promise.resolve({data: this.commentDocuments}) : ApiService.getDocumentList(this.requestID, this.requestType);
+    const documentPromise = this.commentDocuments
+      ? Promise.resolve({data: this.commentDocuments})
+      : ApiService.getDocumentList(this.requestID, this.requestType);
     Promise.all([
       documentPromise,
       ApiService.getCommentList(this.requestID, this.requestType),
@@ -192,19 +196,19 @@ export default {
   },
   methods: {
     getDocumentTypeCodes() {
-      return this.$store.dispatch(`${this.requestType}/getDocumentTypeCodes`);
+      return getRequestStore().getDocumentTypeCodes();
     },
     setUnsubmittedDocuments(unsubmittedDocuments) {
-      this.$store.commit(`${this.requestType}/setUnsubmittedDocuments`, unsubmittedDocuments);
+      getRequestStore().setUnsubmittedDocuments(unsubmittedDocuments);
     },
     setCommentHistory(commentHistory) {
-      this.$store.commit(`${this.requestType}/setCommentHistory`, commentHistory);
+      getRequestStore().setCommentHistory(commentHistory);
     },
     setUnsubmittedComment(unsubmittedComment) {
-      this.$store.commit(`${this.requestType}/setUnsubmittedComment`, unsubmittedComment);
+      getRequestStore().setUnsubmittedComment(unsubmittedComment);
     },
     setRequestComments(requestComments) {
-      this.$store.commit(`${this.requestType}/setRequestComments`, requestComments);
+      getRequestStore().setRequestComments(requestComments);
     },
     linkDocumentsToComments(messages, documents) {
       const myMessages = messages.filter(message => message.myself);

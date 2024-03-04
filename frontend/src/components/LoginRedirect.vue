@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     clearStorage() {
-      this.$store.commit('auth/setJwtToken');
+      useAuthStore().setJwtToken();
     }
   }
 };
@@ -60,9 +60,6 @@ export default {
     max-width:80%;
     margin: 2rem;
   }
-  /* .v-card__text{
-    padding-top: 0px; 
-  } */
   .img-card{
     height: auto !important;
     width: 90%;

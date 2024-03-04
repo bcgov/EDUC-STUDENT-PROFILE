@@ -100,11 +100,12 @@
 </template>
 
 <script>
-import {mapState} from 'pinia';
-import {useRootStore} from '../store/root';
-import {humanFileSize} from '../utils/file';
-import {ApiRoutes} from '../utils/constants';
-import {find} from 'lodash';
+import { mapState } from 'pinia';
+import { useRootStore } from '../store/root';
+import { getRequestStore } from '../store/request';
+import { humanFileSize } from '../utils/file';
+import { ApiRoutes } from '../utils/constants';
+import { find } from 'lodash';
 
 export default {
   props: {
@@ -134,10 +135,10 @@ export default {
   computed: {
     ...mapState(useRootStore, ['requestType']),
     documentTypeCodes() {
-      return this.$store.getters[`${this.requestType}/documentTypeCodes`];
+      return getRequestStore().documentTypeCodes;
     },
     requestID() {
-      return this.$store.getters[`${this.requestType}/requestID`];
+      return getRequestStore().requestID;
     },
     documentType() {
       const typeCode = find(this.documentTypeCodes, ['documentTypeCode', this.document.documentTypeCode]);
@@ -159,7 +160,7 @@ export default {
   },
   methods: {
     deleteFile(documentData) {
-      return this.$store.dispatch(`${this.requestType}/deleteFile`, documentData);
+      return getRequestStore().deleteFile(documentData);
     },
     setSuccessAlert(alertMessage) {
       this.alertMessage = alertMessage;

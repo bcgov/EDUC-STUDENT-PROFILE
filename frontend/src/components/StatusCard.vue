@@ -136,6 +136,7 @@
 <script>
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
+import { getRequestStore } from '../store/request';
 import { find } from 'lodash';
 
 import { RequestStatuses } from '../utils/constants';
@@ -165,10 +166,10 @@ export default {
   computed: {
     ...mapState(useRootStore, ['requestType']),
     request() {
-      return this.$store.getters[`${this.requestType}/request`];
+      return getRequestStore().request;
     },
     statuses() {
-      return this.$store.getters[`${this.requestType}/statuses`];
+      return getRequestStore.statuses;
     },
     statusCodeName() {
       return `${this.requestType}StatusCode`;

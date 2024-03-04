@@ -2,9 +2,9 @@ const baseRoot = '/api';
 const authRoot = baseRoot + '/auth';
 const gmpRoot = baseRoot + '/gmp';
 const umpRoot = baseRoot + '/ump';
-let object;
 
-object = {
+//Authentication endpoints
+export const AuthRoutes = Object.freeze({
   LOGIN:'/',
   LOGIN_BCSC: authRoot + '/logout?loginBcsc=true',
   LOGIN_BCEID: authRoot + '/logout?loginBceid=true',
@@ -14,9 +14,7 @@ object = {
   REFRESH: authRoot + '/refresh',
   TOKEN: authRoot + '/token',
   SESSION_REMAINING_TIME: authRoot + '/user-session-remaining-time',
-};
-//Authentication endpoints
-export const AuthRoutes = Object.freeze(object);
+});
 
 export const ApiRoutes = Object.freeze({
   USER: baseRoot + '/user',

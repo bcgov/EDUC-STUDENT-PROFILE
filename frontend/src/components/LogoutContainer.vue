@@ -44,6 +44,7 @@
 
 <script>
 import { AuthRoutes } from '../utils/constants';
+import { useAuthStore } from '../store/auth';
 export default {
   data() {
     return {
@@ -51,11 +52,12 @@ export default {
     };
   },
   mounted() {
+    useAuthStore().setJwtToken();
     this.$store.commit('auth/setJwtToken');
   },
   methods: {
     clearStorage() {
-      this.$store.commit('auth/setJwtToken');
+      useAuthStore().setJwtToken();
     }
   }
 };

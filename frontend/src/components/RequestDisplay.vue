@@ -76,6 +76,7 @@
 <script>
 import { mapState } from 'pinia';
 import { useRootStore } from '../store/root';
+import { getRequestStore } from '../store/request';
 import { RequestStatuses } from '../utils/constants';
 
 import ChatBox from './ChatBox.vue';
@@ -119,7 +120,7 @@ export default {
       return this.request[`${this.requestType}StatusCode`];
     },
     request() {
-      return this.$store.getters[`${this.requestType}/request`];
+      return getRequestStore().request;
     },
     requestStatuses() {
       return RequestStatuses;
