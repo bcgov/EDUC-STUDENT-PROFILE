@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 
 export const useRootStore = defineStore('root', {
-  state: {
+  state: () => ({
     student: null,
     requestType: null
-  },
+  }),
   actions: {
     setStudent(student) {
       this.student = student;

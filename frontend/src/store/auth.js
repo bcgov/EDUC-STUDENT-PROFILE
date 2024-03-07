@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', {
     setLoading(isLoading) {
       this.isLoading = isLoading;
     },
-    loginErrorRedirect(){
+    loginErrorRedirect() {
       this.setLoginError();
     },
     logout() {

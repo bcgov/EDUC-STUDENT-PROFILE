@@ -8,18 +8,17 @@
 </template>
 
 <script>
-import StaticConfig from '../common/staticConfig';
 import { useAuthStore } from '../store/auth';
 
 export default {
   name: 'ModalJourney',
-  data(){
-    return{
-      journeyBuilder: StaticConfig.VUE_APP_JOURNEY_BUILDER
+  data() {
+    return {
+      journeyBuilder: import.meta.env.VITE_APP_JOURNEY_BUILDER
     };
   },
   mounted() {
-    console.log(this.journeyBuilder);
+    console.warn('Gonna redirect you now!')
     window.location = document.getElementById('journey_href').href;
   },
   methods: {

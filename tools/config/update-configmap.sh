@@ -155,18 +155,16 @@ var collector = 'spt.apps.gov.bc.ca';
 //  <!-- Snowplow stop plowing -->
 "
 
-regConfig="var config = (function() {
-  return {
-    \"VUE_APP_BCEID_REG_URL\" : \"$bceid_reg_url\",
-    \"BANNER_ENVIRONMENT\" : \"$bannerEnvironment\",
-    \"BANNER_COLOR\" : \"$bannerColor\",
-    \"VUE_APP_JOURNEY_BUILDER\" : \"$journey_builder_url\",
-    \"VUE_APP_IDLE_TIMEOUT_IN_MILLIS\" : \"1800000\"
-  };
-})();"
+regConfig="
+VITE_APP_BCEID_REG_URL=\"$bceid_reg_url\"
+VITE_APP_IDLE_TIMEOUT_IN_MILLIS=1800000
+VITE_APP_JOURNEY_BUILDER=\"$journey_builder_url\"
+VITE_BANNER_COLOR=\"$bannerColor\"
+VITE_BANNER_ENVIRONMENT=\"$bannerEnvironment\"
+"
 
 echo Creating config map $APP_NAME-frontend-config-map
-oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map --from-literal=TZ=$TZVALUE --from-literal=HOST_ROUTE=$HOST_ROUTE --from-literal=config.js="$regConfig" --from-literal=snowplow.js="$snowplow"  --dry-run -o yaml | oc apply -f -
+oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map --from-literal=TZ=$TZVALUE --from-literal=HOST_ROUTE=$HOST_ROUTE --from-literal=.env.$envValue="$regConfig" --from-literal=snowplow.js="$snowplow" --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for $APP_NAME-frontend-$SOAM_KC_REALM_ID application
 oc -n $PEN_NAMESPACE-$envValue set env --from=configmap/$APP_NAME-frontend-config-map dc/$APP_NAME-frontend-$SOAM_KC_REALM_ID

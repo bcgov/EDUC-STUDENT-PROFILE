@@ -266,7 +266,7 @@ function checkStudentRequestExists(_to, _from, next) {
 function hasCompletedPenRequestButNoStudentLinkage() {
   const rootStore = useRootStore();
   const penRequest = usePenRequestStore();
-  return penRequest?.request.penRequestStatusCode === PenRequestStatuses.MANUAL && !rootStore.student;
+  return penRequest?.request?.penRequestStatusCode === PenRequestStatuses.MANUAL && !rootStore.student;
 }
 
 function checkPenRequestExists(_to, _from, next) {
@@ -275,7 +275,7 @@ function checkPenRequestExists(_to, _from, next) {
   const authStore = useAuthStore();
 
   if(authStore.isAuthenticated
-    && (['ABANDONED', 'REJECTED'].includes(penRequest?.request.penRequestStatusCode)
+    && (['ABANDONED', 'REJECTED'].includes(penRequest?.request?.penRequestStatusCode)
       || hasCompletedPenRequestButNoStudentLinkage())) {
     rootStore.setRequestType('penRequest');
     next();

@@ -2,9 +2,9 @@ import { defineStore } from 'pinia';
 import ApiService from '../common/apiService';
 
 export const useConfigStore = defineStore('config', {
-  state: {
+  state: () => ({
     numDaysAllowedInDraftStatus: null,
-  },
+  }),
   actions: {
     setNumDaysAllowedInDraftStatus(numDaysAllowedInDraftStatus) {
       this.numDaysAllowedInDraftStatus = numDaysAllowedInDraftStatus;

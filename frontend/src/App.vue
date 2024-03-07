@@ -22,7 +22,6 @@ import { mapState, mapActions } from 'pinia';
 import { useAuthStore } from './store/auth';
 import { useStudentRequestStore, usePenRequestStore } from './store/request';
 import HttpStatus from 'http-status-codes';
-import StaticConfig from './common/staticConfig';
 
 import HeaderToolbar from './components/HeaderToolbar.vue';
 import FooterComponent from './components/FooterComponent.vue';
@@ -39,8 +38,8 @@ export default {
   },
   data() {
     return {
-      bannerEnvironment: StaticConfig.BANNER_ENVIRONMENT,
-      bannerColor: StaticConfig.BANNER_COLOR
+      bannerEnvironment: import.meta.env.VITE_BANNER_ENVIRONMENT,
+      bannerColor: import.meta.env.VITE_BANNER_COLOR
     };
   },
   computed: {
@@ -52,9 +51,13 @@ export default {
   async created() {
     this.setLoading(true);
     this.getJwtToken().then(() =>
-      Promise.all([this.getPenRequestCodes('penRequest'), this.getStudentRequestCodes('studentRequest'), this.getUserInfo()])
+      Promise.all([
+        this.getPenRequestCodes('penRequest'),
+        this.getStudentRequestCodes('studentRequest'),
+        this.getUserInfo()
+      ])
     ).catch(e => {
-      if(! e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
+      if(!e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
         this.logout();
         this.$router.replace({name: 'error', query: { message: `500_${e.data || 'ServerError'}` } });
       }
