@@ -68,7 +68,7 @@ import { AuthRoutes } from '../utils/constants';
 export default {
   data() {
     return {
-      appTitle: import.meta.env.VUE_APP_TITLE,
+      appTitle: import.meta.env.VITE_APP_TITLE,
       authRoutes: AuthRoutes
     };
   },
