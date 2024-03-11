@@ -55,7 +55,7 @@ const router = createRouter({
           meta: {
             requiresAuth: true
           },
-          beforeEnter: (_to, _from, next) => {
+          beforeEnter: () => {
             const rootStore = useRootStore();
             const umpStore = useUmpStore();
             const penRequest = usePenRequestStore();
@@ -68,9 +68,7 @@ const router = createRouter({
                 .some(status => status === penRequest.request.penRequestStatusCode);
             if(authStore.isAuthenticated && !studentRequest.request && !hasInflightGMPRequest) {
               rootStore.setRequestType('studentRequest');
-              next('ump/request');
-            } else {
-              next();
+              return '/ump/request';
             }
           },
         },
@@ -132,7 +130,6 @@ const router = createRouter({
     {
       path: '/gmp',
       component: RouterView,
-
       children: [
         {
           path: '',
@@ -141,26 +138,27 @@ const router = createRouter({
           meta: {
             requiresAuth: true
           },
-          beforeEnter: (_to, _from, next) => {
+          beforeEnter: () => {
             const rootStore = useRootStore();
             const gmpStore = useGmpStore();
             const penRequest = usePenRequestStore();
             const studentRequest = useStudentRequestStore();
             const authStore = useAuthStore();
+            console.log('HERE');
 
             gmpStore.$reset();
             const hasInflightOrCompletedUMPRequest = studentRequest.request
               && values(pick(StudentRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV', 'COMPLETED']))
                 .some(status => status === studentRequest.request.studentRequestStatusCode);
+
             if (authStore.isAuthenticated
                 && ((!penRequest.request
                 && !hasInflightOrCompletedUMPRequest) || hasCompletedPenRequestButNoStudentLinkage())) {
+
               rootStore.setRequestType('penRequest');
-              next('gmp/request');
-            } else {
-              next();
+              return { name: 'gmp-step1' };
             }
-          },
+          }
         },
         {
           path: 'request',
@@ -249,7 +247,7 @@ const router = createRouter({
   ]
 });
 
-function checkStudentRequestExists(_to, _from, next) {
+function checkStudentRequestExists() {
   const rootStore = useRootStore();
   const studentRequest = useStudentRequestStore();
   const authStore = useAuthStore();
@@ -257,9 +255,8 @@ function checkStudentRequestExists(_to, _from, next) {
     && (!studentRequest.request || ['COMPLETED', 'ABANDONED', 'REJECTED']
       .includes(studentRequest.request.studentRequestStatusCode))) {
     rootStore.setRequestType('studentRequest');
-    next();
   } else {
-    next('/ump');
+    return '/ump';
   }
 }
 
@@ -269,7 +266,7 @@ function hasCompletedPenRequestButNoStudentLinkage() {
   return penRequest?.request?.penRequestStatusCode === PenRequestStatuses.MANUAL && !rootStore.student;
 }
 
-function checkPenRequestExists(_to, _from, next) {
+function checkPenRequestExists() {
   const rootStore = useRootStore();
   const penRequest = usePenRequestStore();
   const authStore = useAuthStore();
@@ -278,30 +275,24 @@ function checkPenRequestExists(_to, _from, next) {
     && (!penRequest.request || ['ABANDONED', 'REJECTED'].includes(penRequest?.request?.penRequestStatusCode)
       || hasCompletedPenRequestButNoStudentLinkage())) {
     rootStore.setRequestType('penRequest');
-    next();
   } else {
-    next('/gmp');
+    return '/gmp';
   }
 }
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to) => {
   const authStore = useAuthStore();
 
   if (to.meta.requiresAuth && authStore.isAuthenticated) {
     authStore.getJwtToken().then(() => {
       if (!authStore.isAuthenticated) {
-        next('/token-expired');
-      } else if (to.meta.notRefreshUserInfo) {
-        next();
+        return '/token-expired';
       } else {
-        authStore.getUserInfo().then(next).catch(() => next('error'));
+        authStore.getUserInfo().then(() => '').catch(() => '/error');
       }
     }).catch(() => {
-      next('/token-expired');
+      return '/token-expired';
     });
-  }
-  else{
-    next();
   }
 });
 
