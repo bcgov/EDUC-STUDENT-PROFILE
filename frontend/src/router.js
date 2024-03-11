@@ -274,8 +274,8 @@ function checkPenRequestExists(_to, _from, next) {
   const penRequest = usePenRequestStore();
   const authStore = useAuthStore();
 
-  if(authStore.isAuthenticated
-    && (['ABANDONED', 'REJECTED'].includes(penRequest?.request?.penRequestStatusCode)
+  if (authStore.isAuthenticated
+    && (!penRequest.request || ['ABANDONED', 'REJECTED'].includes(penRequest?.request?.penRequestStatusCode)
       || hasCompletedPenRequestButNoStudentLinkage())) {
     rootStore.setRequestType('penRequest');
     next();
