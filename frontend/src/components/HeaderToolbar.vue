@@ -1,9 +1,8 @@
 <template>
   <v-toolbar
-    class="toolbar_header"
+    id="toolbarHeader"
     dense
   >
-    <!-- Navbar content -->
     <img
       src="../assets/images/bc-gov-logo.svg"
       class="img-theme"
@@ -20,8 +19,7 @@
           <v-chip
             tabindex="0"
             pill
-            color="#003366"
-            theme="dark"
+            color="white"
             v-bind="props"
           >
             <v-avatar
@@ -97,12 +95,12 @@ export default {
   .title {
     width: 50%;
     height: auto;
-    max-height: 50px !important;
   }
-  .span-title{
+
+  .span-title {
     color: white;
-    text-align: center !important;
   }
+
   @media screen and (min-width: 601px) {
     .span-title {
       font-size: 20px;
@@ -111,7 +109,7 @@ export default {
       width: 20%;
       max-height: 40px !important;
     }
-    .display-name{
+    .display-name {
       display: inline-block;
     }
   }
@@ -127,7 +125,7 @@ export default {
       max-height: 100px !important;
       padding-right: inherit;
     }
-    .display-name{
+    .display-name {
       display: none;
     }
   }
@@ -142,14 +140,14 @@ export default {
       max-height: 100px !important;
       padding-right: inherit;
     }
-    .display-name{
+    .display-name {
       display: none;
     }
   }
-  .toolbar_header {
-    background-color: rgb(0, 51, 102) !important;
-    border-bottom: 2px solid rgb(252, 186, 25) !important;
-    max-height: 3.5rem;
+
+  #toolbarHeader {
+    background-color: rgb(0, 51, 102);
+    border-bottom: 2px solid rgb(252, 186, 25);
   }
 
   .gov-header .v-btn,

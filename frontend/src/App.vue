@@ -2,15 +2,18 @@
   <v-app id="app">
     <MsieBanner v-if="isIE" />
     <HeaderToolbar />
-    <v-app-bar
+    <div
       v-if="bannerColor !== ''"
-      style="color:white;"
-      :color="bannerColor"
-      sticky
-      dense
+      id="bannerEnvironment"
     >
-      <div><h3>{{ bannerEnvironment }} Environment</h3></div>
-    </v-app-bar>
+      <v-container>
+        <v-row>
+          <v-col>
+            <h3>{{ bannerEnvironment }} Environment</h3>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
     <ModalIdle v-if="isAuthenticated" />
     <router-view />
     <FooterComponent />
@@ -74,19 +77,29 @@ export default {
 </script>
 
 <style>
+#bannerEnvironment {
+  background: v-bind(bannerColor);
+  color: white;
+}
+
 .v-application {
   font-family: 'BCSans', Verdana, Arial, sans-serif !important;
 }
+
+.v-application a {
+  color: #1976d2
+}
+
 .v-card--flat {
   background-color: transparent !important;
 }
-.theme--light.application{
+.theme--light.application {
   background: #f1f1f1;
 }
 h1 {
   font-size: 1.25rem;
 }
-.v-toolbar__title{
+.v-toolbar__title {
   font-size: 1rem;
 }
 
