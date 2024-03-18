@@ -38,7 +38,6 @@ const router = createRouter({
       meta: {
         requiresAuth: true
       },
-
     },
     {
       path: '/ump',
@@ -80,7 +79,7 @@ const router = createRouter({
           children: [
             {
               path: '',
-              name: 'step1',
+              name: 'ump-step-1',
               component: CurrentInfo,
               beforeEnter: checkStudentRequestExists,
               meta: {
@@ -90,7 +89,7 @@ const router = createRouter({
             },
             {
               path: 'requestForm',
-              name: 'step2',
+              name: 'ump-step-2',
               component: StudentRequestForm,
               beforeEnter: checkStudentRequestExists,
               meta: {
@@ -100,7 +99,7 @@ const router = createRouter({
             },
             {
               path: 'requestSummary',
-              name: 'step3',
+              name: 'ump-step-3',
               component: StudentRequestSummary,
               beforeEnter: checkStudentRequestExists,
               meta: {
@@ -110,7 +109,7 @@ const router = createRouter({
             },
             {
               path: 'requestSubmission',
-              name: 'step4',
+              name: 'ump-step-4',
               component: StudentRequestSubmission,
               meta: {
                 requiresAuth: true,
@@ -154,7 +153,7 @@ const router = createRouter({
                 && !hasInflightOrCompletedUMPRequest) || hasCompletedPenRequestButNoStudentLinkage())) {
 
               rootStore.setRequestType('penRequest');
-              return { name: 'gmp-step1' };
+              return { name: 'gmp-step-1' };
             }
           }
         },
@@ -167,7 +166,7 @@ const router = createRouter({
           children: [
             {
               path: '',
-              name: 'gmp-step1',
+              name: 'gmp-step-1',
               component: PenRequestForm,
               beforeEnter: checkPenRequestExists,
               meta: {
@@ -176,7 +175,7 @@ const router = createRouter({
             },
             {
               path: 'requestSummary',
-              name: 'gmp-step2',
+              name: 'gmp-step-2',
               component: PenRequestSummary,
               beforeEnter: checkPenRequestExists,
               meta: {
@@ -185,7 +184,7 @@ const router = createRouter({
             },
             {
               path: 'requestSubmission',
-              name: 'gmp-step3',
+              name: 'gmp-step-3',
               component: PenRequestSubmission,
               meta: {
                 requiresAuth: true

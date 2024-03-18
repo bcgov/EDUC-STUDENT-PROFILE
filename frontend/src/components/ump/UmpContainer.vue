@@ -273,10 +273,10 @@ export default {
   },
   watch: {
     isLoading(val) {
-      if(!val) {
-        if(!this.hasRequest && !this.hasInflightGMPRequest) {
-          this.$router.push({ name: 'step1' });
-        } else if(this.hasRequest) {
+      if (!val) {
+        if (!this.hasRequest && !this.hasInflightGMPRequest) {
+          this.$router.push({ name: 'ump-step-1' });
+        } else if (this.hasRequest) {
           this.getInitialDocuments();
         }
       }
@@ -284,7 +284,7 @@ export default {
   },
   created() {
     this.setRequestType('studentRequest');
-    if(this.hasRequest) {
+    if (this.hasRequest) {
       this.getInitialDocuments();
     }
   },
@@ -299,7 +299,7 @@ export default {
     getInitialDocuments() {
       this.getDocumentTypeCodes();
       ApiService.getDocumentList(this.requestID, this.requestType).then((documentRes) => {
-        if(this.request.studentRequestStatusCode === 'DRAFT') {
+        if (this.request.studentRequestStatusCode === 'DRAFT') {
           this.initialDocuments = documentRes.data;
           this.commentDocuments = [];
         } else {
@@ -321,11 +321,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .container{
+  .container {
     padding: 0px;
   }
-  .top-banner{
-    background-color: aliceblue;
+  .top-banner {
     background-size: cover;
     align-items: center;
     display: flex;

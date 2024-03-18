@@ -23,7 +23,7 @@
           <RequestStepper
             :steps="steps"
             :titles="titles"
-            step-route-prefix="gmp-"
+            step-route-prefix="gmp"
           />
         </v-col>
       </v-row>

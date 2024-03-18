@@ -248,7 +248,7 @@ export default {
           this.$router.push({ name: 'home' });
         } else if ((!this.hasPenRequest && !this.hasInflightStudentRequest)
           || this.hasCompletedPenRequestButNoStudentLinkage) {
-          this.$router.push({ name: 'gmp-step1' });
+          this.$router.push({ name: 'gmp-step-1' });
         }
       }
     }
