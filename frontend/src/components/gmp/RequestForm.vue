@@ -1,25 +1,32 @@
 <template>
   <div v-if="dataReady">
-    <v-card
-      color="#FFECA9"
-      class="pa-3 mb-8 mx-3"
-    >
-      <h3>Guidance:</h3>
-      <ul class="pt-2">
-        <li>This form can only be completed by the owner of the PEN</li>
-        <li>
-          Enter your legal name exactly as it appears on your Government Photo ID; including any middle names if
-          applicable
-        </li>
-        <li>
-          If your name has been legally changed since attending school in British Columbia, please indicate previous
-          name(s) in Past Names field
-        </li>
-      </ul>
-    </v-card>
-    <v-card-subtitle>
-      <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Student Information</span>
-    </v-card-subtitle>
+    <v-container>
+      <v-row>
+        <v-col>
+          <v-card
+            color="#FFECA9"
+            title="Guidance"
+          >
+            <v-card-text>
+              <ul class="pl-5">
+                <li>This form can only be completed by the owner of the PEN</li>
+                <li>
+                  Enter your legal name exactly as it appears on your Government Photo ID; including any middle names if
+                  applicable
+                </li>
+                <li>
+                  If your name has been legally changed since attending school in British Columbia, please indicate previous
+                  name(s) in Past Names field
+                </li>
+              </ul>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col><h3>Student Information</h3></v-col>
+      </v-row>
+    </v-container>
 
     <v-form
       id="penRequestForm"
@@ -27,41 +34,26 @@
       v-model="validForm"
       autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
     >
-      <v-container
-        fluid
-        class="py-0"
-      >
-        <v-row>
-          <v-col
-            cols="12"
-            class="declaration py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+      <v-container>
+        <v-row dense>
+          <v-col cols="12">
             <v-checkbox
               v-model="declared"
               color="green"
-              class="mt-0"
               :rules="privacyRule('')"
-            >
-              <template #label>
-                <div class="pl-3">
-                  I declare that I am submitting a request for my Personal Education Number on my own behalf. (If you
-                  are a parent/guardian go to your child's school to get their PEN.)
-                </div>
-              </template>
-            </v-checkbox>
+              label="I declare that I am submitting a request for my Personal Education Number on my own behalf.
+                (If you are a parent/guardian go to your child's school to get their PEN.)"
+            />
           </v-col>
         </v-row>
         <v-row>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+          <v-col cols="12">
             <v-text-field
               id="legalLastName"
               v-model.trim="userPost.legalLastName"
               :readonly="serviceCardBool"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               :rules="requiredRules(legalLastNameHint)"
               :hint="legalLastNameHint"
@@ -76,7 +68,6 @@
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
             <v-text-field
               id="legalFirstName"
@@ -85,7 +76,7 @@
               color="#003366"
               :hint="'As shown on current Government Photo ID. Note, If you have ONE name only – enter it into the '
                 + 'Legal Last Name field and leave Legal First Name blank'"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               label="Legal First Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
@@ -98,7 +89,6 @@
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
             <v-text-field
               id="legalMiddleNames"
@@ -106,7 +96,7 @@
               :readonly="serviceCardBool"
               color="#003366"
               hint="As shown on current Government Photo ID"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               label="Legal Middle Name(s) (provide if applicable)"
               :disabled="enableDisableForm.disabled"
@@ -116,15 +106,12 @@
               :rules="charRules"
             />
           </v-col>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+          <v-col cols="12">
             <v-text-field
               id="usualLastName"
               v-model.trim="userPost.usualLastName"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               hint="Only if different from Legal Last Name"
               label="Usual Last Name (optional)"
@@ -138,13 +125,12 @@
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
             <v-text-field
               id="usualFirstName"
               v-model.trim="userPost.usualFirstName"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               hint="Only if different from Legal First Name"
               label="Usual First Name(s) (optional)"
@@ -158,13 +144,12 @@
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
             <v-text-field
               id="usualMiddleNames"
               v-model.trim="userPost.usualMiddleName"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               hint="Only if different from Legal Middle Name"
               label="Usual Middle Name(s) (optional)"
@@ -178,7 +163,6 @@
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
             <v-text-field
               id="maidenName"
@@ -186,7 +170,7 @@
               color="#003366"
               class="touppercase"
               hint="List all previous Last names used separated with spaces"
-              variant="outlined"
+              variant="underlined"
               label="Maiden Name (if applicable)"
               :disabled="enableDisableForm.disabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
@@ -198,14 +182,13 @@
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
             <v-text-field
               id="pastNames"
               v-model.trim="userPost.pastNames"
               color="#003366"
               hint="List all previous names used separated with spaces"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               label="Past Name(s) (if applicable)"
               :disabled="enableDisableForm.disabled"
@@ -215,16 +198,13 @@
               :rules="charRules"
             />
           </v-col>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+          <v-col cols="12">
             <v-text-field
               v-if="serviceCardBool"
               id="birthdate"
-              v-model="userPost.dob"
+              v-model="rawDob"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               label="Birthdate"
               readonly
               required
@@ -238,16 +218,15 @@
               v-model="menu"
               :close-on-content-click="false"
               transition="scale-transition"
-              offset-y
               min-width="290px"
             >
               <template #activator="{ props }">
                 <v-text-field
                   id="birthdate"
                   ref="birthdate"
-                  v-model="userPost.dob"
+                  :model-value="userPost.dob"
                   color="#003366"
-                  variant="outlined"
+                  variant="underlined"
                   label="Birthdate"
                   readonly
                   :rules="requiredRules()"
@@ -262,19 +241,16 @@
               <v-date-picker
                 id="dob"
                 ref="picker"
-                v-model="userPost.dob"
+                v-model="rawDob"
+                view-mode="year"
                 color="#003366"
-                show-current
                 :max="new Date(localDate.now().minusYears(5).toString()).toISOString().substring(0, 10)"
                 min="1903-01-01"
                 @change="save"
               />
             </v-menu>
           </v-col>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+          <v-col cols="12">
             <v-text-field
               id="email"
               v-model="userPost.email"
@@ -282,7 +258,7 @@
               color="#003366"
               :hint="emailHint"
               class="touppercase"
-              variant="outlined"
+              variant="underlined"
               label="E-mail Address"
               :disabled="enableDisableForm.disabled"
               required
@@ -291,16 +267,13 @@
               density="compact"
             />
           </v-col>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+          <v-col cols="12">
             <v-text-field
               id="lastBCSchool"
               v-model.trim="userPost.lastBCSchool"
               color="#003366"
               hint="Last BC K-12 school or Post Secondary Institute attended"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               label="Last B.C. School Attended (optional)"
               :disabled="enableDisableForm.disabled"
@@ -310,16 +283,13 @@
               :rules="charRules"
             />
           </v-col>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+          <v-col cols="12">
             <v-text-field
               id="lastBCStudentNumber"
               v-model.trim="userPost.lastBCSchoolStudentNumber"
               color="#003366"
               hint="School Issued Local ID"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               label="School Student ID Number (optional)"
               :disabled="enableDisableForm.disabled"
@@ -329,16 +299,13 @@
               :rules="charRules"
             />
           </v-col>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+          <v-col cols="12">
             <v-text-field
               id="currentSchool"
               v-model.trim="userPost.currentSchool"
               color="#003366"
               hint="Current BC K-12 school or Post Secondary Institute"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               label="Current B.C. School Attending (optional)"
               :disabled="enableDisableForm.disabled"
@@ -349,99 +316,72 @@
             />
           </v-col>
         </v-row>
-      </v-container>
-      <v-container
-        fluid
-        no-padding
-      >
-        <v-row>
-          <v-col
-            cols="12"
-            class="declaration py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+        <v-row dense>
+          <v-col cols="12">
             <v-checkbox
               id="acceptance_chk"
               v-model="acceptance"
               color="green"
-              class="mt-0"
+              label="The personal demographic data provided above is complete and accurate."
+              :disabled="enableDisableForm.disabled"
               :rules="acceptanceRule('')"
               @click="clickAcceptance"
-            >
-              <template #label>
-                <div class="pl-3">
-                  The personal demographic data provided above is complete and accurate.
-                </div>
-              </template>
-            </v-checkbox>
+            />
           </v-col>
         </v-row>
+      </v-container>
+      <v-container>
         <v-row>
           <v-col
             id="confidential_information"
             cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
-            <v-card
-              height="100%"
-              width="100%"
-              elevation="2"
-              class="text-black pa-4"
-            >
-              <p><strong>Collection Notice:</strong></p>
-              <p>
-                The information included in this form is collected under ss. 26(c) of the Freedom of Information and
-                Protection of Privacy Act, R.S.B.C. 1996, c. 165. The information you provide will be used in
-                confirming your identity and communicating with you.
-              </p>
-              <p>
-                If you have any questions about the collection and use of this information, please contact:
-              </p>
-              <p>
-                <a href="mailto:pens.coordinator@gov.bc.ca">PEN Coordinator</a><br>
-                Data Management Unit, Student Data & Educational Resource Services Branch<br>
-                B.C. Ministry of Education and Child Care<br>
-                PO Box 9886 Stn Prov Govt<br>
-                Victoria BC V8W 9T6<br>
-                OR through Enquiry BC (Victoria): (250) 387-6121
-              </p>
+            <v-card elevation="2">
+              <v-card-title>Collection Notice</v-card-title>
+              <v-card-text id="collection-notice">
+                <p class="pb-4">
+                  The information included in this form is collected under ss. 26(c) of the Freedom of Information and
+                  Protection of Privacy Act, R.S.B.C. 1996, c. 165. The information you provide will be used in
+                  confirming your identity and communicating with you.
+                </p>
+                <p class="pb-4">
+                  If you have any questions about the collection and use of this information, please contact:
+                </p>
+                <p>
+                  <a href="mailto:pens.coordinator@gov.bc.ca"><strong>PEN Coordinator</strong></a><br>
+                  Data Management Unit, Student Data & Educational Resource Services Branch<br>
+                  B.C. Ministry of Education and Child Care<br>
+                  PO Box 9886 Stn Prov Govt<br>
+                  Victoria BC V8W 9T6<br>
+                  OR through Enquiry BC (Victoria): (250) 387-6121
+                </p>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
-        <v-row
-          justify="space-between"
-          class="pt-2"
-        >
-          <v-col
-            cols="1"
-            sm="2"
-            class="d-flex justify-left align-self-center py-0 px-0 pl-4"
-          >
+        <v-row>
+          <v-col>
             <v-btn
               id="cancelButton"
               to="home"
               color="#003366"
-              class="text-white align-self-center"
+              class="text-white"
             >
               Cancel
             </v-btn>
           </v-col>
-          <v-col
-            cols="11"
-            sm="2"
-            class="d-flex justify-end align-self-center py-0 px-0 pr-3"
-          >
-            <v-card-actions class="justify-end">
-              <v-btn
-                id="submit_form"
-                color="#003366"
-                class="text-white align-self-center"
-                :disabled="!validForm"
-                :loading="submitting"
-                @click="submitRequestForm"
-              >
-                Next
-              </v-btn>
-            </v-card-actions>
+          <v-spacer />
+          <v-col class="text-right">
+            <v-btn
+              id="submit_form"
+              color="#003366"
+              class="text-white"
+              :disabled="!validForm"
+              :loading="submitting"
+              @click="submitRequestForm"
+            >
+              Next
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -453,13 +393,13 @@
 import { mapState, mapWritableState, mapActions } from 'pinia';
 import { useAuthStore } from '../../store/auth';
 import { useGmpStore } from '../../store/gmp';
-import {LocalDate} from '@js-joda/core';
+import { LocalDate } from '@js-joda/core';
 
 export default {
   emits: ['next'],
   data() {
     return {
-      localDate:LocalDate,
+      localDate: LocalDate,
       legalLastNameHint: 'As shown on current Government Photo ID. Note, If you have ONE name only – enter it in Legal'
         + ' Last Name field and leave Legal First Name blank',
       emailHint: 'Valid Email Required',
@@ -490,6 +430,7 @@ export default {
         lastBCSchoolStudentNumber: null,
         currentSchool: null
       },
+      rawDob: null,
       enableDisableForm: {
         disabled: true
       },
@@ -525,12 +466,14 @@ export default {
     },
   },
   watch: {
-    menu(val) {
-      val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'));
+    rawDob(val) {
+      const date = new Date(val);
+      this.$nextTick().then(() => {
+        this.userPost.dob = date.toISOString().substring(0, 10);
+      });
     },
   },
   mounted() {
-
     //populate form if user is logged in with BCSC
     if (this.userInfo && this.userInfo.accountType === 'BCSC') {
       this.userPost.legalLastName = this.userInfo.legalLastName;
@@ -564,93 +507,90 @@ export default {
       this.$refs.menu.save(date);
       this.$refs.birthdate.$el.querySelectorAll('#birthdate')[0].focus();
     },
-    validate() {
-      this.$refs.form.validate();
+    async validate() {
+      this.validForm = await this.$refs.form.validate();
     },
-    submitRequestForm() {
-      this.validate();
+    async submitRequestForm() {
+      await this.validate();
       if (this.validForm) {
         this.setRequestData(this.userPost);
         this.$emit('next');
       }
     },
-    maxSelectableDate(){
+    maxSelectableDate() {
       return new Date(LocalDate.now().minusYears(5).toString()).toISOString().substring(0, 10);
     },
     clickAcceptance() {
-      if(this.acceptance) {
+      if (this.acceptance) {
         this.validate();
       }
     },
     focusBirthdateField(event) {
-      if(event.key === 'Tab' && event.type === 'keyup') {
+      if (event.key === 'Tab' && event.type === 'keyup') {
         this.menu = true;
       }
+    },
+    onDatePickerChange(newValue) {
+      console.log('Heyo!');
+      this.userPost.dob = newValue;
     }
   }
 };
 </script>
 
 <style scoped>
+input[autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"]::-webkit-contacts-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  height: 0;
+  width: 0;
+  margin: 0;
+}
 
-  input[autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"]::-webkit-contacts-auto-fill-button {
-    visibility: hidden;
-    display: none !important;
-    pointer-events: none;
-    height: 0;
-    width: 0;
-    margin: 0;
-  }
+#penRequestForm :deep(.v-input__details) { overflow: visible; }
+
+.mainCard {
+  margin: 20px 0;
+  padding: 10px;
+  width: 100%;
+  /* max-width: 900px; */
+}
+
+.top_group {
+  padding-top: 15px;
+}
+
+.bottom_group {
+  padding-bottom: 15px;
+}
+
+@media screen and (max-width: 300px) {
   .mainCard {
-    margin: 20px 0;
-    padding: 10px;
+    margin-top: .1vh;
+    padding-top: 10px;
     width: 100%;
-    /* max-width: 900px; */
+    margin-bottom: 8rem;
   }
+}
 
-  .declaration /deep/ .v-icon {
-    padding-left: 2px;
+@media screen and (min-width: 301px) and (max-width: 600px) {
+  .mainCard {
+    margin-top: .1vh;
+    padding-top: 10px;
+    width: 100%;
+    margin-bottom: 7rem;
   }
+}
 
-  .noPadding {
-    padding-top: 0;
-    margin-top: 0;
+@media screen and (min-width: 601px) and (max-width: 900px) {
+  .mainCard {
+    margin-top: .1vh;
+    padding-top: 10px;
+    width: 100%;
+    margin-bottom: 7rem;
   }
-
-  .top_group {
-    padding-top: 15px;
-  }
-
-  .bottom_group {
-    padding-bottom: 15px;
-  }
-
-  @media screen and (max-width: 300px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 8rem;
-    }
-  }
-
-  @media screen and (min-width: 301px) and (max-width: 600px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 7rem;
-    }
-  }
-
-  @media screen and (min-width: 601px) and (max-width: 900px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 7rem;
-    }
-  }
+}
 </style>
 
 <style>
