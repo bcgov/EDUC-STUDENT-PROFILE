@@ -56,7 +56,7 @@
           xs="8"
         >
           <p class="ml-2 mb-0">
-            <strong>{{ request.dob ? moment(request.dob).format('MMMM D, YYYY'):'' }}</strong>
+            <strong>{{ formattedDate }}</strong>
           </p>
         </v-col>
       </v-row>
@@ -97,6 +97,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 
 export default {
   name: 'StudentInfoCard',
@@ -110,6 +111,9 @@ export default {
     fullName() {
       return [this.request.legalFirstName, this.request.legalMiddleNames, this.request.legalLastName]
         .filter(Boolean).join(' ').toUpperCase();
+    },
+    formattedDate(){
+      return this.request.dob ? moment(this.request.dob).format('MMMM D, YYYY') : '';
     }
   },
 };
