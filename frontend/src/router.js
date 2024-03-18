@@ -143,7 +143,6 @@ const router = createRouter({
             const penRequest = usePenRequestStore();
             const studentRequest = useStudentRequestStore();
             const authStore = useAuthStore();
-            console.log('HERE');
 
             gmpStore.$reset();
             const hasInflightOrCompletedUMPRequest = studentRequest.request

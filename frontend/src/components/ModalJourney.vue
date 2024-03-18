@@ -18,7 +18,6 @@ export default {
     };
   },
   mounted() {
-    console.warn('Gonna redirect you now!')
     window.location = document.getElementById('journey_href').href;
   },
   methods: {
