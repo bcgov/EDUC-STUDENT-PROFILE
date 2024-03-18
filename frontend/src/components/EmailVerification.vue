@@ -188,21 +188,19 @@ export default {
 </script>
 
 <style scoped>
-.container{
+.container {
   padding: 0;
 }
 
-.full-height{
+.full-height {
   height: 100%;
 }
 
-.background{
-  background-color: aliceblue;
+.background {
   min-height: 500px;
   background-size: cover;
   display: flex;
   height: 100%;
   width: 100%;
 }
-
 </style>

@@ -21,7 +21,7 @@ export default {
         refreshToken: token
       });
 
-      if(response && response.data && response.data.error){
+      if (response && response.data && response.data.error) {
         return {error: response.data.error_description};
       }
       

@@ -152,7 +152,7 @@ export default {
     },
     selectFile(file) {
       this.file = file;
-      if(!this.file && !this.active) {
+      if (!this.file && !this.active) {
         this.fileInputError = 'Required';
       } else {
         this.fileInputError = [];
@@ -163,16 +163,16 @@ export default {
       this.$refs.form.validate();
     },
     submitRequest() {
-      if(this.dataReady){
+      if (this.dataReady) {
         try {
-          if(this.file.name && this.file.name.match('^[\\u0080-\\uFFFF\\w,\\s-_]+\\.[A-Za-z]{3,4}$')){
+          if (this.file.name && this.file.name.match('^[\\u0080-\\uFFFF\\w,\\s-_]+\\.[A-Za-z]{3,4}$')) {
             this.active = true;
             const reader = new FileReader();
             reader.onload = this.uploadFile;
             reader.onabort = this.handleFileReadErr;
             reader.onerror = this.handleFileReadErr;
             reader.readAsBinaryString(this.file);
-          }else{
+          }else {
             this.active = false;
             this.setErrorAlert('Please remove spaces and special characters from file name and try uploading again.');
           }
@@ -205,7 +205,7 @@ export default {
     },
     makefileFormatList(extensions) {
       extensions = extensions.map(v => v.split(new RegExp('/'))[1]).filter(v => v).map(v => v.toUpperCase());
-      if(extensions.length <= 2) {
+      if (extensions.length <= 2) {
         return extensions.join(' and ');
       } else {
         const lastTwo = extensions.splice(-2, 2).join(', and ');
@@ -229,7 +229,7 @@ export default {
 </script>
 
 <style scoped>
-.document-upload{
+.document-upload {
   padding: 1.1rem;
   max-width: 50rem;
   min-width: 10rem;
@@ -239,17 +239,17 @@ export default {
   padding: 24px 24px 20px;
 }
 
-p{
+p {
   padding-top: 10px
 }
-ul{
+ul {
   width: 100%
 }
 
-.v-input{
+.v-input {
   padding-bottom: 0;
 }
-.bottom-text{
+.bottom-text {
   /* margin-top: -0.7rem; */
   padding-top: 0;
   color: #666666;
@@ -257,12 +257,12 @@ ul{
   font-size: 0.8rem
 }
 
-.v-text-field__details{
+.v-text-field__details {
   display: none !important;
   height: 0 !important;
   min-height: 0 !important;
 }
-.v-messages{
+.v-messages {
   min-height: 0 !important;
   height: 0 !important;
 }

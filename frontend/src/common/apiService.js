@@ -60,7 +60,7 @@ export default {
     }
   },
 
-  async postRequest(userInfo, requestType){
+  async postRequest(userInfo, requestType) {
     try{
       return await apiAxios.post(ApiRoutes[requestType].REQUEST, userInfo);
     } catch(e) {
@@ -69,7 +69,7 @@ export default {
     }
   },
 
-  async updateRequestStatus(requestId, status, requestType){
+  async updateRequestStatus(requestId, status, requestType) {
     try{
       return await apiAxios.patch(`${ApiRoutes[requestType].REQUEST}/${requestId}`, {[`${requestType}StatusCode`]: status});
     } catch(e) {
@@ -105,10 +105,10 @@ export default {
     }
   },
 
-  async uploadFile(requestId, fileData, requestType){
+  async uploadFile(requestId, fileData, requestType) {
     try{
       let url;
-      if(requestId) {
+      if (requestId) {
         url = `${ApiRoutes[requestType].REQUEST}/${requestId}/documents`;
       } else {
         url = `${ApiRoutes[requestType].REQUEST}/documents`;
@@ -149,7 +149,7 @@ export default {
 
   async deleteDocument(requestId, documentId, requestType) {
     try{
-      if(requestId) {
+      if (requestId) {
         return await apiAxios.delete(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
       } else {
         return await apiAxios.delete(ApiRoutes[requestType].REQUEST + '/documents' + `/${documentId}`);
@@ -187,7 +187,7 @@ export default {
     }
   },
 
-  async resendVerificationEmail(requestId, requestType){
+  async resendVerificationEmail(requestId, requestType) {
     try{
       return await apiAxios.post(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/verification-email');
     } catch(e) {

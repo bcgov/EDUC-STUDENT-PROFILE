@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     setUserInfo(userInfo) {
-      if(userInfo){
+      if (userInfo) {
         this.userInfo = userInfo;
       } else {
         this.userInfo = null;
@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
       this.setJwtToken();
       this.setUserInfo();
     },
-    async getUserInfo(){
+    async getUserInfo() {
       const studentRequest = useStudentRequestStore();
       const penRequest = usePenRequestStore();
       const rootStore = useRootStore();

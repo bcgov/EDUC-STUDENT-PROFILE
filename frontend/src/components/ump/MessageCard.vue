@@ -304,7 +304,7 @@ export default {
       return this.fullName(this.student.legalFirstName, this.student.legalMiddleNames, this.student.legalLastName);
     },
   },
-  async created(){
+  async created() {
     await this.getNumDaysAllowedInDraftStatus();
   },
   methods: {
@@ -321,7 +321,7 @@ export default {
   font-size: 1.2rem;
 }
 
-.pen-info{
+.pen-info {
   line-height: 1.2;
 }
 </style>

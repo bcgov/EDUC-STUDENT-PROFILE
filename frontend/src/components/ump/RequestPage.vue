@@ -121,15 +121,15 @@ export default {
   },
   watch: {
     'updateData.email': function(newVal) {
-      if(newVal && this.updateData.email !== this.recordedData.email) {
+      if (newVal && this.updateData.email !== this.recordedData.email) {
         this.steps = 4;
-      } else if(newVal && this.updateData.email === this.recordedData.email) {
+      } else if (newVal && this.updateData.email === this.recordedData.email) {
         this.steps = 3;
       }
     },
   },
   mounted() {
-    if(!(this.isAuthenticated)){
+    if (!(this.isAuthenticated)) {
       this.$router.push('home');
     }
     this.setRequest();
@@ -143,19 +143,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.container{
+.container {
   padding: 0px;
 }
-.top-banner{
-  background-color: aliceblue;
+
+.top-banner {
   background-size: cover;
   align-items: center;
   display: flex;
 }
-.full-height{
+.full-height {
   height: 100%;
 }
-.student-request-card{
+.student-request-card {
   background: #F2E8D5;
 }
 </style>

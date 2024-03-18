@@ -325,27 +325,27 @@ export default {
 hr {
     margin-bottom: 1rem;
 }
-.bottomBar{
+.bottomBar {
     position: relative;
     bottom: 0;
     width: 100%;
 }
 
-.v-text-field{
+.v-text-field {
     margin-top: 0;
 }
-.v-textarea textarea{
+.v-textarea textarea {
     padding: 0;
 }
 
-.theme--dark.v-btn.v-btn--disabled{
+.theme--dark.v-btn.v-btn--disabled {
     color: #cdbbbb !important;
 }
 
-.v-messages{
+.v-messages {
     min-height: 0 !important;
 }
-.v-text-field__details{
+.v-text-field__details {
     min-height: 0 !important;
 }
 
@@ -364,18 +364,18 @@ hr {
 
 .slider {
   transition-property: all;
-	transition-duration: 0.8s;
-	transition-timing-function: ease;
+  transition-duration: 0.8s;
+  transition-timing-function: ease;
 }
 
 .slider.open {
   overflow-y: hidden;
-	max-height: 100px; /*approximate max height */
+  max-height: 100px; /*approximate max height */
   /* visibility: visible; */
 }
 
 .slider.closed {
-	max-height: 0;
+  max-height: 0;
   /* visibility:hidden; */
   transition-duration: 0.5s;
 }

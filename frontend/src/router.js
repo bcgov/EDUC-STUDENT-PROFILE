@@ -64,7 +64,7 @@ const router = createRouter({
             const hasInflightGMPRequest = penRequest.request
               && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV']))
                 .some(status => status === penRequest.request.penRequestStatusCode);
-            if(authStore.isAuthenticated && !studentRequest.request && !hasInflightGMPRequest) {
+            if (authStore.isAuthenticated && !studentRequest.request && !hasInflightGMPRequest) {
               rootStore.setRequestType('studentRequest');
               return '/ump/request';
             }

@@ -60,7 +60,7 @@ export default {
         this.getUserInfo()
       ])
     ).catch(e => {
-      if(!e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
+      if (!e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
         this.logout();
         this.$router.replace({name: 'error', query: { message: `500_${e.data || 'ServerError'}` } });
       }
@@ -145,7 +145,7 @@ h1 {
 
 @media screen and (max-width: 370px) {
 
-  .v-toolbar__title{
+  .v-toolbar__title {
     font-size: 0.9rem;
     line-height: 1;
     overflow: hidden;
@@ -163,7 +163,7 @@ h1 {
 }
 
 @media screen and (min-width: 371px) and (max-width: 600px) {
-  .v-toolbar__title{
+  .v-toolbar__title {
     font-size: 0.9rem;
     line-height: 1.5;
     overflow: hidden;
@@ -181,7 +181,7 @@ h1 {
 }
 
 @media screen and (min-width: 601px) and (max-width: 700px) {
-  .v-toolbar__title{
+  .v-toolbar__title {
     font-size: 1rem;
     line-height: 1.5;
     overflow: hidden;

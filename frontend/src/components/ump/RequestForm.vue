@@ -569,12 +569,12 @@ export default {
     },
     validateRequestForm() {
       if (this.$refs.form.validate() && this.validForm) {
-        if(isEqual(mapValues(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v=> v === null ? '' : v),
+        if (isEqual(mapValues(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v=> v === null ? '' : v),
           mapValues(pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v => v === null ? '' : v))) {
           this.setErrorDialog('You must specify at least one change in order to submit a request.');
-        } else if(this.unsubmittedDocuments.length === 0) {
+        } else if (this.unsubmittedDocuments.length === 0) {
           this.setErrorDialog('You must upload an image of supporting legal identification to submit a request.');
-        } else{
+        } else {
           this.$emit('next');
         }
       }
@@ -583,7 +583,7 @@ export default {
       this.validate();
     },
     focusBirthdateField(event) {
-      if(event.key === 'Tab' && event.type === 'keyup') {
+      if (event.key === 'Tab' && event.type === 'keyup') {
         this.menu = true;
       }
     },

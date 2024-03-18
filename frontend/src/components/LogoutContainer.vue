@@ -65,10 +65,10 @@ export default {
 
 <style scoped>
 
-  .full-height{
+  .full-height {
     height: 100%;
   }
-  .session-expired-card{
+  .session-expired-card {
     margin-top: 15rem;
     width: 100%;
     background: #D9E7D8;

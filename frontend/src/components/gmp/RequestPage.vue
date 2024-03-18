@@ -55,7 +55,7 @@ export default {
     },
   },
   mounted() {
-    if(!(this.isAuthenticated)){
+    if (!(this.isAuthenticated)) {
       this.$router.push('home');
     }
   },
@@ -63,16 +63,15 @@ export default {
 </script>
 
 <style scoped>
-.container{
+.container {
   padding: 0px;
 }
-.top-banner{
-  background-color: aliceblue;
+.top-banner {
   background-size: cover;
   align-items: center;
   display: flex;
 }
-.full-height{
+.full-height {
   height: 100%;
 }
 </style>

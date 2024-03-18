@@ -329,17 +329,17 @@ export default {
     align-items: center;
     display: flex;
   }
-  .full-height{
+  .full-height {
     height: 100%;
   }
-  .infoTab{
+  .infoTab {
     padding: 10px 0px;
     background-color: #fafafa
   }
-  .bottomContainer{
+  .bottomContainer {
     padding-bottom: 30px
   }
-  .student-request-card{
+  .student-request-card {
     background: #F2E8D5;
   }
 </style>

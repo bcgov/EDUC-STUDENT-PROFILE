@@ -75,17 +75,17 @@ export default {
 </script>
 
 <style scoped>
-  .full-height{
+  .full-height {
     height: 100%;
   }
-  .session-expired-card{
+  .session-expired-card {
     margin-top: 15rem;
     width: 100%;
     background: #F2E8D5;
   }
 
   @media screen and (max-width: 300px) {
-    .session-expired-card{
+    .session-expired-card {
       margin-top: 2rem;
       height: 50%;
       width: 100%;
@@ -93,14 +93,14 @@ export default {
     }
   }
   @media screen and (min-width: 301px) and (max-width: 350px) {
-    .session-expired-card{
+    .session-expired-card {
       margin-top: 1rem;
       width: 100%;
       background: #F2E8D5;
     }
   }
   @media screen and (min-width: 351px) and (max-width: 450px) {
-    .session-expired-card{
+    .session-expired-card {
       margin-top: 8rem;
       width: 100%;
       background: #F2E8D5;

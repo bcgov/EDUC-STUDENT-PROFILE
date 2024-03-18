@@ -87,14 +87,14 @@ export default {
 </script>
 
 <style scoped>
-.card-row{
+.card-row {
   padding: 0 15px;
 }
 
-p{
+p {
   padding-top: 10px
 }
-ul{
+ul {
   width: 100%;
 }
 

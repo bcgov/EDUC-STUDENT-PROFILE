@@ -311,7 +311,7 @@ export default {
       this.$refs.birthdate.$el.querySelectorAll('#birthdate')[0].focus();
     },
     focusBirthdateField(event) {
-      if(event.key === 'Tab' && event.type === 'keyup') {
+      if (event.key === 'Tab' && event.type === 'keyup') {
         this.menu = true;
       }
     },
@@ -319,7 +319,7 @@ export default {
       this.$refs.form.validate();
     },
     nextStep() {
-      if(this.hasStudentRecord || this.validateForm()) {
+      if (this.hasStudentRecord || this.validateForm()) {
         this.setRecordedData(this.recordedData);
         this.$emit('next');
       }
@@ -330,12 +330,12 @@ export default {
     },
     checkDigit(pen) {
       const parsedPen = parseInt(pen);
-      if(!pen || pen.length !== 9 || parsedPen === 0 || isNaN(parsedPen)) {
+      if (!pen || pen.length !== 9 || parsedPen === 0 || isNaN(parsedPen)) {
         return false;
       }
 
       const penDigits = [];
-      for(let i = 0; i < pen.length; i++) {
+      for (let i = 0; i < pen.length; i++) {
         penDigits[i] = parseInt(pen.charAt(i), 10);
       }
       const S1 = penDigits.slice(0,-1).filter((_element, index) => {return index % 2 === 0;}).reduce((a,b) => a+b,0);
@@ -343,7 +343,7 @@ export default {
       const B = 2 * A;
       let S2 = B.toString().split('').map(Number).reduce(function (a, b) {return a + b;}, 0);
       const S3 = S1 + S2;
-      if((S3 % 10) === 0) {
+      if ((S3 % 10) === 0) {
         return penDigits.pop() === 0;
       }
       return penDigits.pop() === (10 - (S3%10));

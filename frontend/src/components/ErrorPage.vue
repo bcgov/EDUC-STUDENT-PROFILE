@@ -39,8 +39,8 @@ export default {
       errorMessage: this.$route.query.message
     };
   },
-  async created(){
-    if(this.errorMessage === 'Unable_to_authenticate'){
+  async created() {
+    if (this.errorMessage === 'Unable_to_authenticate') {
       this.loginErrorRedirect();
     }
   },
@@ -51,24 +51,23 @@ export default {
 </script>
 
 <style scoped>
-  .v-icon{
+  .v-icon {
     padding-left: 10px;
   }
-  .error-card{
+  .error-card {
     margin-top: 5%;
     min-width: 30%;
   }
-  .gov-header{
+  .gov-header {
     color: #003366;
   }
-  .v-btn{
+  .v-btn {
     text-transform: none
   }
-  .blue-back{
-    background-color: aliceblue;
+  .blue-back {
     height: 100%;
   }
-  .detail-text{
+  .detail-text {
     color: rgba(0, 0, 0, 0.54);
     font-size: 0.875rem;
   }

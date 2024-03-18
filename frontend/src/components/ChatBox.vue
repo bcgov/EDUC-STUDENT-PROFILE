@@ -176,19 +176,19 @@ export default {
       console.log(error);
       this.alert = true;
     }).finally(() => {
-      if(!this.userInfo){
+      if (!this.userInfo) {
         console.log('UserInfo undefined');
       }
-      if(!this.request){
+      if (!this.request) {
         console.log('request object undefined');
       }
-      if(!this.unsubmittedDocuments){
+      if (!this.unsubmittedDocuments) {
         console.log('unsubmittedDocuments object undefined');
       }
-      if(!this.commentHistory){
+      if (!this.commentHistory) {
         console.log('Comment History object undefined');
       }
-      if(!this.setRequestComments){
+      if (!this.setRequestComments) {
         console.log('Set Request Comments objects undefined');
       }
       this.loading = false;
@@ -228,8 +228,8 @@ export default {
     splitComments(messages, unsubmittedDocuments) {
       const lastMessage = messages[messages.length - 1];
       let requestIndex = messages.length;
-      if(this.status === this.requestStatuses.RETURNED && lastMessage) {
-        if(lastMessage.myself) {
+      if (this.status === this.requestStatuses.RETURNED && lastMessage) {
+        if (lastMessage.myself) {
           this.setUnsubmittedComment(lastMessage);
           unsubmittedDocuments = (unsubmittedDocuments || []).concat(lastMessage.documents || []);
           messages = messages.slice(0, messages.length - 1);

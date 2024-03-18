@@ -71,7 +71,7 @@ export default {
   computed: {
     commentObject() {
       const readableTime = this.comment.readableTime;
-      if(this.comment.myself){
+      if (this.comment.myself) {
         return {
           name: this.myself.name,
           content: this.comment.content,
@@ -102,7 +102,7 @@ export default {
     }
   },
   methods: {
-    toPascal(str){
+    toPascal(str) {
       return str.replace(/\w\S*/g, m => m.charAt(0).toUpperCase() + m.substr(1).toLowerCase());
     },
   }
@@ -130,26 +130,26 @@ export default {
     font-weight: bold;
     color: #333;
 }
-.username{
+.username {
   padding-left: 0.5rem;
   padding-right: 0.1rem;
   font-size: 0.85rem;
 }
-.timestamp{
+.timestamp {
   font-size: 0.72rem;
   color: rgba(0, 0, 0, 0.38)
 }
-.header-row{
+.header-row {
   padding-bottom: 0;
 }
-.header-col{
+.header-col {
   padding-top: 0;
   padding-bottom: 0;
 }
-.content-col{
+.content-col {
   padding: 0.2rem 0.5rem 0.2rem 1rem;
 }
-.studentGreen{
+.studentGreen {
   background-color: #E9F2DF;
   padding: 0.5rem;
   align-items: center;
@@ -157,7 +157,7 @@ export default {
   border-bottom: 1px solid #97888e;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
-.adminBlue{
+.adminBlue {
   background-color: #F2F2F2;
   padding: 0.5rem;
 
@@ -166,7 +166,7 @@ export default {
   border-bottom: 1px solid #97888e;
   box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
-.iconCol{
+.iconCol {
   flex-grow: 0
 }
 .commentContent {

@@ -267,27 +267,25 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .container{
+  .container {
     padding: 0px;
   }
-  .top-banner{
-    background-color: aliceblue;
-    background-size: cover;
+  .top-banner {
     align-items: center;
     display: flex;
   }
-  .full-height{
+  .full-height {
     height: 100%;
   }
-  .infoTab{
+  .infoTab {
     padding: 10px 0px;
     background-color: #fafafa
   }
-  .bottomContainer{
+  .bottomContainer {
     padding-bottom: 30px
   }
 
-  .student-request-card{
+  .student-request-card {
     background: #F2E8D5;
   }
 </style>

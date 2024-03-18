@@ -28,7 +28,7 @@ function addComments(storeObject) {
         this.unsubmittedComment = null;
         this.requestComments = null;
       },
-      async postComment({requestID, comment}){
+      async postComment({requestID, comment}) {
         const root = useRootStore();
         const response = await ApiService.postComment(requestID, comment, root.requestType);
         this.setUnsubmittedComment(response.data);
@@ -58,12 +58,12 @@ function addDocuments(storeObject) {
       },
       async getDocumentTypeCodes() {
         const root = useRootStore();
-        if(!this.documentTypeCodes) {
+        if (!this.documentTypeCodes) {
           const response = await ApiService.getDocumentTypeCodes(root.requestType);
           this.setDocumentTypeCodes(response.data);
         }
       },
-      async deleteFile({requestID, documentID}){
+      async deleteFile({requestID, documentID}) {
         const root = useRootStore();
         await ApiService.deleteDocument(requestID, documentID, root.requestType);
         const documents = this.unsubmittedDocuments.filter(document => document.documentID !== documentID);
@@ -92,11 +92,11 @@ function createRequestStore(id) {
       setRequest(request = null) {
         this.request = request;
       },
-      async postRequest(request){
+      async postRequest(request) {
         const rootStore = useRootStore();
         try {
           const response = await ApiService.postRequest(request, rootStore.requestType);
-          if(response.status !== 200){
+          if (response.status !== 200) {
             return false;
           }
           this.setRequest(response.data);

@@ -314,7 +314,7 @@ export default {
       return Math.floor(new Date() - new Date(this.request.statusUpdateDate)) / (1000*60*60) > 24;
     },
   },
-  async created(){
+  async created() {
     await this.getNumDaysAllowedInDraftStatus();
   },
   methods: {
@@ -328,7 +328,7 @@ export default {
   font-size: 1.2rem;
 }
 
-.pen-info{
+.pen-info {
   line-height: 1.2;
 }
 
