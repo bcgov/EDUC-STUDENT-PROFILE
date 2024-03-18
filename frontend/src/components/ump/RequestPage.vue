@@ -146,7 +146,6 @@ export default {
 .container {
   padding: 0px;
 }
-
 .top-banner {
   background-size: cover;
   align-items: center;
