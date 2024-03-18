@@ -31,7 +31,6 @@
     <v-form
       id="penRequestForm"
       ref="form"
-      v-model="validForm"
       autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
     >
       <v-container>
@@ -40,9 +39,10 @@
             <v-checkbox
               v-model="declared"
               color="green"
-              :rules="privacyRule('')"
+              :rules="requiredCheckbox()"
               label="I declare that I am submitting a request for my Personal Education Number on my own behalf.
                 (If you are a parent/guardian go to your child's school to get their PEN.)"
+              @update:model-value="disableFormIfNotDeclared"
             />
           </v-col>
         </v-row>
@@ -58,7 +58,7 @@
               :rules="requiredRules(legalLastNameHint)"
               :hint="legalLastNameHint"
               label="Legal Last Name"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               required
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
@@ -79,11 +79,11 @@
               variant="underlined"
               class="touppercase"
               label="Legal First Name(s) (if applicable)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col
@@ -99,11 +99,11 @@
               variant="underlined"
               class="touppercase"
               label="Legal Middle Name(s) (provide if applicable)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col cols="12">
@@ -115,11 +115,11 @@
               class="touppercase"
               hint="Only if different from Legal Last Name"
               label="Usual Last Name (optional)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col
@@ -134,11 +134,11 @@
               class="touppercase"
               hint="Only if different from Legal First Name"
               label="Usual First Name(s) (optional)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col
@@ -153,11 +153,11 @@
               class="touppercase"
               hint="Only if different from Legal Middle Name"
               label="Usual Middle Name(s) (optional)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="25"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col
@@ -172,11 +172,11 @@
               hint="List all previous Last names used separated with spaces"
               variant="underlined"
               label="Maiden Name (if applicable)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="40"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col
@@ -191,11 +191,11 @@
               variant="underlined"
               class="touppercase"
               label="Past Name(s) (if applicable)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="255"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col cols="12">
@@ -208,7 +208,7 @@
               label="Birthdate"
               readonly
               required
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               density="compact"
             />
@@ -230,7 +230,7 @@
                   label="Birthdate"
                   readonly
                   :rules="requiredRules()"
-                  :disabled="enableDisableForm.disabled"
+                  :disabled="formDisabled"
                   required
                   autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                   density="compact"
@@ -260,7 +260,7 @@
               class="touppercase"
               variant="underlined"
               label="E-mail Address"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               required
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="255"
@@ -276,11 +276,11 @@
               variant="underlined"
               class="touppercase"
               label="Last B.C. School Attended (optional)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="255"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col cols="12">
@@ -292,11 +292,11 @@
               variant="underlined"
               class="touppercase"
               label="School Student ID Number (optional)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="12"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
           <v-col cols="12">
@@ -308,11 +308,11 @@
               variant="underlined"
               class="touppercase"
               label="Current B.C. School Attending (optional)"
-              :disabled="enableDisableForm.disabled"
+              :disabled="formDisabled"
               autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
               maxlength="255"
               density="compact"
-              :rules="charRules"
+              :rules="charRules()"
             />
           </v-col>
         </v-row>
@@ -323,9 +323,9 @@
               v-model="acceptance"
               color="green"
               label="The personal demographic data provided above is complete and accurate."
-              :disabled="enableDisableForm.disabled"
-              :rules="acceptanceRule('')"
-              @click="clickAcceptance"
+              :disabled="formDisabled"
+              :rules="requiredCheckbox()"
+              @update:model-value="validateForm"
             />
           </v-col>
         </v-row>
@@ -376,7 +376,6 @@
               id="submit_form"
               color="#003366"
               class="text-white"
-              :disabled="!validForm"
               :loading="submitting"
               @click="submitRequestForm"
             >
@@ -431,9 +430,7 @@ export default {
         currentSchool: null
       },
       rawDob: null,
-      enableDisableForm: {
-        disabled: true
-      },
+      formDisabled: true,
       serviceCardReadOnlyFields:[
         'legalLastName',
         'legalFirstName',
@@ -456,12 +453,6 @@ export default {
         v => !!v || this.emailHint,
         v => /^[\w!#$%&’*+/=?`{|}~^-]+(?:\.[\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}$/.test(v)
           || this.emailHint,
-      ];
-    },
-    charRules() {
-      return [
-        v => !(/[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u1100-\u11FF\u3040-\u309F\u30A0-\u30FF\u3130-\u318F\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF]/.test(v))
-          || 'Enter English characters only'
       ];
     },
   },
@@ -492,26 +483,27 @@ export default {
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,
-        ...this.charRules
+        ...this.charRules()
       ];
     },
-    privacyRule(hint = 'Required') {
-      this.enableDisableForm.disabled = !this.declared;
-      return [v => !!v || hint];
+    requiredCheckbox(hint = 'Required') {
+      return [ v => v || hint ];
     },
-    acceptanceRule(hint = 'Required') {
-      this.validForm = (this.validForm && this.declared && this.acceptance);
-      return [v => !!v || hint];
+    charRules() {
+      return [
+        v => !(/[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u1100-\u11FF\u3040-\u309F\u30A0-\u30FF\u3130-\u318F\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF]/.test(v))
+        || 'Enter English characters only'
+      ];
+    },
+    disableFormIfNotDeclared() {
+      this.formDisabled = !this.declared;
     },
     save(date) {
       this.$refs.menu.save(date);
       this.$refs.birthdate.$el.querySelectorAll('#birthdate')[0].focus();
     },
-    async validate() {
-      this.validForm = await this.$refs.form.validate();
-    },
     async submitRequestForm() {
-      await this.validate();
+      await this.validateForm();
       if (this.validForm) {
         this.setRequestData(this.userPost);
         this.$emit('next');
@@ -520,10 +512,9 @@ export default {
     maxSelectableDate() {
       return new Date(LocalDate.now().minusYears(5).toString()).toISOString().substring(0, 10);
     },
-    clickAcceptance() {
-      if (this.acceptance) {
-        this.validate();
-      }
+    async validateForm() {
+      await this.$nextTick();
+      this.validForm = (await this.$refs.form.validate()).valid;
     },
     focusBirthdateField(event) {
       if (event.key === 'Tab' && event.type === 'keyup') {
