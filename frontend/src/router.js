@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, RouterView } from 'vue-router';
 
 import HomePage from './components/HomePage.vue';
 import LogoutContainer from './components/LogoutContainer.vue';
@@ -9,7 +9,6 @@ import PenRequestVerification from './components/gmp/Verification.vue';
 import StudentRequestVerification from './components/ump/Verification.vue';
 import ErrorPage from './components/ErrorPage.vue';
 import LoginError from './components/LoginError.vue';
-import RouterView from './components/RouterView.vue';
 import UmpContainer from './components/ump/UmpContainer.vue';
 import GmpContainer from './components/gmp/GmpContainer.vue';
 import CurrentInfo from './components/ump/CurrentInfo.vue';
