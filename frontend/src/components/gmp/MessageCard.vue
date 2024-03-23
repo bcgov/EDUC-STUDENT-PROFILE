@@ -2,11 +2,9 @@
   <v-alert
     v-if="isSagaInProgress"
     variant="outlined"
-    height="100%"
-    width="100%"
-    class="pa-3 bootstrap-success"
+    class="bootstrap-success"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Thank you. Your request has been accepted.</strong>
     </p>
   </v-alert>
@@ -15,17 +13,17 @@
     variant="outlined"
     height="100%"
     width="100%"
-    class="pa-3 bootstrap-success"
+    class="bootstrap-success"
   >
     <p
       v-if="status === requestStatuses.INITREV"
-      class="mb-2"
+      class="pb-4"
     >
       <strong>Your email has been verified and your PEN request has now been submitted for processing.</strong>
     </p>
     <p
       v-else
-      class="mb-2"
+      class="pb-4"
     >
       <strong>Your PEN request has now been re-submitted for processing.</strong>
     </p>
@@ -43,9 +41,9 @@
     variant="outlined"
     height="100%"
     width="100%"
-    class="pa-3 bootstrap-warning"
+    class="bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Your email verification was not completed within the time limited. Repeat the email verification
         process.</strong>
     </p>
@@ -61,22 +59,16 @@
   <v-alert
     v-else-if="status === requestStatuses.DRAFT && ! timedout"
     variant="outlined"
-    height="100%"
-    width="100%"
-    class="pa-3 bootstrap-warning"
+    class="bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>You are almost finished. To complete your request, you must verify the email address you provided by
         completing the following steps:</strong>
     </p>
-    <p>
-      <ol>
-        <li>
-          Go to your email inbox for <strong>{{ request.email }}</strong> and look for an email from {{ ministry }}.
-          You may need to check your spam folder
-        </li>
-        <li><strong>Within 24 hours</strong> you must click on the link in the email to complete your request</li>
-      </ol>
+    <p class="pb-4">
+      Go to your email inbox for <strong>{{ request.email }}</strong> and look for an email from {{ ministry }}.
+      You may need to check your spam folder
+      <strong>Within 24 hours</strong> you must click on the link in the email to complete your request
     </p>
     <p>
       If the email has expired or is not in your Inbox (or spam folder) click on the 'Resend Verification Email'
@@ -88,9 +80,9 @@
     variant="outlined"
     height="100%"
     width="100%"
-    class="pa-3 bootstrap-warning"
+    class="bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Additional information is required.</strong> See the request below.
     </p>
   </v-alert>
@@ -99,9 +91,9 @@
     variant="outlined"
     height="100%"
     width="100%"
-    class="pa-3 bootstrap-warning"
+    class="bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Your request to get your PEN could not be completed, for the following reason:</strong>
     </p>
     <p>
@@ -116,21 +108,21 @@
     variant="outlined"
     height="100%"
     width="100%"
-    class="pa-3 bootstrap-success"
+    class="bootstrap-success"
   >
     <p class="mb-1">
       <strong>Your PEN request is complete. Your PEN is:</strong>
     </p>
-    <p class="mb-2 pen">
+    <p class="pb-4 pen">
       <strong>{{ student.pen }}</strong>
     </p>
     <p
       v-if="request.completeComment && request.completeComment.length > 0"
-      class="mb-2 comment"
+      class="pb-4 comment"
     >
       {{ request.completeComment }}
     </p>
-    <p class="mb-2">
+    <p class="pb-4">
       Below is the key information the Ministry of Education and Child Care has on file for you. If any of this
       information is not current, please proceed to
       <router-link to="ump">
@@ -151,7 +143,7 @@
           md="4"
           sm="4"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             Legal Last Name:
           </p>
         </v-col>
@@ -161,7 +153,7 @@
           md="5"
           sm="5"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             <strong>{{ student.legalLastName }}</strong>
           </p>
         </v-col>
@@ -176,7 +168,7 @@
           md="4"
           sm="4"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             Legal First Name(s):
           </p>
         </v-col>
@@ -186,7 +178,7 @@
           md="5"
           sm="5"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             <strong>{{ student.legalFirstName }}</strong>
           </p>
         </v-col>
@@ -202,7 +194,7 @@
           sm="4"
         >
           <p
-            class="mb-2"
+            class="pb-4"
             color="green"
           >
             Legal Middle Name(s):
@@ -214,7 +206,7 @@
           md="5"
           sm="5"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             <strong>{{ student.legalMiddleNames }}</strong>
           </p>
         </v-col>
@@ -229,7 +221,7 @@
           md="4"
           sm="4"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             Date of Birth:
           </p>
         </v-col>
@@ -239,13 +231,13 @@
           md="5"
           sm="5"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             <strong>{{ student.dob }}</strong>
           </p>
         </v-col>
       </v-row>
     </v-container>
-    <p class="mb-2">
+    <p class="pb-4">
       {{ request.tomorrow ? 'As of tomorrow morning 8am PST, you may use your PEN to'
         : 'You now may wish to use your PEN to:' }}
       <ul>
@@ -259,7 +251,7 @@
         </li>
       </ul>
     </p>
-    <p class="mb-2">
+    <p class="pb-4">
       You can log back into GetMyPEN at any time to see your PEN.
     </p>
   </v-alert>
@@ -268,9 +260,9 @@
     variant="outlined"
     height="100%"
     width="100%"
-    class="pa-3 bootstrap-warning"
+    class="bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Your PEN Request was not actioned within {{ numDaysAllowedInDraftStatus }} days and was therefore
         cancelled. Please fill out the form again and verify your email to submit a new request.</strong>
     </p>

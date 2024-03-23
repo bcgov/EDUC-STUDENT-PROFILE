@@ -221,7 +221,7 @@
           xs="8"
         >
           <p class="mb-2">
-            <strong>{{ student.dob ? moment(student.dob).format('MMMM D, YYYY'):'' }}</strong>
+            <strong>{{ formatDob(student.dob ) }}</strong>
           </p>
         </v-col>
       </v-row>
@@ -269,6 +269,7 @@ import { useAuthStore } from '../../store/auth';
 import { useStudentRequestStore } from '../../store/request';
 import { useConfigStore } from '../../store/config';
 import { StudentRequestStatuses } from '../../utils/constants';
+import { formatDob } from '../../utils/dateTime';
 
 export default {
   name: 'MessageCard',
@@ -303,6 +304,7 @@ export default {
     updatedFullName() {
       return this.fullName(this.student.legalFirstName, this.student.legalMiddleNames, this.student.legalLastName);
     },
+    formatDob
   },
   async created() {
     await this.getNumDaysAllowedInDraftStatus();

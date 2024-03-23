@@ -4,9 +4,9 @@
     width="100%"
     elevation="0"
   >
-    <v-card-subtitle class="px-1 info-card-title">
+    <v-card-title class="px-1 info-card-title">
       Student Information
-    </v-card-subtitle>
+    </v-card-title>
     <v-container
       fluid
       class="pt-0 px-1"
@@ -56,7 +56,7 @@
           xs="8"
         >
           <p class="ml-2 mb-0">
-            <strong>{{ formattedDate }}</strong>
+            <strong>{{ formatDob(request?.dob) }}</strong>
           </p>
         </v-col>
       </v-row>
@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import moment from 'moment';
+import { formatDob } from '../utils/dateTime';
 
 export default {
   name: 'StudentInfoCard',
@@ -112,10 +112,8 @@ export default {
       return [this.request.legalFirstName, this.request.legalMiddleNames, this.request.legalLastName]
         .filter(Boolean).join(' ').toUpperCase();
     },
-    formattedDate(){
-      return this.request.dob ? moment(this.request.dob).format('MMMM D, YYYY') : '';
-    }
   },
+  methods: { formatDob }
 };
 </script>
 

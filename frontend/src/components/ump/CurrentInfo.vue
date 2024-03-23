@@ -117,7 +117,7 @@
               id="recordedDob"
               color="#003366"
               variant="outlined"
-              :model-value="moment(recordedData.dob).format('MMMM D, YYYY')"
+              :model-value="formatDob(recordedData.dob)"
               :hint="birthdateHint"
               persistent-hint
               readonly
@@ -138,7 +138,7 @@
                   ref="birthdate"
                   color="#003366"
                   variant="outlined"
-                  :model-value="recordedData.dob ? moment(recordedData.dob).format('MMMM D, YYYY'):''"
+                  :model-value="formatDob(recordedData.dob)"
                   :rules="requiredRules(birthdateHint)"
                   :hint="birthdateHint"
                   persistent-hint
@@ -223,6 +223,7 @@ import { useRootStore } from '../../store/root';
 import { useUmpStore } from '../../store/ump';
 import { LocalDate } from '@js-joda/core';
 import { pick } from 'lodash';
+import { formatDob } from '../../utils/dateTime';
 
 export default {
   emits: ['next'],
@@ -348,6 +349,7 @@ export default {
       }
       return penDigits.pop() === (10 - (S3%10));
     },
+    formatDob
   }
 };
 </script>

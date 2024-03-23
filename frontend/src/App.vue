@@ -93,12 +93,15 @@ export default {
 .v-card--flat {
   background-color: transparent !important;
 }
+
 .theme--light.application {
   background: #f1f1f1;
 }
+
 h1 {
   font-size: 1.25rem;
 }
+
 .v-toolbar__title {
   font-size: 1rem;
 }

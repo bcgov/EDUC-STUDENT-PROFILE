@@ -208,7 +208,7 @@
                     ref="birthdate"
                     color="#003366"
                     variant="outlined"
-                    :model-value="request.dob ? moment(request.dob).format('MMMM D, YYYY'):''"
+                    :model-value="formatDob(request.dob)"
                     :rules="requiredRules(dobHint)"
                     label="Birthdate"
                     readonly
@@ -444,6 +444,7 @@ import { useStudentRequestStore } from '../../store/request';
 import { useUmpStore } from '../../store/ump';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, mapValues, pick } from 'lodash';
+import { formatDob } from '../../utils/dateTime';
 
 import DocumentChip from '../DocumentChip.vue';
 import DocumentUpload from '../DocumentUpload.vue';
@@ -589,7 +590,8 @@ export default {
     },
     previousStep() {
       this.$emit('back');
-    }
+    },
+    formatDob
   }
 };
 </script>

@@ -42,40 +42,32 @@
   <v-container
     v-else-if="isAuthenticated && hasPenRequest && requestType === 'penRequest'"
     fluid
-    class="full-height"
   >
-    <article
-      id="request-display-container"
-      class="top-banner full-height"
+    <v-row
+      align="center"
+      justify="center"
     >
-      <v-row
-        align="center"
-        justify="center"
-        style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;"
+      <v-col
+        xs="11"
+        sm="11"
+        md="10"
+        lg="8"
+        xl="6"
       >
-        <v-col
-          class="pt-1 pt-sm-3"
-          xs="11"
-          sm="11"
-          md="10"
-          lg="8"
-          xl="6"
+        <RequestDisplay
+          :title="requestTitle"
+          :can-create-request="canCreateRequest"
+          :new-request-text="newRequestText"
         >
-          <RequestDisplay
-            :title="requestTitle"
-            :can-create-request="canCreateRequest"
-            :new-request-text="newRequestText"
-          >
-            <template #message>
-              <MessageCard />
-            </template>
-            <template #request>
-              <RequestCard :request="request" />
-            </template>
-          </RequestDisplay>
-        </v-col>
-      </v-row>
-    </article>
+          <template #message>
+            <MessageCard />
+          </template>
+          <template #request>
+            <RequestCard :request="request" />
+          </template>
+        </RequestDisplay>
+      </v-col>
+    </v-row>
   </v-container>
 
   <v-container
