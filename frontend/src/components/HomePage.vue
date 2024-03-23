@@ -61,7 +61,8 @@
     >
       <v-col
         cols="12"
-        lg="4"
+        lg="6"
+        xl="4"
         class="px-8"
       >
         <UserStudentCard
@@ -79,7 +80,8 @@
       </v-col>
       <v-col
         cols="12"
-        lg="4"
+        lg="6"
+        xl="4"
         class="px-8"
       >
         <v-card
