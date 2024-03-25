@@ -522,7 +522,6 @@ export default {
       }
     },
     onDatePickerChange(newValue) {
-      console.log('Heyo!');
       this.userPost.dob = newValue;
     }
   }
