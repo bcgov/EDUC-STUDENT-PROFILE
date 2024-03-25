@@ -320,7 +320,7 @@
           <v-col cols="12">
             <v-checkbox
               id="acceptance_chk"
-              v-model="acceptance"
+              v-model="accepted"
               color="green"
               label="The personal demographic data provided above is complete and accurate."
               :disabled="formDisabled"
@@ -411,7 +411,6 @@ export default {
       nameLimit: 80,
       validForm: false,
       submitting: false,
-      acceptance: false,
       userPost: {
         digitalID: null,
         legalLastName: null,
@@ -441,7 +440,7 @@ export default {
   computed: {
     ...mapState(useAuthStore, ['userInfo']),
     ...mapState(useGmpStore, ['requestData']),
-    ...mapWritableState(useGmpStore, ['declared']),
+    ...mapWritableState(useGmpStore, ['accepted', 'declared']),
     dataReady() {
       return !!this.userInfo;
     },
@@ -477,6 +476,7 @@ export default {
       this.userPost.dob = this.userInfo.dob?(this.userInfo.dob).substr(0, 10):'';
     }
     Object.assign(this.userPost, this.requestData);
+    this.disableFormIfNotDeclared();
   },
   methods: {
     ...mapActions(useGmpStore, ['setRequestData']),

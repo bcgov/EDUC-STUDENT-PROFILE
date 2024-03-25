@@ -4,6 +4,7 @@ export const useGmpStore = defineStore('gmp', {
   state: () => ({
     requestData: {},
     declared: false,
+    accepted: false
   }),
   actions: {
     setRequestData(requestData) {
