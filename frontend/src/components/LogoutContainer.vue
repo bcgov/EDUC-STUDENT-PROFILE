@@ -53,7 +53,6 @@ export default {
   },
   mounted() {
     useAuthStore().setJwtToken();
-    this.$store.commit('auth/setJwtToken');
   },
   methods: {
     clearStorage() {

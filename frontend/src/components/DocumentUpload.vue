@@ -127,7 +127,7 @@ export default {
   },
   methods: {
     setUploadedDocument(document) {
-      this.$store.commit(`${this.requestType}/setUploadedDocument`, document);
+      this.getRequestStore().setUploadedDocument(document);
     },
     closeForm() {
       this.resetForm();

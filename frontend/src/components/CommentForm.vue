@@ -170,7 +170,8 @@ export default {
       return this.unsubmittedDocuments.length > 0;
     },
     isSagaInProgress() {
-      return this.$store.state[`${this.requestType}`].request.sagaInProgress;
+      const rootStore = useRootStore();
+      return rootStore.requestType?.request?.sagaInProgress;
     }
   },
   methods: {
