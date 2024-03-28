@@ -1,7 +1,7 @@
 <template>
   <v-footer
     color="#003366"
-    class="justify-center"
+    class="justify-center flex-wrap"
   >
     <v-btn
       id="footer-home"
