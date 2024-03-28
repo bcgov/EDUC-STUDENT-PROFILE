@@ -79,7 +79,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
   .v-icon {
     padding-left: 10px;
   }
@@ -88,7 +88,7 @@ export default {
     text-decoration: none;
   }
 
-  .v-toolbar__content {
+  :deep(.v-toolbar__content) {
     padding: 4px 10px 4px 65px;
   }
 
