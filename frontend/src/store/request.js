@@ -80,7 +80,7 @@ function createRequestStore(id) {
       request: null,
     }),
     getters: {
-      requestID: () => {
+      requestID() {
         const rootStore = useRootStore();
         return this.request && this.request[`${rootStore.requestType}ID`];
       },
