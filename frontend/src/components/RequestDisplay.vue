@@ -31,14 +31,12 @@
       />
     </v-col>
   </v-row>
-  <v-row>
-    <ChatBox
-      v-if="status !== requestStatuses.DRAFT
-        && status !== requestStatuses.INITREV
-        && status !== requestStatuses.ABANDONED"
-      :comment-documents="commentDocuments"
-    />
-  </v-row>
+  <ChatBox
+    v-if="status !== requestStatuses.DRAFT
+      && status !== requestStatuses.INITREV
+      && status !== requestStatuses.ABANDONED"
+    :comment-documents="commentDocuments"
+  />
   <v-row>
     <v-col>
       <slot

@@ -2,42 +2,27 @@
   <v-menu
     v-model="menu"
     location="bottom right"
-    
     transition="scale-transition"
     origin="top left"
   >
     <template #activator="{ props }">
       <v-chip
-        class="chip-overflow ma-1 px-2 align-self-center"
-        closable
-        :close-icon="disabled ? '' : 'fa-chevron-down' "
-        :color="disabled ? 'black' : '#0C7CBA' "
-        :disabled="disabled"
+        :append-icon="disabled ? '' : 'mdi-chevron-down'"
         label
-        variant="outlined"
         v-bind="props"
-        @click:close="menu = true"
+        @click="menu = true"
       >
         {{ document.fileName }}
       </v-chip>
     </template>
 
-    <v-card
-      width="380px"
-      class="pa-1 pa-sm-2"
-    >
-      <v-list>
-        <v-list-item
-          class="pa-0 pa-sm-0"
-          prepend-icon="fa-id-card"
-        >
+    <v-card width="380px">
+      <v-list density="compact">
+        <v-list-item prepend-icon="mdi-id-card">
           <v-list-item-title>{{ documentType }}</v-list-item-title>
         </v-list-item>
 
-        <v-list-item
-          class="px-0 pa-sm-0"
-          prepend-icon="fa-file"
-        >
+        <v-list-item prepend-icon="mdi-file">
           <v-list-item-title>
             <router-link
               :to="{ path: documentUrl }"
@@ -48,17 +33,11 @@
           </v-list-item-title>
         </v-list-item>
 
-        <v-list-item
-          class="px-0 pa-sm-0"
-          prepend-icon="fa-hdd"
-        >
+        <v-list-item prepend-icon="mdi-harddisk">
           <v-list-item-title>{{ fileSize }}</v-list-item-title>
         </v-list-item>
 
-        <v-list-item
-          class="px-0 pa-sm-0"
-          prepend-icon="fa-clock"
-        >
+        <v-list-item prepend-icon="mdi-clock">
           <v-list-item-title>{{ humanCreateDate }}</v-list-item-title>
         </v-list-item>
       </v-list>
@@ -80,7 +59,7 @@
           v-if="!undeletable"
           id="delete-document"
           color="#003366"
-          class="text-white"
+          variant="elevated"
           :loading="deleting"
           @click.stop="deleteDocument()"
         >
@@ -89,7 +68,6 @@
         <v-btn
           id="documentUploadCancel"
           color="#003366"
-          class="text-white"
           @click="menu = false"
         >
           Cancel
@@ -122,6 +100,7 @@ export default {
       default: false
     },
   },
+  emits: ['clear-selected'],
   data() {
     return {
       deleting: false,
@@ -158,6 +137,11 @@ export default {
       }
     },
   },
+  watch: {
+    menu(newVal) {
+      if (newVal === false) this.$emit('clear-selected');
+    }
+  },
   methods: {
     deleteFile(documentData) {
       return getRequestStore().deleteFile(documentData);
@@ -190,69 +174,4 @@ export default {
 </script>
 
 <style scoped>
-
-.chip-overflow /deep/ .v-chip__content {
-  line-height: 28px;
-  display: inline-block !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding-right: 38px !important;
-  position: relative;
-}
-
-.chip-overflow /deep/ .v-chip__close {
-  border-left: 1px solid #0C7CBA;
-  position: absolute;
-  top: 5px;
-  right: 8px;
-  width: 24px;
-  padding-left: 7px !important;
-  max-width: 24px;
-}
-
-.v-list-item {
-  min-height: 0;
-}
-
-.v-list-item__content {
-  padding: 8px 0;
-}
-
-.v-avatar {
-  margin: 4px 16px 4px 0 !important;
-  height: 36px !important;
-  min-width: 36px !important;
-  width: 36px !important;
-}
-
-@media screen and (max-width: 320px) {
-  .v-list-item /deep/ .v-list-item__title {
-    font-size: 0.85rem;
-  }
-
-  .v-avatar {
-    margin-right: 0 !important;
-  }
-
-  .v-icon {
-    padding-left: 0 !important;
-    font-size: 1.2rem;
-  }
-}
-
-@media screen and (min-width: 321px) and (max-width: 410px) {
-  .v-list-item /deep/ .v-list-item__title {
-    font-size: 0.9rem;
-  }
-
-  .v-avatar {
-    margin-right: 12px !important;
-  }
-
-  .v-icon {
-    padding-left: 10px !important;
-  }
-}
-
 </style>

@@ -41,7 +41,7 @@
           color="#38598a"
           theme="dark"
           class="ml-2 text-none"
-          @click.stop="$router.push({ path: 'request', append: true })"
+          @click.stop="$router.push({ name: 'gmp-step-1' })"
         >
           {{ newRequestText }}
         </v-btn>

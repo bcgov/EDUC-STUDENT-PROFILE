@@ -1,43 +1,46 @@
 <template>
   <v-card class="document-upload">
-    <v-card-title><h3>Document Upload</h3></v-card-title>
-    <!-- <v-card-text> -->
-    <v-form
-      ref="form"
-      v-model="validForm"
-    >
-      <v-select
-        v-model="documentTypeCode"
-        color="#003366"
-        required
-        :rules="requiredRules"
+    <v-card-title>Document Upload</v-card-title>
+    <v-card-item>
+      <v-form
+        ref="form"
+        v-model="validForm"
+      >
+        <v-select
+          v-model="documentTypeCode"
+          required
+          :rules="requiredRules"
+          variant="underlined"
+          :eager="eager"
+          :items="documentTypes"
+          label="Document Type"
+        />
+        <v-file-input
+          v-model="fileArray"
+          :rules="fileRules"
+          :accept="fileAccept"
+          placeholder="Select your file"
+          show-size
+          :error-messages="fileInputError"
+          variant="underlined"
+        />
+        <p class="bottom-text">
+          {{ fileFormats }} files supported
+        </p>
+      </v-form>
+    </v-card-item>
+    <v-card-item>
+      <v-alert
+        v-model="alert"
+        density="compact"
         variant="outlined"
-        :eager="eager"
-        :items="documentTypes"
-        label="Document Type"
-      />
-      <v-file-input
-        color="#003366"
-        :rules="fileRules"
-        :accept="fileAccept"
-        placeholder="Select your file"
-        :error-messages="fileInputError"
-        @change="selectFile"
-      />
-      <p class="bottom-text">
-        {{ fileFormats }} files supported
-      </p>
-    </v-form>
-    <v-alert
-      v-model="alert"
-      density="compact"
-      variant="outlined"
-      closable
-      :class="alertType"
-      class="mb-3"
-    >
-      {{ alertMessage }}
-    </v-alert>
+        closable
+        :class="alertType"
+        class="mb-3"
+      >
+        {{ alertMessage }}
+      </v-alert>
+    </v-card-item>
     <v-card-actions>
       <v-spacer />
       <v-btn
@@ -45,6 +48,7 @@
         :key="buttonKey"
         color="#003366"
         class="text-white"
+        variant="elevated"
         :disabled="!dataReady"
         :loading="active"
         @click="submitRequest"
@@ -53,7 +57,7 @@
       </v-btn>
       <v-btn
         color="#003366"
-        class="text-white"
+        variant="outlined"
         @click="closeForm"
       >
         Close
@@ -70,6 +74,18 @@ import { humanFileSize, getFileNameWithMaxNameLength } from '../utils/file';
 import ApiService from '../common/apiService';
 import { sortBy } from 'lodash';
 
+/**
+ * Returns a rule that tests the input value as an array of File types before applying a callback rule.
+ *
+ * @param {(val: any) => true|String} fn subsequent rule to apply
+ */
+function withBaseFileRule(fn) {
+  return value => {
+    if (!Array.isArray(value) || !value.every(v => v instanceof File)) return 'Please select a file';
+    return fn(value);
+  };
+}
+
 export default {
   props: {
     eager: {
@@ -80,21 +96,19 @@ export default {
   emits: ['close:form'],
   data() {
     return {
-      fileRules: [ ],
-      fileAccept: '',
-      fileFormats: 'PDF, JPEG, and PNG',
-      requiredRules: [v => !!v || 'Required'],
-      validForm: true,
-      fileInputError: [],
-      documentTypeCode: null,
-      file: null,
       active: false,
-      buttonKey: 0,
-
       alert: false,
       alertMessage: null,
-      alertType: null
-
+      alertType: null,
+      buttonKey: 0,
+      documentTypeCode: null,
+      fileAccept: '',
+      fileArray: [],
+      fileFormats: 'PDF, JPEG, and PNG',
+      fileInputError: [],
+      fileRules: [],
+      requiredRules: [v => !!v || 'Required'],
+      validForm: true
     };
   },
   computed: {
@@ -106,11 +120,11 @@ export default {
       return getRequestStore().requestID;
     },
     dataReady () {
-      return this.validForm && this.file;
+      return this.validForm && this.fileArray;
     },
     documentTypes() {
       return sortBy(this.documentTypeCodes, ['displayOrder']).map(code =>
-        ({text: code.label, value: code.documentTypeCode}));
+        ({title: code.label, value: code.documentTypeCode}));
     }
   },
   watch: {
@@ -127,7 +141,7 @@ export default {
   },
   methods: {
     setUploadedDocument(document) {
-      this.getRequestStore().setUploadedDocument(document);
+      getRequestStore().setUploadedDocument(document);
     },
     closeForm() {
       this.resetForm();
@@ -150,32 +164,19 @@ export default {
       this.alertType = 'bootstrap-error';
       this.alert = true;
     },
-    selectFile(file) {
-      this.file = file;
-      if (!this.file && !this.active) {
-        this.fileInputError = 'Required';
-      } else {
-        this.fileInputError = [];
-        this.alert = false;
-      }
-    },
     validate() {
       this.$refs.form.validate();
     },
     submitRequest() {
       if (this.dataReady) {
         try {
-          if (this.file.name && this.file.name.match('^[\\u0080-\\uFFFF\\w,\\s-_]+\\.[A-Za-z]{3,4}$')) {
-            this.active = true;
-            const reader = new FileReader();
-            reader.onload = this.uploadFile;
-            reader.onabort = this.handleFileReadErr;
-            reader.onerror = this.handleFileReadErr;
-            reader.readAsBinaryString(this.file);
-          }else {
-            this.active = false;
-            this.setErrorAlert('Please remove spaces and special characters from file name and try uploading again.');
-          }
+          const [ file ] = this.fileArray;
+          this.active = true;
+          const reader = new FileReader();
+          reader.onload = this.uploadFile;
+          reader.onabort = this.handleFileReadErr;
+          reader.onerror = this.handleFileReadErr;
+          reader.readAsBinaryString(file);
         } catch (e) {
           this.handleFileReadErr();
           throw e;
@@ -186,22 +187,24 @@ export default {
       this.active = false;
       this.setErrorAlert('Sorry, an unexpected error seems to have occurred. Try uploading your files later.');
     },
-    uploadFile(env) {
+    async uploadFile(env) {
+      const [ file ] = this.fileArray;
       let document = {
         documentTypeCode: this.documentTypeCode,
-        fileName: getFileNameWithMaxNameLength(this.file.name),
-        fileExtension: this.file.type,
-        fileSize: this.file.size,
+        fileName: getFileNameWithMaxNameLength(file.name),
+        fileExtension: file.type,
+        fileSize: file.size,
         documentData: btoa(env.target.result)
       };
 
-      return ApiService.uploadFile(this.requestID, document, this.requestType).then(response => {
+      try {
+        const response = await ApiService.uploadFile(this.requestID, document, this.requestType);
         this.setUploadedDocument(response.data);
         this.resetForm();
         this.setSuccessAlert();
-      }).catch(() => {
+      } catch {
         this.handleFileReadErr();
-      });
+      }
     },
     makefileFormatList(extensions) {
       extensions = extensions.map(v => v.split(new RegExp('/'))[1]).filter(v => v).map(v => v.toUpperCase());
@@ -218,8 +221,23 @@ export default {
       const fileRequirements = response.data;
       const maxSize = fileRequirements.maxSize;
       this.fileRules = [
-        value => !value || value.size < maxSize || `File size should not be larger than ${humanFileSize(maxSize)}!`,
-        value => !value || fileRequirements.extensions.includes(value.type) || `File formats should be ${this.fileFormats}.`,
+        withBaseFileRule((value) => {
+          const [ file ] = value;
+          return !file || file?.size < maxSize || `File size should not be larger than ${humanFileSize(maxSize)}!`;
+        }),
+        withBaseFileRule(value => {
+          const [ file ] = value;
+          return !file
+            || fileRequirements.extensions.includes(file.type)
+            || `File formats should be ${this.fileFormats}.`;
+        }),
+        withBaseFileRule(value => {
+          const [ file ] = value;
+          const hasNoSpecialCharacters = !!file
+            && !!file?.name
+            && !!file?.name.match('^[\\u0080-\\uFFFF\\w,\\s-_]+\\.[A-Za-z]{3,4}$');
+          return hasNoSpecialCharacters || 'File name cannot have special characters.';
+        })
       ];
       this.fileAccept = fileRequirements.extensions.join();
       this.fileFormats = this.makefileFormatList(fileRequirements.extensions);
@@ -233,46 +251,6 @@ export default {
   padding: 1.1rem;
   max-width: 50rem;
   min-width: 10rem;
-}
-
-.v-dialog > .v-card > .v-card__text {
-  padding: 24px 24px 20px;
-}
-
-p {
-  padding-top: 10px
-}
-ul {
-  width: 100%
-}
-
-.v-input {
-  padding-bottom: 0;
-}
-.bottom-text {
-  /* margin-top: -0.7rem; */
-  padding-top: 0;
-  color: #666666;
-  margin-left: 1.7rem;
-  font-size: 0.8rem
-}
-
-.v-text-field__details {
-  display: none !important;
-  height: 0 !important;
-  min-height: 0 !important;
-}
-.v-messages {
-  min-height: 0 !important;
-  height: 0 !important;
-}
-
-h3 {
-  font-size: 1.2rem
-}
-
-.v-alert {
-  font-size: 1.05rem;
 }
 
 </style>

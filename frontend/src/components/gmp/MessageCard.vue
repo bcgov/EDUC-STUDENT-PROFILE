@@ -4,9 +4,7 @@
     variant="outlined"
     class="bootstrap-success"
   >
-    <p class="pb-4">
-      <strong>Thank you. Your request has been accepted.</strong>
-    </p>
+    <p><strong>Thank you. Your request has been accepted.</strong></p>
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.INITREV || status === requestStatuses.SUBSREV"
@@ -27,14 +25,16 @@
     >
       <strong>Your PEN request has now been re-submitted for processing.</strong>
     </p>
-    <ul>
-      <li>Requests are processed M-F 8am – 4:30pm excluding stat holidays</li>
-      <li>In most cases you will get a response within 1-3 business days</li>
-      <li>
-        You will receive an email when your request has been processed. You can also log into GetMyPEN after one
-        business day to check on status of your request
-      </li>
-    </ul>
+    <p class="pb-4">
+      Requests are processed M-F 8am – 4:30pm excluding stat holidays
+    </p>
+    <p class="pb-4">
+      In most cases you will get a response within 1-3 business days
+    </p>
+    <p>
+      You will receive an email when your request has been processed. You can also log into GetMyPEN after one
+      business day to check on status of your request
+    </p>
   </v-alert>
   <v-alert
     v-else-if="status === requestStatuses.DRAFT && timedout"
@@ -82,7 +82,7 @@
     width="100%"
     class="bootstrap-warning"
   >
-    <p class="pb-4">
+    <p>
       <strong>Additional information is required.</strong> See the request below.
     </p>
   </v-alert>
@@ -96,10 +96,8 @@
     <p class="pb-4">
       <strong>Your request to get your PEN could not be completed, for the following reason:</strong>
     </p>
-    <p>
-      <ul>
-        <li>{{ request.failureReason }}</li>
-      </ul>
+    <p class="pb-4">
+      <i>{{ request.failureReason }}</i>
     </p>
     <p>If needed, you can submit another request using the button below.</p>
   </v-alert>
@@ -239,19 +237,15 @@
     </v-container>
     <p class="pb-4">
       {{ request.tomorrow ? 'As of tomorrow morning 8am PST, you may use your PEN to'
-        : 'You now may wish to use your PEN to:' }}
-      <ul>
-        <li>
-          <a
-            :href="transcriptUrl"
-            target="_blank"
-          >
-            Order Transcripts & Certificates - StudentTranscripts Service
-          </a>
-        </li>
-      </ul>
+        : 'You now may wish to use your PEN to' }}
+      <a
+        :href="transcriptUrl"
+        target="_blank"
+      >
+        Order Transcripts & Certificates - StudentTranscripts Service
+      </a>
     </p>
-    <p class="pb-4">
+    <p>
       You can log back into GetMyPEN at any time to see your PEN.
     </p>
   </v-alert>
@@ -262,7 +256,7 @@
     width="100%"
     class="bootstrap-warning"
   >
-    <p class="pb-4">
+    <p>
       <strong>Your PEN Request was not actioned within {{ numDaysAllowedInDraftStatus }} days and was therefore
         cancelled. Please fill out the form again and verify your email to submit a new request.</strong>
     </p>

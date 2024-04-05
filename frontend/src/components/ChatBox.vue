@@ -1,102 +1,90 @@
 <template>
-  <v-container
-    class="pa-0"
-    fluid
-  >
-    <!-- <v-row class="pb-5" v-if="requestComment"> -->
-    <v-card
+  <v-row>
+    <v-col
       v-if="status === requestStatuses.RETURNED"
-      class="mb-5"
+      cols="12"
     >
-      <v-toolbar
-        flat
-        color="#036"
-        class="text-white"
-        height="45rem"
+      <v-card>
+        <v-toolbar
+          flat
+          color="#036"
+          title="Request"
+          density="compact"
+          class="text-white"
+        />
+        <div>
+          <v-progress-linear
+            v-if="loading"
+            indeterminate
+            absolute
+            location="top"
+            color="indigo-darken-2"
+          />
+          <CommentList
+            :comments="requestComments"
+            :participants="participants"
+            :user="myself"
+          />
+        </div>
+      </v-card>
+    </v-col>
+    <v-col v-if="status === requestStatuses.RETURNED">
+      <v-card>
+        <v-toolbar
+          flat
+          color="#036"
+          density="compact"
+          class="text-white"
+        >
+          <v-toolbar-title>Respond Here</v-toolbar-title>
+        </v-toolbar>
+        <div
+          id="comments-outer"
+          class="comments-outside"
+        >
+          <v-progress-linear
+            v-if="loading"
+            indeterminate
+            absolute
+            location="top"
+            color="indigo-darken-2"
+          />
+          <CommentForm
+            :unsubmitted-documents="unsubmittedDocuments"
+          />
+        </div>
+      </v-card>
+    </v-col>
+    <v-col cols="12">
+      <v-card
+        v-if="hasHistory"
+        class="mb-5"
       >
-        <v-toolbar-title>Request</v-toolbar-title>
-      </v-toolbar>
-      <div>
-        <v-progress-linear
-          v-if="loading"
-          indeterminate
-          absolute
-          location="top"
-          color="indigo-darken-2"
-        />
-        <SingleComment
-          v-for="comment in requestComments"
-          :key="comment.id"
-          :comment="comment"
-          :myself="myself"
-          :participants="participants"
-          :highlight="true"
-        />
-      </div>
-    </v-card>
-    <!-- </v-row> -->
-    <!-- <v-row class="pb-5"> -->
-    <v-card
-      v-if="status === requestStatuses.RETURNED"
-      class="mb-5"
-    >
-      <v-toolbar
-        flat
-        color="#036"
-        class="text-white"
-        height="45rem"
-      >
-        <v-toolbar-title>Respond Here</v-toolbar-title>
-      </v-toolbar>
-      <div
-        id="comments-outer"
-        class="comments-outside"
-      >
-        <v-progress-linear
-          v-if="loading"
-          indeterminate
-          absolute
-          location="top"
-          color="indigo-darken-2"
-        />
-        <CommentForm
-          :unsubmitted-documents="unsubmittedDocuments"
-        />
-      </div>
-    </v-card>
-    <!-- </v-row> -->
-    <!-- <v-row class="pb-5"> -->
-    <v-card
-      v-if="hasHistory"
-      class="mb-5"
-    >
-      <v-toolbar
-        flat
-        color="#036"
-        class="text-white"
-        height="45rem"
-      >
-        <v-toolbar-title>Discussion History</v-toolbar-title>
-      </v-toolbar>
-      <div>
-        <v-progress-linear
-          v-if="loading"
-          indeterminate
-          absolute
-          location="top"
-          color="indigo-darken-2"
-        />
-        <SingleComment
-          v-for="comment in commentHistory"
-          :key="comment.id"
-          :comment="comment"
-          :myself="myself"
-          :participants="participants"
-        />
-      </div>
-    </v-card>
-    <!-- </v-row> -->
-  </v-container>
+        <v-toolbar
+          flat
+          density="compact"
+          color="#036"
+          class="text-white"
+        >
+          <v-toolbar-title>Discussion History</v-toolbar-title>
+        </v-toolbar>
+        <div>
+          <v-progress-linear
+            v-if="loading"
+            indeterminate
+            absolute
+            location="top"
+            color="indigo-darken-2"
+          />
+          <CommentList
+            :comments="commentHistory"
+            :participants="participants"
+            :user="myself"
+          />
+        </div>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 <script>
 import { groupBy, sortBy, findLastIndex } from 'lodash';
@@ -106,14 +94,14 @@ import { useRootStore } from '../store/root';
 import { useAuthStore } from '../store/auth';
 import { getRequestStore } from '../store/request';
 
-import SingleComment from './SingleComment.vue';
+import CommentList from './CommentList.vue';
 import CommentForm from './CommentForm.vue';
 import ApiService from '../common/apiService';
 
 export default {
   components: {
     CommentForm,
-    SingleComment,
+    CommentList
   },
   props: {
     commentDocuments: {
@@ -161,7 +149,7 @@ export default {
   },
   created() {
     this.getDocumentTypeCodes();
-    const documentPromise = this.commentDocuments
+    const documentPromise = this.commentDocuments.length > 0
       ? Promise.resolve({data: this.commentDocuments})
       : ApiService.getDocumentList(this.requestID, this.requestType);
     Promise.all([
@@ -311,7 +299,4 @@ hr {
   background-color: #555;
 }
 
-.v-toolbar /deep/ .v-toolbar__content {
-  padding-left: 20px !important;
-}
 </style>
