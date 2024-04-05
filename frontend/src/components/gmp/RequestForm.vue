@@ -3,24 +3,23 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-card
-            color="#FFECA9"
-            title="Guidance"
+          <v-alert
+            variant="outlined"
+            class="bootstrap-warning"
           >
-            <v-card-text>
-              <ul class="pl-5">
-                <li>This form can only be completed by the owner of the PEN</li>
-                <li>
-                  Enter your legal name exactly as it appears on your Government Photo ID; including any middle names if
-                  applicable
-                </li>
-                <li>
-                  If your name has been legally changed since attending school in British Columbia, please indicate previous
-                  name(s) in Past Names field
-                </li>
-              </ul>
-            </v-card-text>
-          </v-card>
+            <h3>Guidance</h3>
+            <ul class="pl-5">
+              <li>This form can only be completed by the owner of the PEN</li>
+              <li>
+                Enter your legal name exactly as it appears on your Government Photo ID; including any middle names if
+                applicable
+              </li>
+              <li>
+                If your name has been legally changed since attending school in British Columbia, please indicate previous
+                name(s) in Past Names field
+              </li>
+            </ul>
+          </v-alert>
         </v-col>
       </v-row>
       <v-row>
