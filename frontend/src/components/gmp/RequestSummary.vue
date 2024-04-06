@@ -52,8 +52,7 @@
     </v-row>
 
     <v-row>
-      <v-col
-      >
+      <v-col>
         <v-btn
           id="cancelButton"
           to="home"

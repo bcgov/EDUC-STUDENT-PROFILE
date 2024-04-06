@@ -16,8 +16,10 @@
       </v-alert>
     </v-row>
 
-    <v-row class="pb-5">
-      <MessageCard />
+    <v-row>
+      <v-col>
+        <MessageCard />
+      </v-col>
     </v-row>
     <v-row>
       <StatusCard
@@ -25,22 +27,16 @@
         @error-alert="setErrorAlert"
       />
     </v-row>
+    <RequestCard :request="request" />
     <v-row>
-      <RequestCard :request="request" />
-    </v-row>
-    <v-row
-      justify="end"
-      class="py-1"
-    >
       <v-col
+        class="text-right"
         cols="12"
-        sm="2"
-        class="d-flex justify-end align-self-center py-0 px-0 pr-4 pt-3"
       >
         <v-btn
           id="Home"
           color="#003366"
-          class="text-white align-self-center"
+          class="text-white"
           to="home"
         >
           Home

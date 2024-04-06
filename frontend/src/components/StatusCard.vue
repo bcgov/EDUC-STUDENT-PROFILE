@@ -1,67 +1,50 @@
 <template>
-  <div class="status-card d-flex flex-wrap justify-space-between px-1 pb-2">
-    <div class="py-0 pl-0">
-      <v-row no-gutters>
-        <v-col>
-          <p class="pb-4">
-            Status of your request: &nbsp;<strong>{{ statusLabel }}</strong>
-          </p>
-        </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col>
-          <p class="pb-4">
-            Status was last updated: &nbsp;<strong>{{ timeSinceLastUpdate.timeSince }}</strong>,
-            at {{ timeSinceLastUpdate.dateFormatted }}
-          </p>
-        </v-col>
-      </v-row>
-      <v-row
-        v-if="showFirstSubmission"
-        no-gutters
-      >
-        <v-col>
-          <p>
-            Request was first Submitted: &nbsp;<strong>{{ timeSinceInitialSubmission.timeSince }}</strong>
-            {{ timeSinceInitialSubmission.dateFormatted }}
-          </p>
-        </v-col>
-      </v-row>
-    </div>
-    <div
-      v-if="canCreateRequest(status)"
-      class="pa-0 align-self-start"
+  <v-col
+    cols="12"
+    lg="6"
+  >
+    <p class="pb-4">
+      Status of your request: &nbsp;<strong>{{ statusLabel }}</strong>
+    </p>
+    <p class="pb-4">
+      Status was last updated: &nbsp;<strong>{{ timeSinceLastUpdate.timeSince }}</strong>,
+      at {{ timeSinceLastUpdate.dateFormatted }}
+    </p>
+    <p>
+      Request was first Submitted: &nbsp;<strong>{{ timeSinceInitialSubmission.timeSince }}</strong>
+      {{ timeSinceInitialSubmission.dateFormatted }}
+    </p>
+  </v-col>
+  <v-col
+    v-if="canCreateRequest(status)"
+    :class="{'text-right': $vuetify.display.lgAndUp }"
+    cols="12"
+    lg="6"
+  >
+    <v-btn
+      color="#38598a"
+      theme="dark"
+      class="ml-2 text-none"
+      @click.stop="$router.push({ name: 'gmp-step-1' })"
     >
-      <v-row
-        no-gutters
-        justify="end"
-        class="pb-5"
-      >
-        <v-btn
-          color="#38598a"
-          theme="dark"
-          class="ml-2 text-none"
-          @click.stop="$router.push({ name: 'gmp-step-1' })"
-        >
-          {{ newRequestText }}
-        </v-btn>
-      </v-row>
-    </div>
-    <div v-else-if="status === requestStatuses.DRAFT">
-      <v-row justify="end">
-        <v-col>
-          <v-btn
-            color="#38598a"
-            theme="dark"
-            :loading="sending"
-            @click.stop="resendVerificationEmail"
-          >
-            Resend Verification Email
-          </v-btn>
-        </v-col>
-      </v-row>
-    </div>
-  </div>
+      {{ newRequestText }}
+    </v-btn>
+  </v-col>
+  <v-col
+    v-else-if="status === requestStatuses.DRAFT"
+    :class="{'text-right': $vuetify.display.lgAndUp }"
+    cols="12"
+    lg="6"
+  >
+    <v-btn
+      color="#38598a"
+      theme="dark"
+      :loading="sending"
+      @click.stop="resendVerificationEmail"
+    >
+      Resend Verification Email
+    </v-btn>
+  </v-col>
 </template>
 
 <script>

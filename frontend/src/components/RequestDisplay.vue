@@ -22,14 +22,12 @@
     <v-col><slot name="message" /></v-col>
   </v-row>
   <v-row>
-    <v-col>
-      <StatusCard
-        :can-create-request="canCreateRequest"
-        :new-request-text="newRequestText"
-        @success-alert="setSuccessAlert"
-        @error-alert="setErrorAlert"
-      />
-    </v-col>
+    <StatusCard
+      :can-create-request="canCreateRequest"
+      :new-request-text="newRequestText"
+      @success-alert="setSuccessAlert"
+      @error-alert="setErrorAlert"
+    />
   </v-row>
   <ChatBox
     v-if="status !== requestStatuses.DRAFT
