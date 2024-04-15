@@ -1,35 +1,38 @@
 <template>
   <div v-if="updateData">
-    <v-alert
-      v-model="alert"
-      density="compact"
-      variant="outlined"
-      closable
-      class="pa-3 mb-3 mx-3 bootstrap-error"
-    >
-      {{ alertMessage }}
-    </v-alert>
+    <v-row v-if="alertMessage">
+      <v-col>
+        <v-alert
+          v-model="alert"
+          density="compact"
+          variant="outlined"
+          closable
+          class="bootstrap-error"
+        >
+          {{ alertMessage }}
+        </v-alert>
+      </v-col>
+    </v-row>
 
-    <v-alert
-      variant="outlined"
-      class="pa-3 mb-3 mx-3 bootstrap-warning"
-    >
-      <h3>Guidance:</h3>
-      <ul class="pt-2">
-        <li>
-          Please review your information below before completing the request. If requested updates are incorrect or
-          need to be adjusted further, use the <strong>Back</strong> button to return to the UpdateMyPENInfo form
-        </li>
-      </ul>
-    </v-alert>
+    <v-row>
+      <v-col>
+        <v-alert
+          variant="outlined"
+          class="bootstrap-warning"
+        >
+          <h3>Guidance</h3>
+          <p>
+            Please review your information below before completing the request. If requested updates are incorrect or
+            need to be adjusted further, use the <strong>Back</strong> button to return to the UpdateMyPENInfo form
+          </p>
+        </v-alert>
+      </v-col>
+    </v-row>
 
-    <StudentInfoCard
-      :request="updateData"
-      class="px-3"
-    >
+    <StudentInfoCard :request="updateData">
       <template #hint>
         <v-row no-gutters>
-          <p>
+          <p class="pb-4">
             <strong>Please confirm that the information below correctly summarizes the requested changes to your PEN
               Information</strong>
           </p>
@@ -81,11 +84,7 @@
       </template>
     </StudentInfoCard>
     <v-row justify="space-between">
-      <v-col
-        cols="1"
-        sm="2"
-        class="d-flex justify-left align-self-center py-0 px-0 pl-7"
-      >
+      <v-col>
         <v-btn
           id="cancelButton"
           to="home"
@@ -95,30 +94,25 @@
           Cancel
         </v-btn>
       </v-col>
-      <v-col
-        cols="11"
-        sm="2"
-        class="d-flex justify-end align-self-center py-0 px-0 pr-6"
-      >
-        <v-card-actions class="justify-end pr-2">
-          <v-btn
-            id="previous-step"
-            color="#003366"
-            class="text-white align-self-center"
-            @click="previousStep"
-          >
-            Back
-          </v-btn>
-          <v-btn
-            id="next-step"
-            color="#003366"
-            class="text-white align-self-center"
-            :loading="submitting"
-            @click="submitRequest"
-          >
-            {{ emailChanged ? 'Next' : 'Submit' }}
-          </v-btn>
-        </v-card-actions>
+      <v-spacer />
+      <v-col class="text-right">
+        <v-btn
+          id="previous-step"
+          color="#003366"
+          class="text-white mr-2"
+          @click="previousStep"
+        >
+          Back
+        </v-btn>
+        <v-btn
+          id="next-step"
+          color="#003366"
+          class="text-white"
+          :loading="submitting"
+          @click="submitRequest"
+        >
+          {{ emailChanged ? 'Next' : 'Submit' }}
+        </v-btn>
       </v-col>
     </v-row>
   </div>

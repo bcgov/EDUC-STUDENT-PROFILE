@@ -1,66 +1,64 @@
 <template>
   <div>
-    <v-alert
-      v-model="alert"
-      density="compact"
-      variant="outlined"
-      closable
-      class="pa-3 mb-3 mx-3 bootstrap-error"
-    >
-      {{ alertMessage }}
-    </v-alert>
-
-    <v-alert
-      variant="outlined"
-      class="pa-3 mb-3 mx-3 bootstrap-warning"
-    >
-      <h3>Guidance:</h3>
-      <ul class="pt-2">
-        <li>This form can only be completed by the owner of the PEN</li>
-        <li>
-          This form can only be completed if you have already left high school. If you are still attending a K-12
-          school, request changes at your school
-        </li>
-      </ul>
-    </v-alert>
-
-    <v-container
-      fluid
-      class="py-0"
-    >
-      <v-row>
+    <v-container>
+      <v-row dense>
+        <v-col
+          v-if="alertMessage"
+          cols="12"
+        >
+          <v-alert
+            v-model="alert"
+            density="compact"
+            variant="outlined"
+            class="bootstrap-error"
+          >
+            {{ alertMessage }}
+          </v-alert>
+        </v-col>
+        <v-col cols="12">
+          <v-alert
+            variant="outlined"
+            class="bootstrap-warning"
+          >
+            <h3>Guidance</h3>
+            <ul class="pl-5">
+              <li>This form can only be completed by the owner of the PEN</li>
+              <li>
+                This form can only be completed if you have already left high school. If you are still attending a K-12
+                school, request changes at your school
+              </li>
+            </ul>
+          </v-alert>
+        </v-col>
         <v-col
           cols="12"
-          class="declaration py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
+          class="declaration"
         >
           <v-checkbox
             id="declarationCheckbox"
             v-model="declared"
+            density="compact"
             color="green"
-            class="mt-0"
-            :rules="checkboxRules('')"
+            hide-details="true"
+            :rules="checkboxRules('Required')"
             @click="clickCheckbox"
           >
             <template #label>
-              <div class="pl-3">
-                I declare that I am submitting a student data change request on my own behalf. Update personal data as
-                indicated below
-              </div>
+              I declare that I am submitting a student data change request on my own behalf. Update personal data as
+              indicated below
             </template>
           </v-checkbox>
         </v-col>
+        <v-col cols="12">
+          <v-alert class="bootstrap-warning">
+            <span>
+              Check fields that need to be changed and enter new information. Leave fields unchecked that do not require
+              changes. At least one field in the Student Information section must be changed in order to submit a request.
+            </span>
+          </v-alert>
+        </v-col>
       </v-row>
     </v-container>
-
-    <v-alert
-      variant="outlined"
-      class="pa-3 mb-3 mx-3 bootstrap-warning"
-    >
-      <span>
-        Check fields that need to be changed and enter new information. Leave fields unchecked that do not require
-        changes. At least one field in the Student Information section must be changed in order to submit a request.
-      </span>
-    </v-alert>
 
     <v-form
       id="requestForm"
@@ -68,30 +66,24 @@
       v-model="validForm"
       autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
     >
-      <v-card-subtitle class="mb-2">
-        <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Student Information</span>
-      </v-card-subtitle>
-
-      <v-container
-        fluid
-        class="py-0"
-      >
-        <v-row>
+      <v-container>
+        <v-row class="mb-4">
+          <v-col>
+            <h3>Student Information</h3>
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
-            <v-container
-              class="d-flex align-start pa-0"
-              fluid
-            >
+            <div class="d-flex">
               <v-checkbox
                 id="editLegalFirstNameCheckbox"
                 v-model="canEditLegalFirstName"
-                class="pt-0 pr-2 mt-0"
+                class="mr-4"
                 label="Change"
-                dense
+                density="compact"
                 :disabled="enableDisableForm.disabled"
               />
               <v-text-field
@@ -100,7 +92,8 @@
                 color="#003366"
                 hint="As shown on current Government Photo ID"
                 :persistent-hint="!enableDisableForm.disabled && canEditLegalFirstName"
-                variant="outlined"
+                hide-details="auto"
+                variant="underlined"
                 class="touppercase"
                 label="Current Legal First Name(s); leave blank if you do not have a first name"
                 :disabled="enableDisableForm.disabled || !canEditLegalFirstName"
@@ -109,23 +102,19 @@
                 density="compact"
                 :rules="charRules"
               />
-            </v-container>
+            </div>
           </v-col>
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
-            <v-container
-              class="d-flex align-start pa-0"
-              fluid
-            >
+            <div class="d-flex">
               <v-checkbox
                 id="editLegalMiddleNamesCheckbox"
                 v-model="canEditLegalMiddleNames"
-                class="pt-0 pr-2 mt-0"
+                class="mr-4"
                 label="Change"
-                dense
+                density="compact"
                 :disabled="enableDisableForm.disabled"
               />
               <v-text-field
@@ -134,7 +123,8 @@
                 color="#003366"
                 hint="As shown on current Government Photo ID"
                 :persistent-hint="!enableDisableForm.disabled && canEditLegalMiddleNames"
-                variant="outlined"
+                hide-details="auto"
+                variant="underlined"
                 class="touppercase"
                 label="Current Legal Middle Name(s)"
                 :disabled="enableDisableForm.disabled || !canEditLegalMiddleNames"
@@ -143,29 +133,23 @@
                 density="compact"
                 :rules="charRules"
               />
-            </v-container>
+            </div>
           </v-col>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
-            <v-container
-              class="d-flex align-start pa-0"
-              fluid
-            >
+          <v-col cols="12">
+            <div class="d-flex">
               <v-checkbox
                 id="editLegalLastNameCheckbox"
                 v-model="canEditLegalLastName"
-                class="pt-0 pr-2 mt-0"
+                class="mr-4"
                 label="Change"
-                dense
+                density="compact"
                 :disabled="enableDisableForm.disabled"
               />
               <v-text-field
                 id="legalLastName"
                 v-model.trim="request.legalLastName"
                 color="#003366"
-                variant="outlined"
+                variant="underlined"
                 :rules="charRules && requiredRules(lastNameHint)"
                 class="touppercase"
                 :hint="legalLastNameHint"
@@ -176,22 +160,16 @@
                 maxlength="25"
                 density="compact"
               />
-            </v-container>
+            </div>
           </v-col>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
-            <v-container
-              class="d-flex align-start pa-0"
-              fluid
-            >
+          <v-col cols="12">
+            <div class="d-flex">
               <v-checkbox
                 id="editBirthdateCheckbox"
                 v-model="canEditBirthdate"
-                class="pt-0 pr-2 mt-0"
+                class="mr-4"
                 label="Change"
-                dense
+                density="compact"
                 :disabled="enableDisableForm.disabled"
               />
               <v-menu
@@ -207,7 +185,7 @@
                     id="birthdate"
                     ref="birthdate"
                     color="#003366"
-                    variant="outlined"
+                    variant="underlined"
                     :model-value="formatDob(request.dob)"
                     :rules="requiredRules(dobHint)"
                     label="Birthdate"
@@ -222,59 +200,46 @@
                 <v-date-picker
                   id="dob"
                   ref="picker"
-                  v-model="request.dob"
+                  v-model="rawDob"
                   color="#003366"
+                  view-mode="year"
                   show-current
                   :max="new Date(localDate.now().minusYears(5).toString()).toISOString().substring(0, 10)"
                   min="1903-01-01"
                   @change="save"
                 />
               </v-menu>
-            </v-container>
+            </div>
           </v-col>
         </v-row>
       </v-container>
 
-      <v-alert
-        variant="outlined"
-        class="pa-3 mb-3 mx-3 bootstrap-warning"
-      >
-        <span>In order to complete this request to update your PEN information, an image of supporting legal
-          identification is required.</span>
-      </v-alert>
-
-      <v-container
-        fluid
-        class="py-0"
-      >
+      <v-container>
         <v-row>
-          <v-col class="d-flex align-start flex-wrap py-0">
-            <DocumentChip
-              v-for="document in unsubmittedDocuments"
-              :key="document.documentID"
-              :document="document"
-              :disabled="enableDisableForm.disabled"
-            />
-            <v-dialog
-              v-model="dialog"
-              max-width="30rem"
-              max-height="50rem"
-              xl="2"
-              lg="2"
-              md="2"
-              xs="2"
-              sm="2"
+          <v-col>
+            <v-alert
+              variant="outlined"
+              class="bootstrap-warning"
             >
+              <p>
+                In order to complete this request to update your PEN information, an image of supporting legal
+                identification is required.
+              </p>
+            </v-alert>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-dialog v-model="dialog">
               <template #activator="{ props }">
                 <v-btn
                   rounded
                   :disabled="enableDisableForm.disabled"
-                  class="ma-1 text-white order-first"
                   color="#0C7CBA"
                   v-bind="props"
                 >
                   <v-icon start>
-                    fa-paperclip
+                    mdi-paperclip
                   </v-icon>
                   Upload
                 </v-btn>
@@ -283,34 +248,41 @@
                 @close:form="() => dialog = false"
               />
             </v-dialog>
+            <v-chip-group
+              v-model="selectedDocument"
+              color="#0C7CBA"
+              column
+              variant="outlined"
+            >
+              <DocumentChip
+                v-for="document in unsubmittedDocuments"
+                :key="document.documentID"
+                :document="document"
+                :disabled="enableDisableForm.disabled"
+                @clear-selected="() => selectedDocument = -1"
+              />
+            </v-chip-group>
           </v-col>
         </v-row>
       </v-container>
 
-      <v-card-subtitle class="mb-2">
-        <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">Contact Information</span>
-      </v-card-subtitle>
-
-      <v-container
-        fluid
-        class="py-0"
-      >
+      <v-container>
         <v-row>
-          <v-col
-            cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
-            <v-container
-              class="d-flex align-start pa-0"
-              fluid
-            >
+          <v-col>
+            <h3>Contact Information</h3>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <div class="d-flex">
               <v-checkbox
                 v-if="hasStudentRecord"
                 id="editEmail"
                 v-model="canEditEmail"
-                class="pt-0 pr-2 mt-0"
+                class="mr-4"
+                hide-details="auto"
                 label="Change"
-                dense
+                density="compact"
                 :disabled="enableDisableForm.disabled"
               />
               <v-text-field
@@ -319,84 +291,66 @@
                 :rules="emailRules"
                 color="#003366"
                 :hint="emailHint"
+                hide-details="auto"
                 class="touppercase"
-                variant="outlined"
+                variant="underlined"
                 label="E-mail Address"
                 :disabled="enableDisableForm.disabled || (!canEditEmail && hasStudentRecord)"
                 autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
                 maxlength="255"
                 density="compact"
               />
-            </v-container>
+            </div>
           </v-col>
         </v-row>
       </v-container>
-      <v-container
-        fluid
-        no-padding
-      >
+      <v-container>
         <v-row>
-          <v-col
-            cols="12"
-            class="declaration py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
-          >
+          <v-col cols="12">
             <v-checkbox
               id="acceptance_chk"
               v-model="acceptance"
               color="green"
-              class="mt-0"
+              hide-details="true"
               :rules="checkboxRules('')"
+              density="compact"
+              label="The personal demographic data provided above is complete and accurate."
               @click="clickCheckbox"
-            >
-              <template #label>
-                <div class="pl-3">
-                  The personal demographic data provided above is complete and accurate.
-                </div>
-              </template>
-            </v-checkbox>
+            />
           </v-col>
         </v-row>
         <v-row>
           <v-col
             id="confidential_information"
             cols="12"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
-            <v-card
-              height="100%"
-              width="100%"
-              elevation="2"
-              class="text-black pa-4"
-            >
-              <p><strong>Collection Notice:</strong></p>
-              <p>
-                The information included in this form is collected under ss. 26(c) of the Freedom of Information and
-                Protection of Privacy Act, R.S.B.C. 1996, c. 165. The information you provide will be used in
-                confirming your identity and communicating with you.
-              </p>
-              <p>
-                If you have any questions about the collection and use of this information, please contact:
-              </p>
-              <p>
-                <a href="mailto:pens.coordinator@gov.bc.ca">PEN Coordinator</a><br>
-                Data Management Unit, Student Data & Educational Resource Services Branch<br>
-                B.C. Ministry of Education and Child Care<br>
-                PO Box 9886 Stn Prov Govt<br>
-                Victoria BC V8W 9T6<br>
-                OR through Enquiry BC (Victoria): (250) 387-6121
-              </p>
+            <v-card>
+              <v-card-title tag="h3">
+                Collection Notice
+              </v-card-title>
+              <v-card-text>
+                <p class="pb-4">
+                  The information included in this form is collected under ss. 26(c) of the Freedom of Information and
+                  Protection of Privacy Act, R.S.B.C. 1996, c. 165. The information you provide will be used in
+                  confirming your identity and communicating with you.
+                </p>
+                <p class="pb-4">
+                  If you have any questions about the collection and use of this information, please contact:
+                </p>
+                <p>
+                  <a href="mailto:pens.coordinator@gov.bc.ca">PEN Coordinator</a><br>
+                  Data Management Unit, Student Data & Educational Resource Services Branch<br>
+                  B.C. Ministry of Education and Child Care<br>
+                  PO Box 9886 Stn Prov Govt<br>
+                  Victoria BC V8W 9T6<br>
+                  OR through Enquiry BC (Victoria): (250) 387-6121
+                </p>
+              </v-card-text>
             </v-card>
           </v-col>
         </v-row>
-        <v-row
-          justify="space-between"
-          class="pt-2"
-        >
-          <v-col
-            cols="1"
-            sm="2"
-            class="d-flex justify-left align-self-center py-0 px-0 pl-4"
-          >
+        <v-row>
+          <v-col>
             <v-btn
               id="cancelButton"
               to="home"
@@ -406,30 +360,25 @@
               Cancel
             </v-btn>
           </v-col>
-          <v-col
-            cols="11"
-            sm="2"
-            class="d-flex justify-end align-self-center py-0 px-0 pr-3"
-          >
-            <v-card-actions>
-              <v-btn
-                id="previous-step"
-                color="#003366"
-                class="text-white align-self-center"
-                @click="previousStep"
-              >
-                Back
-              </v-btn>
-              <v-btn
-                id="next-step"
-                color="#003366"
-                class="text-white align-self-center"
-                :disabled="!validForm"
-                @click="validateRequestForm"
-              >
-                Next
-              </v-btn>
-            </v-card-actions>
+          <v-spacer />
+          <v-col class="text-right">
+            <v-btn
+              id="previous-step"
+              color="#003366"
+              class="text-white mr-2"
+              @click="previousStep"
+            >
+              Back
+            </v-btn>
+            <v-btn
+              id="next-step"
+              color="#003366"
+              class="text-white"
+              :disabled="!validForm"
+              @click="validateRequestForm"
+            >
+              Next
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -438,9 +387,9 @@
 </template>
 
 <script>
-import { mapState, mapWritableState, mapActions } from 'pinia';
+import { mapState, mapWritableState } from 'pinia';
 import { useRootStore } from '../../store/root';
-import { useStudentRequestStore } from '../../store/request';
+import { getRequestStore, useStudentRequestStore } from '../../store/request';
 import { useUmpStore } from '../../store/ump';
 import { LocalDate } from '@js-joda/core';
 import { isEqual, mapValues, pick } from 'lodash';
@@ -475,13 +424,15 @@ export default {
       },
       acceptance: false,
       dialog: false,
+      rawDob: null,
+      selectedDocument: -1
     };
   },
   computed: {
     ...mapState(useStudentRequestStore, ['unsubmittedDocuments']),
     ...mapState(useRootStore, ['student']),
     ...mapState(useUmpStore, ['recordedData']),
-    ...mapState(useUmpStore, { request: 'updateData' }),
+    ...mapWritableState(useUmpStore, { request: 'updateData' }),
     ...mapWritableState(useUmpStore, [
       'declared',
       'canEditLegalLastName',
@@ -531,6 +482,12 @@ export default {
       handler() {
         Object.assign(this.request, this.recordedData);
       }
+    },
+    rawDob(val) {
+      const date = new Date(val);
+      this.$nextTick().then(() => {
+        this.request.dob = date.toISOString().substring(0, 10);
+      });
     }
   },
   mounted() {
@@ -541,10 +498,9 @@ export default {
       : this.recordedData.legalMiddleNames;
     this.request.dob = this.canEditBirthdate ? this.request.dob : this.recordedData.dob;
     this.request.email = (this.canEditEmail || !this.hasStudentRecord) ? this.request.email : this.recordedData.email;
-    this.getDocumentTypeCodes();
+    getRequestStore().getDocumentTypeCodes();
   },
   methods: {
-    ...mapActions('studentRequest',['getDocumentTypeCodes']),
     requiredRules(hint = 'Required') {
       return [
         v => !!(v && v.trim()) || hint,
@@ -570,8 +526,11 @@ export default {
     },
     validateRequestForm() {
       if (this.$refs.form.validate() && this.validForm) {
-        if (isEqual(mapValues(pick(this.request, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v=> v === null ? '' : v),
-          mapValues(pick(this.recordedData, ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v => v === null ? '' : v))) {
+        if (isEqual(
+          mapValues(pick(this.request,
+            ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v=> v === null ? '' : v),
+          mapValues(pick(this.recordedData,
+            ['legalLastName', 'legalFirstName', 'legalMiddleNames', 'dob']), v => v === null ? '' : v))) {
           this.setErrorDialog('You must specify at least one change in order to submit a request.');
         } else if (this.unsubmittedDocuments.length === 0) {
           this.setErrorDialog('You must upload an image of supporting legal identification to submit a request.');
@@ -607,10 +566,6 @@ export default {
     margin: 0;
   }
 
-  .v-dialog {
-    max-width: 1vw;
-  }
-
   .declaration /deep/ .v-icon {
     padding-left: 2px;
   }
@@ -618,10 +573,6 @@ export default {
   .v-input--checkbox /deep/ .v-icon {
     padding-left: 2px;
   }
-
- /* .v-input--checkbox /deep/ .v-input--selection-controls__input {
-    margin-right: 4px;
-  } */
 
   .v-dialog > .v-card > .v-card__text {
     padding: 24px 24px 20px;
@@ -644,5 +595,5 @@ export default {
 <style>
   .touppercase.v-text-field > .v-input__control > .v-input__slot > .v-text-field__slot input {
     text-transform: uppercase
-  }
+elect }
 </style>

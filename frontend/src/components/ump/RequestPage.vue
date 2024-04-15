@@ -6,15 +6,10 @@
   >
     <article
       id="request-display-container"
-      class="top-banner full-height"
+      class="full-height"
     >
-      <v-row
-        align="center"
-        justify="center"
-        style="width: 1vw;margin-right: 0;margin-left: 0;margin-bottom: 5rem;"
-      >
+      <v-row>
         <v-col
-          class="pt-1 pt-sm-3"
           xs="10"
           sm="8"
           md="6"
@@ -57,18 +52,15 @@
     <!-- request form -->
     <article
       id="request-form-container"
-      class="top-banner full-height"
+      class="full-height"
     >
-      <v-row
-        align="center"
-        justify="center"
-      >
+      <v-row>
         <v-col
-          xs="10"
-          sm="10"
+          cols="12"
           md="10"
-          lg="10"
-          xl="10"
+          offset-md="1"
+          lg="8"
+          offset-lg="2"
         >
           <RequestStepper
             :steps="steps"
@@ -143,14 +135,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.container {
-  padding: 0px;
-}
-.top-banner {
-  background-size: cover;
-  align-items: center;
-  display: flex;
-}
 .full-height {
   height: 100%;
 }

@@ -9,16 +9,13 @@
       id="request-form-container"
       class="top-banner full-height"
     >
-      <v-row
-        align="center"
-        justify="center"
-      >
+      <v-row>
         <v-col
-          xs="8"
-          sm="8"
-          md="8"
+          cols="12"
+          md="10"
+          offset-md="1"
           lg="8"
-          xl="8"
+          offset-lg="2"
         >
           <RequestStepper
             :steps="steps"

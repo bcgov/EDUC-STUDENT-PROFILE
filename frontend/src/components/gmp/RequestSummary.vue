@@ -7,7 +7,7 @@
           density="compact"
           variant="outlined"
           closable
-          class="pa-3 mb-3 mx-3 bootstrap-error"
+          class="bootstrap-error"
         >
           {{ alertMessage }}
         </v-alert>
@@ -24,7 +24,9 @@
             Please review your information and email below before completing the request. If anything is incorrect,
             use the <strong>Back</strong> button to return to the GetMyPEN form
           </p>
-          <p class="pb-4">If we are unable to locate your PEN based on the information provided below;</p>
+          <p class="pb-4">
+            If we are unable to locate your PEN based on the information provided below;
+          </p>
           <ul class="pl-5">
             <li>Identification may be requested or</li>
             <li>Your PEN request may be rejected</li>
@@ -35,17 +37,12 @@
 
     <v-row>
       <v-col>
-        <StudentInfoCard
-          :request="requestData"
-          class="px-3"
-        >
+        <StudentInfoCard :request="requestData">
           <template #hint>
-            <v-row no-gutters>
-              <p>
-                <strong>Please confirm the information below correctly summarizes your legal names, demographic information
-                  and contact information before continuing.</strong>
-              </p>
-            </v-row>
+            <p class="pb-4">
+              <strong>Please confirm the information below correctly summarizes your legal names, demographic information
+                and contact information before continuing.</strong>
+            </p>
           </template>
         </StudentInfoCard>
       </v-col>

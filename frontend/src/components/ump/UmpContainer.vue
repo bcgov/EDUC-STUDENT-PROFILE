@@ -71,7 +71,7 @@
           lg="8"
           xl="6"
         >
-          <RequestDisplay 
+          <RequestDisplay
             :title="requestTitle"
             :can-create-request="canCreateRequest"
             :new-request-text="newRequestText"
@@ -94,12 +94,17 @@
                     no-gutters
                     class="mb-2"
                   >
-                    <DocumentChip
-                      v-for="document in initialDocuments"
-                      :key="document.documentID"
-                      :document="document"
-                      :undeletable="true"
-                    />
+                    <v-chip-group
+                      color="#0C7CBA"
+                      variant="outlined"
+                    >
+                      <DocumentChip
+                        v-for="document in initialDocuments"
+                        :key="document.documentID"
+                        :document="document"
+                        :undeletable="true"
+                      />
+                    </v-chip-group>
                   </v-row>
                 </template>
               </StudentInfoCard>
@@ -160,7 +165,6 @@
       </v-row>
     </article>
   </v-container>
-
 
   <v-container
     v-else-if="isAuthenticated && !hasRequest"

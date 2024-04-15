@@ -47,7 +47,7 @@
       <strong>Your email verification was not completed within the time limited. Repeat the email verification
         process.</strong>
     </p>
-    <ol>
+    <ol class="pl-5">
       <li>Click the 'Resend Verification Email' button below</li>
       <li>
         Go to your email inbox for {{ request.email }} and check for an email from {{ ministry }}. Check your spam

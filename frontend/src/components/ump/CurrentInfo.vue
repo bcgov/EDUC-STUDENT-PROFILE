@@ -1,21 +1,26 @@
 <template>
   <div>
-    <v-alert
-      variant="outlined"
-      class="pa-3 mb-3 mx-3 bootstrap-warning"
-    >
-      <h3>Guidance:</h3>
-      <ul class="pt-2">
-        <li>This process can only be completed by the owner of the PEN</li>
-        <li>
-          This process can only be completed if you have already left high school. If you are still attending a K-12
-          school, request changes at your school
-        </li>
-      </ul>
-    </v-alert>
-    <v-card-subtitle>
-      <span style="font-size: 1.3rem;font-weight: bolder; color: #333333">{{ subtitle }}</span>
-    </v-card-subtitle>
+    <v-container>
+      <v-row>
+        <v-col>
+          <v-alert class="bootstrap-warning">
+            <h3>Guidance</h3>
+            <ul class="pl-5">
+              <li>This process can only be completed by the owner of the PEN</li>
+              <li>
+                This process can only be completed if you have already left high school. If you are still attending a K-12
+                school, request changes at your school
+              </li>
+            </ul>
+          </v-alert>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <h3>{{ subtitle }}</h3>
+        </v-col>
+      </v-row>
+    </v-container>
 
     <v-form
       id="requestForm"
@@ -23,22 +28,18 @@
       v-model="validForm"
       autocomplete="6b4437dc-5a5a-11ea-8e2d-0242ac130003"
     >
-      <v-container
-        fluid
-        class="py-0"
-      >
+      <v-container>
         <v-row>
           <v-col
             cols="12"
             sm="6"
-            class="py-0 px-2 px-sm-2 px-md-3 px-lg-3 px-xl-3"
           >
             <v-text-field
               id="recordedPen"
               v-model="recordedData.pen"
               :rules="penRules"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               :hint="penHint"
               persistent-hint
               :readonly="hasStudentRecord"
@@ -59,7 +60,7 @@
               v-model.trim="recordedData.legalFirstName"
               :rules="charRules"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               :hint="firstNameHint"
               persistent-hint
@@ -79,7 +80,7 @@
               v-model.trim="recordedData.legalMiddleNames"
               :rules="charRules"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               :hint="middleNameHint"
               persistent-hint
@@ -98,7 +99,7 @@
               v-model.trim="recordedData.legalLastName"
               :rules="requiredRules(lastNameHint)"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               :hint="lastNameHint"
               persistent-hint
@@ -116,7 +117,7 @@
               v-if="hasStudentRecord"
               id="recordedDob"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               :model-value="formatDob(recordedData.dob)"
               :hint="birthdateHint"
               persistent-hint
@@ -137,7 +138,7 @@
                   id="birthdate"
                   ref="birthdate"
                   color="#003366"
-                  variant="outlined"
+                  variant="underlined"
                   :model-value="formatDob(recordedData.dob)"
                   :rules="requiredRules(birthdateHint)"
                   :hint="birthdateHint"
@@ -170,7 +171,7 @@
               id="recordedEmail"
               v-model="recordedData.email"
               color="#003366"
-              variant="outlined"
+              variant="underlined"
               class="touppercase"
               hint="Recorded E-mail Address"
               persistent-hint
@@ -180,36 +181,27 @@
           </v-col>
         </v-row>
 
-        <v-row justify="space-between">
-          <v-col
-            cols="1"
-            sm="2"
-            class="d-flex justify-left align-self-center py-0 px-0 pl-4"
-          >
+        <v-row>
+          <v-col>
             <v-btn
               id="cancelButton"
               to="home"
               color="#003366"
-              class="text-white align-self-center"
+              class="text-white"
             >
               Cancel
             </v-btn>
           </v-col>
-          <v-col
-            cols="11"
-            sm="2"
-            class="d-flex justify-end align-self-center py-0 px-0 pr-3"
-          >
-            <v-card-actions>
-              <v-btn
-                id="next-step"
-                color="#003366"
-                class="text-white align-self-center"
-                @click="nextStep"
-              >
-                Next
-              </v-btn>
-            </v-card-actions>
+          <v-spacer />
+          <v-col class="text-right">
+            <v-btn
+              id="next-step"
+              color="#003366"
+              class="text-white"
+              @click="nextStep"
+            >
+              Next
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>

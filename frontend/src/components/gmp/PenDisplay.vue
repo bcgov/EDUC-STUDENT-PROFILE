@@ -26,7 +26,7 @@
       <v-row class="card-row">
         <h4>Where can I use my PEN?</h4>
         <p>The following links lead to applications where you can use your PEN</p>
-        <ul>
+        <ul class="pl-5">
           <v-row>
             <v-col class="list-col">
               <li>

@@ -6,7 +6,7 @@
     width="100%"
     class="pa-3 bootstrap-success"
   >
-    <p class="mb-2">
+    <p>
       <strong>Thank you. Your request has been accepted.</strong>
     </p>
   </v-alert>
@@ -19,24 +19,24 @@
   >
     <p
       v-if="request.email === request.recordedEmail && status === requestStatuses.INITREV"
-      class="mb-2"
+      class="pb-4"
     >
       <strong>Your request to update your student information with the changes below has been submitted.</strong>
     </p>
     <p
       v-else-if="status === requestStatuses.INITREV"
-      class="mb-2"
+      class="pb-4"
     >
       <strong>Your email has been verified and your UpdateMyPENInfo request has now been submitted for processing.
       </strong>
     </p>
     <p
       v-else
-      class="mb-2"
+      class="pb-4"
     >
       <strong>Your UpdateMyPENInfo request has now been re-submitted for processing.</strong>
     </p>
-    <ul>
+    <ul class="pl-5">
       <li>Requests are processed M-F 8am - 4:30pm excluding stat holidays</li>
       <li>In most cases you will get a response within 1-3 business days</li>
       <li>
@@ -52,11 +52,11 @@
     width="100%"
     class="pa-3 bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Your email verification was not completed within the time limited. Repeat the email verification process.
       </strong>
     </p>
-    <ol>
+    <ol class="pl-5">
       <li>Click the 'Resend Verification Email' button below</li>
       <li>
         Go to your email inbox for {{ request.email }} and check for an email from {{ ministry }}. Check your spam
@@ -72,12 +72,12 @@
     width="100%"
     class="pa-3 bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>You are almost finished. To complete your request for the changes below, you must verify the email
         address you provided by completing the following steps:
       </strong>
     </p>
-    <ol>
+    <ol class="pl-5">
       <li>
         Go to your email for {{ request.email }} and look for an email from the Ministry of Education and Child Care.
         You may need to check your spam folder
@@ -97,7 +97,7 @@
     width="100%"
     class="pa-3 bootstrap-warning"
   >
-    <p class="mb-2">
+    <p>
       <strong>Additional information is required.</strong> See the request below.
     </p>
   </v-alert>
@@ -108,14 +108,12 @@
     width="100%"
     class="pa-3 bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Your request to update your PEN information could not be completed for the following reason:</strong>
     </p>
-    <p>
-      <ul>
-        <li>{{ request.failureReason }}</li>
-      </ul>
-    </p>
+    <ul class="pl-5">
+      <li>{{ request.failureReason }}</li>
+    </ul>
     <p>If needed, you can submit another request using the button below.</p>
   </v-alert>
   <v-alert
@@ -125,17 +123,17 @@
     width="100%"
     class="pa-3 bootstrap-success"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Your request to update your PEN information is complete</strong>
     </p>
     <p
       v-if="request.completeComment && request.completeComment.length > 0"
-      class="mb-2 comment"
+      class="pb-4 comment"
     >
       {{ request.completeComment }}
     </p>
 
-    <p class="mb-2">
+    <p class="pb-4">
       For your reference, your student record at the Ministry of Education and Child Care has been updated as shown
       below
     </p>
@@ -155,7 +153,7 @@
           sm="3"
           xs="3"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             PEN:
           </p>
         </v-col>
@@ -166,7 +164,7 @@
           sm="8"
           xs="8"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             <strong>{{ student.pen }}</strong>
           </p>
         </v-col>
@@ -182,7 +180,7 @@
           sm="3"
           xs="3"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             Name:
           </p>
         </v-col>
@@ -193,7 +191,7 @@
           sm="8"
           xs="8"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             <strong>{{ updatedFullName }}</strong>
           </p>
         </v-col>
@@ -209,7 +207,7 @@
           sm="3"
           xs="3"
         >
-          <p class="mb-2">
+          <p class="pb-4">
             Birthdate:
           </p>
         </v-col>
@@ -220,20 +218,20 @@
           sm="8"
           xs="8"
         >
-          <p class="mb-2">
-            <strong>{{ formatDob(student.dob ) }}</strong>
+          <p class="pb-4">
+            <strong>{{ formatDob(student.dob) }}</strong>
           </p>
         </v-col>
       </v-row>
     </v-container>
 
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>If any of this information is not current, please submit a new request or contact
         <a href="mailto:pens.coordinator@gov.bc.ca">pens.coordinator@gov.bc.ca</a>.</strong>
     </p>
-    <p class="mb-2">
+    <p class="pb-4">
       {{ request.tomorrow ? 'As of tomorrow morning 8am PST, you may use your PEN to' : 'You now may wish to use your PEN to:' }}
-      <ul>
+      <ul class="pl-5">
         <li>
           <a
             :href="transcriptUrl"
@@ -244,7 +242,7 @@
         </li>
       </ul>
     </p>
-    <p class="mb-2">
+    <p>
       You can log back into UpdateMyPENInfo at any time to see your PEN and current student information.
     </p>
   </v-alert>
@@ -255,7 +253,7 @@
     width="100%"
     class="pa-3 bootstrap-warning"
   >
-    <p class="mb-2">
+    <p class="pb-4">
       <strong>Your Update PEN Info Request was not actioned within {{ numDaysAllowedInDraftStatus }} days and was
         therefore cancelled. Please fill out the form again and verify your email to submit a new request.</strong>
     </p>
@@ -303,8 +301,7 @@ export default {
     },
     updatedFullName() {
       return this.fullName(this.student.legalFirstName, this.student.legalMiddleNames, this.student.legalLastName);
-    },
-    formatDob
+    }
   },
   async created() {
     await this.getNumDaysAllowedInDraftStatus();
@@ -314,6 +311,7 @@ export default {
     fullName(...names) {
       return names.filter(Boolean).join(' ').toUpperCase();
     },
+    formatDob
   }
 };
 </script>

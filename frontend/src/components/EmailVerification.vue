@@ -38,7 +38,7 @@
                   <strong> Your email has been verified and your {{ requestName }} request has now been submitted for
                     processing. </strong>
                 </p>
-                <ul>
+                <ul class="pl-5">
                   <li>Requests are processed M-F 8am – 4:30pm excluding stat holidays</li>
                   <li>In most cases you will get a response within 1-3 business days</li>
                   <li>
@@ -59,7 +59,7 @@
                   <strong>Your email verification was not completed within the 24 hour time limit. Please repeat the
                     email verification process.</strong>
                 </p>
-                <ol>
+                <ol class="pl-5">
                   <li>Log in and click the 'Resend Verification Email' button</li>
                   <li>Go to your email inbox and check for an email from {{ ministry }}. Check your spam folder too</li>
                   <li>Open the email and click on the link within 24 hours to complete the verification process</li>
@@ -77,7 +77,7 @@
                   <strong>Sorry, your email verification could not be completed, for the following reason:</strong>
                 </p>
                 <p>
-                  <ul>
+                  <ul class="pl-5">
                     <li>The verification link is not valid</li>
                   </ul>
                 </p>
@@ -102,7 +102,7 @@
                   <strong>Sorry, Your email verification could not be completed, for the following reason:</strong>
                 </p>
                 <p>
-                  <ul>
+                  <ul class="pl-5">
                     <li>The verification service is not available</li>
                   </ul>
                 </p>
