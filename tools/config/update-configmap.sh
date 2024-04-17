@@ -118,29 +118,6 @@ then
   bannerColor="#8d28d7"
 fi
 
-snowplow="
-// <!-- Snowplow starts plowing - Standalone vE.2.14.0 -->
-;(function(p,l,o,w,i,n,g){if(!p[i]){p.GlobalSnowplowNamespace=p.GlobalSnowplowNamespace||[];
- p.GlobalSnowplowNamespace.push(i);p[i]=function(){(p[i].q=p[i].q||[]).push(arguments)
- };p[i].q=p[i].q||[];n=l.createElement(o);g=l.getElementsByTagName(o)[0];n.async=1;
- n.src=w;g.parentNode.insertBefore(n,g)}}(window,document,\"script\",\"https://www2.gov.bc.ca/StaticWebResources/static/sp/sp-2-14-0.js\",\"snowplow\"));
-var collector = 'spt.apps.gov.bc.ca';
- window.snowplow('newTracker','rt',collector, {
-  appId: \"Snowplow_standalone\",
-  cookieLifetime: 86400 * 548,
-  platform: 'web',
-  post: true,
-  forceSecureTracker: true,
-  contexts: {
-   webPage: true,
-   performanceTiming: true
-  }
- });
- window.snowplow('enableActivityTracking', 30, 30); // Ping every 30 seconds after 30 seconds
- window.snowplow('enableLinkClickTracking');
- window.snowplow('trackPageView');
-//  <!-- Snowplow stop plowing -->
-"
 echo Generating private and public keys
 ssh-keygen -b 4096 -t rsa -f tempPenBackendkey -m pem -q -N ""
 UI_PRIVATE_KEY_VAL="$(cat tempPenBackendkey)"
@@ -182,6 +159,11 @@ oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map \
   --from-literal=SCHEDULER_CRON_STALE_SAGA_RECORD_REDIS="0 0/5 * * * *" \
   --from-literal=MIN_TIME_BEFORE_SAGA_IS_STALE_IN_MINUTES=5 \
   --from-literal=PROFILE_REQUEST_SAGA_API_URL="http://student-profile-saga-api-master.$PEN_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student-profile-saga" \
+  --from-literal=BCEID_REG_URL="$bceid_reg_url" \
+  --from-literal=IDLE_TIMEOUT_IN_MILLIS=1800000 \
+  --from-literal=JOURNEY_BUILDER="$journey_builder_url" \
+  --from-literal=BANNER_COLOR="$bannerColor" \
+  --from-literal=BANNER_ENVIRONMENT="$bannerEnvironment" \
   --from-literal=NODE_ENV="openshift" \
   --dry-run -o yaml | oc apply -f -
 
@@ -189,21 +171,10 @@ echo
 echo Setting environment variables for $APP_NAME-backend-$SOAM_KC_REALM_ID application
 oc -n $PEN_NAMESPACE-$envValue set env --from=configmap/$APP_NAME-backend-config-map dc/$APP_NAME-backend-$SOAM_KC_REALM_ID
 
-
-regConfig="
-VITE_APP_BCEID_REG_URL=\"$bceid_reg_url\"
-VITE_APP_IDLE_TIMEOUT_IN_MILLIS=1800000
-VITE_APP_JOURNEY_BUILDER=\"$journey_builder_url\"
-VITE_BANNER_COLOR=\"$bannerColor\"
-VITE_BANNER_ENVIRONMENT=\"$bannerEnvironment\"
-"
-
 echo Creating config map $APP_NAME-frontend-config-map
 oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map \
   --from-literal=TZ=$TZVALUE \
   --from-literal=HOST_ROUTE=$HOST_ROUTE \
-  --from-literal=.env.$envValue="$regConfig" \
-  --from-literal=snowplow.js="$snowplow" \
   --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for $APP_NAME-frontend-$SOAM_KC_REALM_ID application
