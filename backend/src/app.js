@@ -185,7 +185,7 @@ apiRouter.use('/auth', authRouter);
 apiRouter.use('/user', userRouter);
 apiRouter.use('/ump', studentRequestRouter);
 apiRouter.use('/gmp', penRequestRouter);
-apiRouter.use('/config',configRouter);
+apiRouter.use('/config', configRouter);
 
 //Handle 500 error
 app.use((err, _req, res, next) => {

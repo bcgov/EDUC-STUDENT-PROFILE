@@ -6,9 +6,7 @@ dotenv.config();
 
 const env = process.env.NODE_ENV || 'local';
 
-nconf.argv()
-  .env()
-  .file({ file: path.join(__dirname, `${env}.json`) });
+nconf.argv().env().file({ file: path.join(__dirname, `${env}.json`) });
 
 //injects environment variables into the json file
 nconf.overrides({
@@ -21,11 +19,10 @@ nconf.overrides({
   }
 });
 
-
-
 nconf.defaults({
   environment: env,
-  logoutEndpoint: process.env.SOAM_URL + '/auth/realms/master/protocol/openid-connect/logout',
+  logoutEndpoint:
+    process.env.SOAM_URL + '/auth/realms/master/protocol/openid-connect/logout',
   siteMinder_logout_endpoint: process.env.SITEMINDER_LOGOUT_ENDPOINT,
   server: {
     frontend: process.env.SERVER_FRONTEND,
@@ -69,24 +66,32 @@ nconf.defaults({
   demographics: {
     apiEndpoint: process.env.STUDENT_DEMOG_API_ENDPOINT,
   },
-  redis:{
-    host:process.env.REDIS_HOST,
-    port:process.env.REDIS_PORT,
-    password:process.env.REDIS_PASSWORD
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD
   },
   scheduler :{
-    schedulerCronProfileRequestDraft:process.env.SCHEDULER_CRON_PROFILE_REQUEST_DRAFT,
-    numDaysAllowedInDraftStatus:process.env.NUM_DAYS_ALLOWED_IN_DRAFT_STATUS,
+    schedulerCronProfileRequestDraft: process.env.SCHEDULER_CRON_PROFILE_REQUEST_DRAFT,
+    numDaysAllowedInDraftStatus: process.env.NUM_DAYS_ALLOWED_IN_DRAFT_STATUS,
     expectedDraftRequests: process.env.EXPECTED_DRAFT_REQUESTS,
-    numDaysAllowedInReturnStatusBeforeEmail:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL,
-    numDaysAllowedInReturnStatusBeforeAbandoned:process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED,
+    numDaysAllowedInReturnStatusBeforeEmail: process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL,
+    numDaysAllowedInReturnStatusBeforeAbandoned: process.env.NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED,
     schedulerCronStaleSagaRecordRedis: process.env.SCHEDULER_CRON_STALE_SAGA_RECORD_REDIS,
     minTimeBeforeSagaIsStaleInMinutes: process.env.MIN_TIME_BEFORE_SAGA_IS_STALE_IN_MINUTES
   },
+  frontendConfig: {
+    bannerEnvironment: process.env.BANNER_ENVIRONMENT,
+    bannerColor: process.env.BANNER_COLOR,
+    bceidRegUrl: process.env.BCEID_REG_URL,
+    idleTimeoutInMillis: process.env.IDLE_TIMEOUT_IN_MILLIS,
+    journeyBuilder: process.env.JOURNEY_BUILDER
+  },
   profileSagaAPIURL: process.env.PROFILE_REQUEST_SAGA_API_URL,
-  messaging:{
-    natsUrl:process.env.NATS_URL,
-    natsCluster:process.env.NATS_CLUSTER
+  messaging: {
+    natsUrl: process.env.NATS_URL,
+    natsCluster: process.env.NATS_CLUSTER
   }
 });
+
 module.exports = nconf;
