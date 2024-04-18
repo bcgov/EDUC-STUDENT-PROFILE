@@ -3,13 +3,13 @@
     <MsieBanner v-if="isIE" />
     <HeaderToolbar />
     <div
-      v-if="bannerColor !== ''"
+      v-if="frontEnd.bannerColor"
       id="bannerEnvironment"
     >
       <v-container>
         <v-row>
           <v-col>
-            <h3>{{ bannerEnvironment }} Environment</h3>
+            <h3>{{ frontEnd.bannerEnvironment }} Environment</h3>
           </v-col>
         </v-row>
       </v-container>
@@ -24,6 +24,7 @@
 import { mapState, mapActions } from 'pinia';
 import { useAuthStore } from './store/auth';
 import { useStudentRequestStore, usePenRequestStore } from './store/request';
+import { useConfigStore } from './store/config';
 import HttpStatus from 'http-status-codes';
 
 import HeaderToolbar from './components/HeaderToolbar.vue';
@@ -39,19 +40,17 @@ export default {
     ModalIdle,
     MsieBanner
   },
-  data() {
-    return {
-      bannerEnvironment: import.meta.env.VITE_BANNER_ENVIRONMENT,
-      bannerColor: import.meta.env.VITE_BANNER_COLOR
-    };
-  },
   computed: {
     ...mapState(useAuthStore, ['isAuthenticated', 'loginError', 'isLoading']),
+    ...mapState(useConfigStore, ['frontEnd']),
     isIE() {
       return /Trident\/|MSIE/.test(window.navigator.userAgent);
     }
   },
   async created() {
+    const configStore = useConfigStore();
+
+    await configStore.getFrontEndConfig();
     this.setLoading(true);
     this.getJwtToken().then(() =>
       Promise.all([
@@ -78,7 +77,7 @@ export default {
 
 <style>
 #bannerEnvironment {
-  background: v-bind(bannerColor);
+  background: v-bind('frontEnd.bannerColor');
   color: white;
 }
 
