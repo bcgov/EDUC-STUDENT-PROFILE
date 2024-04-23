@@ -11,4 +11,4 @@ RUN npm ci
 
 COPY . /opt/app-root/src
 EXPOSE 443 8080
-CMD ["npm", "start"]
+CMD ["node", "--max-old-space-size=150", "./src/server.js"]
