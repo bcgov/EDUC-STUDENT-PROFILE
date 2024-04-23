@@ -1,17 +1,17 @@
 <template>
-  <Verification
+  <EmailVerification
     request-name="PEN"
     app-name="GetMyPEN"
-  ></Verification>
+  />
 </template>
 
 <script>
-import Verification from '../Verification';
+import EmailVerification from '../EmailVerification.vue';
 
 export default {
-  name: 'studentRequestVerification',
+  name: 'StudentRequestVerification',
   components: {
-    Verification
+    EmailVerification
   },
 };
 </script>

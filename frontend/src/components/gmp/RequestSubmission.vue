@@ -1,11 +1,14 @@
 <template>
-  <div v-if="request" class="px-6">
+  <div
+    v-if="request"
+    class="px-6"
+  >
     <v-row>
       <v-alert
-        dense
-        outlined
-        dismissible
         v-model="alert"
+        density="compact"
+        variant="outlined"
+        closable
         width="100%"
         :class="`pa-3 mb-3 ${alertType}`"
       >
@@ -13,24 +16,27 @@
       </v-alert>
     </v-row>
 
-    <v-row class="pb-5">
-      <MessageCard></MessageCard>
+    <v-row>
+      <v-col>
+        <MessageCard />
+      </v-col>
     </v-row>
     <v-row>
       <StatusCard
         @success-alert="setSuccessAlert" 
         @error-alert="setErrorAlert"
-      ></StatusCard>
+      />
     </v-row>
+    <RequestCard :request="request" />
     <v-row>
-      <RequestCard :request="request"></RequestCard>
-    </v-row>
-    <v-row justify="end" class="py-1">
-      <v-col cols="12" sm="2" class="d-flex justify-end align-self-center py-0 px-0 pr-4 pt-3">
+      <v-col
+        class="text-right"
+        cols="12"
+      >
         <v-btn
-          color="#003366"
-          class="white--text align-self-center"
           id="Home"
+          color="#003366"
+          class="text-white"
           to="home"
         >
           Home
@@ -41,13 +47,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import StatusCard from '../StatusCard';
-import MessageCard from './MessageCard';
-import RequestCard from './RequestCard';
+import { mapState } from 'pinia';
+import { usePenRequestStore } from '../../store/request';
+
+import StatusCard from '../StatusCard.vue';
+import MessageCard from './MessageCard.vue';
+import RequestCard from './RequestCard.vue';
 
 export default {
-  name: 'requestSubmission',
+  name: 'RequestSubmission',
   components: {
     StatusCard,
     MessageCard,
@@ -61,7 +69,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('penRequest', ['request']),
+    ...mapState(usePenRequestStore, ['request']),
   },
   methods: {
     setSuccessAlert(alertMessage) {

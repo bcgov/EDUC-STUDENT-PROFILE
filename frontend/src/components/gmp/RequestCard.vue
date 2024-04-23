@@ -1,128 +1,84 @@
 <template>
-  <v-card height="100%" width="100%">
-    <v-toolbar flat color="#036" class="white--text">
-      <v-toolbar-title>Data Submitted</v-toolbar-title>
-    </v-toolbar>
-    <v-row no-gutters class="pt-2 px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2" color="green">Legal Last Name:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.legalLastName }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="pt-2 px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2" color="green">Legal First Names:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.legalFirstName }}</strong></p>
-      </v-col>
-    </v-row>   
-    <v-row no-gutters class="pt-2 px-2 pb-8">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2" color="green">Legal Middle Names:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.legalMiddleNames }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2">Usual Last Name:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.usualLastName }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2">Usual First Names:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.usualFirstName }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2 pb-8">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2">Usual Middle Names:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.usualMiddleName }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p>Maiden Name:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p><strong>{{ request.maidenName }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2" color="green">Past Names:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.pastNames }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2">Date of Birth:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.dob ? moment(request.dob).format('YYYY-MM-DD'):'' }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2" color="green">Current BC School:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.currentSchool }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2">Last BC School:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.lastBCSchool }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p>School Student ID:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p><strong>{{ request.lastBCSchoolStudentNumber }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-2">Email:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-2"><strong>{{ request.email }}</strong></p>
-      </v-col>
-    </v-row>
-    <v-row no-gutters class="pb-2 px-2">
-      <v-col cols="12" xl="5" lg="5" md="5" sm="5">
-        <p class="mb-0">ID Type:</p>
-      </v-col>
-      <v-col cols="12" xl="6" lg="6" md="6" sm="6">
-        <p class="mb-0"><strong>{{ userInfo.identityTypeLabel }}</strong></p>
-      </v-col>
-    </v-row>
-  </v-card>
+  <v-row>
+    <v-col>
+      <h2>
+        Data Submitted
+      </h2>
+    </v-col>
+  </v-row>
+  <v-row no-gutters>
+    <v-col cols="12">
+      <v-table density="compact">
+        <tbody>
+          <tr>
+            <td>Legal Last Name:</td>
+            <td><strong>{{ request.legalLastName }}</strong></td>
+          </tr>
+          <tr>
+            <td>Legal First Names:</td>
+            <td><strong>{{ request.legalFirstName }}</strong></td>
+          </tr>
+          <tr>
+            <td>Legal Middle Names:</td>
+            <td><strong>{{ request.legalMiddleNames }}</strong></td>
+          </tr>
+          <tr>
+            <td>Usual Last Name:</td>
+            <td><strong>{{ request.usualLastName }}</strong></td>
+          </tr>
+          <tr>
+            <td>Usual First Names:</td>
+            <td><strong>{{ request.usualFirstName }}</strong></td>
+          </tr>
+          <tr>
+            <td>Usual Middle Names:</td>
+            <td><strong>{{ request.usualMiddleName }}</strong></td>
+          </tr>
+          <tr>
+            <td>Maiden Name:</td>
+            <td><strong>{{ request.maidenName }}</strong></td>
+          </tr>
+          <tr>
+            <td>Past Names:</td>
+            <td><strong>{{ request.pastNames }}</strong></td>
+          </tr>
+          <tr>
+            <td>Date of Birth:</td>
+            <td><strong>{{ formatDob(request?.dob) }}</strong></td>
+          </tr>
+          <tr>
+            <td>Current BC School:</td>
+            <td><strong>{{ request.currentSchool }}</strong></td>
+          </tr>
+          <tr>
+            <td>Last BC School:</td>
+            <td><strong>{{ request.lastBCSchool }}</strong></td>
+          </tr>
+          <tr>
+            <td>School Student ID:</td>
+            <td><strong>{{ request.lastBCSchoolStudentNumber }}</strong></td>
+          </tr>
+          <tr>
+            <td>Email:</td>
+            <td><strong>{{ request.email }}</strong></td>
+          </tr>
+          <tr>
+            <td>ID Type:</td>
+            <td><strong>{{ userInfo.identityTypeLabel }}</strong></td>
+          </tr>
+        </tbody>
+      </v-table>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../../store/auth';
+import { formatDob } from '../../utils/dateTime';
 
 export default {
-  name: 'requestCard',
+  name: 'RequestCard',
   props: {
     request: {
       type: Object,
@@ -130,8 +86,9 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('auth', ['userInfo']),
+    ...mapState(useAuthStore, ['userInfo']),
   },
+  methods: { formatDob }
 };
 </script>
 

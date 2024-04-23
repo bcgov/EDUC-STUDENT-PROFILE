@@ -1,87 +1,107 @@
 <template>
   <v-app id="app">
-    <MsieBanner v-if="isIE"/>
-    <Header/>
-    <v-app-bar v-if="bannerColor !== ''"
-               style="color:white;"
-               :color="bannerColor"
-               sticky
-               dense
-    ><div><h3>{{ bannerEnvironment }} Environment</h3></div></v-app-bar>
-    <ModalIdle v-if="isAuthenticated"/>
-    <router-view/>
-    <Footer/>
+    <MsieBanner v-if="isIE" />
+    <HeaderToolbar />
+    <div
+      v-if="frontendConfig.bannerColor"
+      id="bannerEnvironment"
+    >
+      <v-container>
+        <v-row>
+          <v-col>
+            <h3>{{ frontendConfig.bannerEnvironment }} Environment</h3>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
+    <ModalIdle v-if="isAuthenticated" />
+    <router-view />
+    <FooterComponent />
   </v-app>
 </template>
 
 <script>
-import { mapActions, mapMutations, mapGetters } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useAuthStore } from './store/auth';
+import { useStudentRequestStore, usePenRequestStore } from './store/request';
+import { useConfigStore } from './store/config';
 import HttpStatus from 'http-status-codes';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import ModalIdle from './components/ModalIdle';
-import MsieBanner from './components/MsieBanner';
-import StaticConfig from './common/staticConfig';
+
+import HeaderToolbar from './components/HeaderToolbar.vue';
+import FooterComponent from './components/FooterComponent.vue';
+import ModalIdle from './components/ModalIdle.vue';
+import MsieBanner from './components/MsieBanner.vue';
 
 export default {
-  name: 'app',
+  name: 'App',
   components: {
-    Header,
-    Footer,
+    HeaderToolbar,
+    FooterComponent,
     ModalIdle,
     MsieBanner
   },
-  metaInfo: {
-    meta: StaticConfig.VUE_APP_META_DATA
-  },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated', 'loginError', 'isLoading']),
+    ...mapState(useAuthStore, ['isAuthenticated', 'loginError', 'isLoading']),
+    ...mapState(useConfigStore, ['frontendConfig']),
     isIE() {
       return /Trident\/|MSIE/.test(window.navigator.userAgent);
     }
   },
-  data() {
-    return {
-      bannerEnvironment: StaticConfig.BANNER_ENVIRONMENT,
-      bannerColor: StaticConfig.BANNER_COLOR
-    };
-  },
-  methods: {
-    ...mapMutations('auth', ['setLoading']),
-    ...mapActions('auth', ['getJwtToken', 'getUserInfo', 'logout']),
-    ...mapActions('studentRequest', { getStudentRequestCodes: 'getCodes'}),
-    ...mapActions('penRequest', { getPenRequestCodes: 'getCodes'}),
-  },
   async created() {
+    const configStore = useConfigStore();
+
+    await configStore.getConfig();
     this.setLoading(true);
     this.getJwtToken().then(() =>
-      Promise.all([this.getPenRequestCodes('penRequest'), this.getStudentRequestCodes('studentRequest'), this.getUserInfo()])
+      Promise.all([
+        this.getPenRequestCodes('penRequest'),
+        this.getStudentRequestCodes('studentRequest'),
+        this.getUserInfo()
+      ])
     ).catch(e => {
-      if(! e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
+      if (!e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
         this.logout();
         this.$router.replace({name: 'error', query: { message: `500_${e.data || 'ServerError'}` } });
       }
     }).finally(() => {
       this.setLoading(false);
     });
+  },
+  methods: {
+    ...mapActions(useAuthStore, ['setLoading', 'getJwtToken', 'getUserInfo', 'logout']),
+    ...mapActions(useStudentRequestStore, { getStudentRequestCodes: 'getCodes'}),
+    ...mapActions(usePenRequestStore, { getPenRequestCodes: 'getCodes'}),
   }
 };
 </script>
 
 <style>
+#bannerEnvironment {
+  background: v-bind('frontendConfig.bannerColor');
+  color: white;
+}
+
 .v-application {
   font-family: 'BCSans', Verdana, Arial, sans-serif !important;
 }
+
+.v-application a {
+  color: #1976d2
+}
+
 .v-card--flat {
   background-color: transparent !important;
 }
-.theme--light.application{
+
+.theme--light.application {
   background: #f1f1f1;
 }
+
 h1 {
   font-size: 1.25rem;
 }
-.v-toolbar__title{
+
+.v-toolbar__title {
   font-size: 1rem;
 }
 
@@ -127,7 +147,7 @@ h1 {
 
 @media screen and (max-width: 370px) {
 
-  .v-toolbar__title{
+  .v-toolbar__title {
     font-size: 0.9rem;
     line-height: 1;
     overflow: hidden;
@@ -145,7 +165,7 @@ h1 {
 }
 
 @media screen and (min-width: 371px) and (max-width: 600px) {
-  .v-toolbar__title{
+  .v-toolbar__title {
     font-size: 0.9rem;
     line-height: 1.5;
     overflow: hidden;
@@ -163,7 +183,7 @@ h1 {
 }
 
 @media screen and (min-width: 601px) and (max-width: 700px) {
-  .v-toolbar__title{
+  .v-toolbar__title {
     font-size: 1rem;
     line-height: 1.5;
     overflow: hidden;

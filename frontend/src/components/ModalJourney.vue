@@ -1,28 +1,34 @@
 <template>
   <div style="display: none">
-    <a id="journey_href" :href='journeyBuilder'/>
+    <a
+      id="journey_href"
+      :href="frontendConfig.journeyBuilder"
+    />
   </div>
 </template>
 
 <script>
-import StaticConfig from '@/common/staticConfig';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../store/auth';
+import { useConfigStore } from '../store/config';
+
 export default {
   name: 'ModalJourney',
-  data(){
-    return{
-      journeyBuilder:StaticConfig.VUE_APP_JOURNEY_BUILDER
-    };
+  computed: {
+    ...mapState(useConfigStore, ['frontendConfig'])
   },
-  mounted() {
-    console.log(this.journeyBuilder);
-    window.location = document.getElementById('journey_href').href;
+  async mounted() {
+    if (!this.frontendConfig.journeyBuilder) { // Prevent a race condition with App.vue
+      const configStore = useConfigStore();
+      await configStore.getConfig();
+    }
+    this.$nextTick(() => window.location = this.frontendConfig.journeyBuilder);
   },
   methods: {
     logout() {
-      this.$store.commit('auth/setJwtToken');
+      useAuthStore().setJwtToken();
     }
   }
-
 };
 </script>
 <style scoped>

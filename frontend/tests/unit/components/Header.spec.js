@@ -24,7 +24,7 @@ describe('Header.vue', () => {
   });
 
   test('expect site title', () => {
-    expect(wrapper.html()).toContain(process.env.VUE_APP_TITLE);
+    expect(wrapper.html()).toContain(import.meta.env.VUE_APP_TITLE);
   });
 
   // test('logout of site', () => {

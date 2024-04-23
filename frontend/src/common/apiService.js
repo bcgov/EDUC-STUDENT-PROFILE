@@ -1,6 +1,6 @@
 import axios from 'axios';
-import {ApiRoutes} from '@/utils/constants';
-import AuthService from '@/common/authService';
+import AuthService from '../common/authService';
+import { ApiRoutes } from '../utils/constants';
 
 // Buffer concurrent requests while refresh token is being acquired
 let failedQueue = [];
@@ -60,7 +60,7 @@ export default {
     }
   },
 
-  async postRequest(userInfo, requestType){
+  async postRequest(userInfo, requestType) {
     try{
       return await apiAxios.post(ApiRoutes[requestType].REQUEST, userInfo);
     } catch(e) {
@@ -69,7 +69,7 @@ export default {
     }
   },
 
-  async updateRequestStatus(requestId, status, requestType){
+  async updateRequestStatus(requestId, status, requestType) {
     try{
       return await apiAxios.patch(`${ApiRoutes[requestType].REQUEST}/${requestId}`, {[`${requestType}StatusCode`]: status});
     } catch(e) {
@@ -105,10 +105,10 @@ export default {
     }
   },
 
-  async uploadFile(requestId, fileData, requestType){
+  async uploadFile(requestId, fileData, requestType) {
     try{
       let url;
-      if(requestId) {
+      if (requestId) {
         url = `${ApiRoutes[requestType].REQUEST}/${requestId}/documents`;
       } else {
         url = `${ApiRoutes[requestType].REQUEST}/documents`;
@@ -149,7 +149,7 @@ export default {
 
   async deleteDocument(requestId, documentId, requestType) {
     try{
-      if(requestId) {
+      if (requestId) {
         return await apiAxios.delete(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/documents' + `/${documentId}`);
       } else {
         return await apiAxios.delete(ApiRoutes[requestType].REQUEST + '/documents' + `/${documentId}`);
@@ -187,7 +187,7 @@ export default {
     }
   },
 
-  async resendVerificationEmail(requestId, requestType){
+  async resendVerificationEmail(requestId, requestType) {
     try{
       return await apiAxios.post(ApiRoutes[requestType].REQUEST + `/${requestId}` + '/verification-email');
     } catch(e) {
@@ -195,15 +195,10 @@ export default {
       throw e;
     }
   },
-  async getConfig(configName) {
+  async getConfig() {
     try {
-      const queryParams = {
-        params: {
-          configName: configName
-        }
-      };
-      const response = await apiAxios.get(ApiRoutes.CONFIG, queryParams);
-      return response.data.configValue;
+      const response = await apiAxios.get(ApiRoutes.CONFIG);
+      return response.data;
     } catch (e) {
       console.log(`Failed to do get from Nodejs getNumDaysAllowedInDraftStatus API - ${e}`);
       throw e;

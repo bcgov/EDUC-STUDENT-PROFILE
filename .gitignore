@@ -2,3 +2,6 @@
 /.idea/*
 .idea
 .idea/*
+Session.vim
+.envrc
+.direnv/

@@ -8,7 +8,7 @@ export async function getData(apiMethod, queryParam) {
   }
 }
   
-export async function postData(apiMethod, _context, info){
+export async function postData(apiMethod, _context, info) {
   try {
     const response = await apiMethod(info);
     return response.data;

@@ -1,89 +1,112 @@
 <template>
-  <v-container class="pa-0" fluid>
-    <!-- <v-row class="pb-5" v-if="requestComment"> -->
-      <v-card class="mb-5" v-if="status === requestStatuses.RETURNED">
-        <v-toolbar flat color="#036" class="white--text" height="45rem">
-          <v-toolbar-title>Request</v-toolbar-title>
-        </v-toolbar>
+  <v-row>
+    <v-col
+      v-if="status === requestStatuses.RETURNED"
+      cols="12"
+    >
+      <v-card>
+        <v-toolbar
+          flat
+          color="#036"
+          title="Request"
+          density="compact"
+          class="text-white"
+        />
         <div>
           <v-progress-linear
+            v-if="loading"
             indeterminate
             absolute
-            top
-            color="indigo darken-2"
-            v-if="loading"
-          ></v-progress-linear>
-          <SingleComment
-            v-for="comment in requestComments"
-            :comment="comment"
-            :myself="myself"
+            location="top"
+            color="indigo-darken-2"
+          />
+          <CommentList
+            :comments="requestComments"
             :participants="participants"
-            :key="comment.id"
-            :highlight="true"
-          ></SingleComment>
+            :user="myself"
+          />
         </div>
       </v-card>
-    <!-- </v-row> -->
-    <!-- <v-row class="pb-5"> -->
-      <v-card class="mb-5" v-if="status === requestStatuses.RETURNED">
-        <v-toolbar flat color="#036" class="white--text" height="45rem">
+    </v-col>
+    <v-col v-if="status === requestStatuses.RETURNED">
+      <v-card>
+        <v-toolbar
+          flat
+          color="#036"
+          density="compact"
+          class="text-white"
+        >
           <v-toolbar-title>Respond Here</v-toolbar-title>
         </v-toolbar>
-        <div id="comments-outer" class="comments-outside">
+        <div
+          id="comments-outer"
+          class="comments-outside"
+        >
           <v-progress-linear
+            v-if="loading"
             indeterminate
             absolute
-            top
-            color="indigo darken-2"
-            v-if="loading"
-          ></v-progress-linear>
-          <Comments 
-            :unsubmittedDocuments="unsubmittedDocuments"
-          ></Comments>
+            location="top"
+            color="indigo-darken-2"
+          />
+          <CommentForm
+            :unsubmitted-documents="unsubmittedDocuments"
+          />
         </div>
       </v-card>
-    <!-- </v-row> -->
-    <!-- <v-row class="pb-5"> -->
-      <v-card class="mb-5" v-if="hasHistory">
-        <v-toolbar flat color="#036" class="white--text" height="45rem">
+    </v-col>
+    <v-col cols="12">
+      <v-card
+        v-if="hasHistory"
+        class="mb-5"
+      >
+        <v-toolbar
+          flat
+          density="compact"
+          color="#036"
+          class="text-white"
+        >
           <v-toolbar-title>Discussion History</v-toolbar-title>
         </v-toolbar>
         <div>
           <v-progress-linear
+            v-if="loading"
             indeterminate
             absolute
-            top
-            color="indigo darken-2"
-            v-if="loading"
-          ></v-progress-linear>
-          <SingleComment 
-            v-for="comment in commentHistory"
-            :comment="comment"
-            :myself="myself"
+            location="top"
+            color="indigo-darken-2"
+          />
+          <CommentList
+            :comments="commentHistory"
             :participants="participants"
-            :key="comment.id"
-          ></SingleComment>
+            :user="myself"
+          />
         </div>
       </v-card>
-    <!-- </v-row> -->
-  </v-container>
+    </v-col>
+  </v-row>
 </template>
 <script>
-import SingleComment from './SingleComment.vue';
-import Comments from './Comment.vue';
-import ApiService from '@/common/apiService';
-import { mapGetters } from 'vuex';
 import { groupBy, sortBy, findLastIndex } from 'lodash';
-import { RequestStatuses } from '@/utils/constants';
+import { RequestStatuses } from '../utils/constants';
+import { mapState } from 'pinia';
+import { useRootStore } from '../store/root';
+import { useAuthStore } from '../store/auth';
+import { getRequestStore } from '../store/request';
+
+import CommentList from './CommentList.vue';
+import CommentForm from './CommentForm.vue';
+import ApiService from '../common/apiService';
 
 export default {
   components: {
-    Comments,
-    SingleComment,
+    CommentForm,
+    CommentList
   },
   props: {
     commentDocuments: {
       type: Array,
+      default: () => []
     },
   },
   data() {
@@ -94,19 +117,19 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['userInfo']),
-    ...mapGetters(['requestType']),
+    ...mapState(useAuthStore, ['userInfo']),
+    ...mapState(useRootStore, ['requestType']),
     request() {
-      return this.$store.getters[`${this.requestType}/request`];
+      return getRequestStore().request;
     },
     unsubmittedDocuments() {
-      return this.$store.getters[`${this.requestType}/unsubmittedDocuments`];
+      return getRequestStore().unsubmittedDocuments;
     },
     commentHistory() {
-      return this.$store.getters[`${this.requestType}/commentHistory`];
+      return getRequestStore().commentHistory;
     },
     requestComments() {
-      return this.$store.getters[`${this.requestType}/requestComments`];
+      return getRequestStore().requestComments;
     },
     myself() {
       return { name: this.userInfo.displayName, id: '1' };
@@ -126,7 +149,9 @@ export default {
   },
   created() {
     this.getDocumentTypeCodes();
-    const documentPromise = this.commentDocuments ? Promise.resolve({data: this.commentDocuments}) : ApiService.getDocumentList(this.requestID, this.requestType);
+    const documentPromise = this.commentDocuments.length > 0
+      ? Promise.resolve({data: this.commentDocuments})
+      : ApiService.getDocumentList(this.requestID, this.requestType);
     Promise.all([
       documentPromise,
       ApiService.getCommentList(this.requestID, this.requestType),
@@ -139,19 +164,19 @@ export default {
       console.log(error);
       this.alert = true;
     }).finally(() => {
-      if(!this.userInfo){
+      if (!this.userInfo) {
         console.log('UserInfo undefined');
       }
-      if(!this.request){
+      if (!this.request) {
         console.log('request object undefined');
       }
-      if(!this.unsubmittedDocuments){
+      if (!this.unsubmittedDocuments) {
         console.log('unsubmittedDocuments object undefined');
       }
-      if(!this.commentHistory){
+      if (!this.commentHistory) {
         console.log('Comment History object undefined');
       }
-      if(!this.setRequestComments){
+      if (!this.setRequestComments) {
         console.log('Set Request Comments objects undefined');
       }
       this.loading = false;
@@ -159,19 +184,19 @@ export default {
   },
   methods: {
     getDocumentTypeCodes() {
-      return this.$store.dispatch(`${this.requestType}/getDocumentTypeCodes`);
+      return getRequestStore().getDocumentTypeCodes();
     },
     setUnsubmittedDocuments(unsubmittedDocuments) {
-      this.$store.commit(`${this.requestType}/setUnsubmittedDocuments`, unsubmittedDocuments);
+      getRequestStore().setUnsubmittedDocuments(unsubmittedDocuments);
     },
     setCommentHistory(commentHistory) {
-      this.$store.commit(`${this.requestType}/setCommentHistory`, commentHistory);
+      getRequestStore().setCommentHistory(commentHistory);
     },
     setUnsubmittedComment(unsubmittedComment) {
-      this.$store.commit(`${this.requestType}/setUnsubmittedComment`, unsubmittedComment);
+      getRequestStore().setUnsubmittedComment(unsubmittedComment);
     },
     setRequestComments(requestComments) {
-      this.$store.commit(`${this.requestType}/setRequestComments`, requestComments);
+      getRequestStore().setRequestComments(requestComments);
     },
     linkDocumentsToComments(messages, documents) {
       const myMessages = messages.filter(message => message.myself);
@@ -191,13 +216,12 @@ export default {
     splitComments(messages, unsubmittedDocuments) {
       const lastMessage = messages[messages.length - 1];
       let requestIndex = messages.length;
-      if(this.status === this.requestStatuses.RETURNED && lastMessage) {
-        if(lastMessage.myself) {
+      if (this.status === this.requestStatuses.RETURNED && lastMessage) {
+        if (lastMessage.myself) {
           this.setUnsubmittedComment(lastMessage);
           unsubmittedDocuments = (unsubmittedDocuments || []).concat(lastMessage.documents || []);
-          messages = messages.slice(0, messages.length - 1);          
+          messages = messages.slice(0, messages.length - 1);
         }
-        
         const historyIndex = findLastIndex(messages, ['myself', true]);
         requestIndex = historyIndex + 1;
         this.setRequestComments(messages.slice(requestIndex));
@@ -254,29 +278,25 @@ hr {
   color: #333;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track
-{
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 10px;
-    background-color: #fff;
-}
-.custom-scrollbar::-webkit-scrollbar
-{
-    width: 0.8rem;
-    background-color: #fff;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb
-{
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #555;
+.custom-scrollbar::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  background-color: #fff;
 }
 
-.v-toolbar /deep/ .v-toolbar__content {
-  padding-left: 20px !important;
+.custom-scrollbar::-webkit-scrollbar {
+  width: 0.8rem;
+  background-color: #fff;
 }
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  -moz-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #555;
+}
+
 </style>

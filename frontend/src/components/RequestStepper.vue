@@ -1,42 +1,55 @@
 <template>
-    <v-stepper class="mainCard" v-model="stepCount" v-if="dataReady">
-      <v-row align-content="center" class="flex-grow-0 pb-5">
-        <v-card style="margin-right: 1.4rem;margin-left: 1.4rem" height="100%" width="100%" elevation=0 color="#036"
-                class="white--text">
-          <v-card-title class="py-3 pl-5"><h1>{{titles[stepCount-1]}}</h1></v-card-title>
-        </v-card>
-      </v-row>
+  <v-row class="mb-2">
+    <v-col>
+      <h1>{{ titles[stepCount-1] }}</h1>
+    </v-col>
+  </v-row>
 
-      <v-stepper-header class="mx-3">
-        <template v-for="n in steps">
-          <v-stepper-step
-            :key="`${n}-step`"
-            :complete="stepCount > n"
-            :step="n"
-          >
-            Step {{ n }}
-          </v-stepper-step>
+  <v-stepper
+    v-if="dataReady"
+    :model-value="stepCount"
+    class="mainCard"
+  >
+    <v-stepper-header>
+      <template
+        v-for="n in steps"
+        :key="`${n}-step`"
+      >
+        <v-stepper-item
+          :complete="stepCount > n"
+          :title="`Step ${n}`"
+          :value="n"
+        />
 
-          <v-divider
-            v-if="n !== steps"
-            :key="n"
-          ></v-divider>
-        </template>
-      </v-stepper-header>
+        <v-divider
+          v-if="n !== steps"
+          :key="n"
+        />
+      </template>
+    </v-stepper-header>
 
-      <v-stepper-items>
-        <v-stepper-content v-for="index in 4" :step="index" :key="index" class="px-0">
-          <router-view v-if="stepCount===index" @next="nextStep" @back="previousStep"></router-view>
-        </v-stepper-content>
-      </v-stepper-items>
-    </v-stepper>
+    <v-stepper-window>
+      <v-stepper-window-item
+        v-for="n in steps"
+        :key="`content-${n}`"
+        :value="n"
+        class="px-0"
+      >
+        <router-view
+          @next="nextStep"
+          @back="previousStep"
+        />
+      </v-stepper-window-item>
+    </v-stepper-window>
+  </v-stepper>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../store/auth';
 
 export default {
-  name: 'requestStepper',
+  name: 'RequestStepper',
   props: {
     steps: {
       type: Number,
@@ -57,7 +70,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('auth', ['userInfo']),
+    ...mapState(useAuthStore, ['userInfo']),
     dataReady() {
       return !!this.userInfo;
     },
@@ -65,20 +78,8 @@ export default {
   watch: {
     $route: {
       handler() {
-        const stepName = this.$route.name.replace(this.stepRoutePrefix, '');
-        switch (stepName) {
-        case 'step1':
-          this.stepCount = 1;
-          break;
-        case 'step2':
-          this.stepCount = 2;
-          break;
-        case 'step3':
-          this.stepCount = 3;
-          break;
-        case 'step4':
-          this.stepCount = 4;
-        }
+        const thisStep = Number(this.$route.name.slice(-1));
+        this.stepCount = isNaN(thisStep) ? -1 : thisStep;
         window.scrollTo(0,0);
       }
     }
@@ -88,11 +89,11 @@ export default {
       this.$router.push({ name: name });
     },
     nextStep() {
-      this.goToRoute(`${this.stepRoutePrefix}step${this.stepCount + 1}`);
+      this.goToRoute(`${this.stepRoutePrefix}-step-${this.stepCount + 1}`);
       window.scrollTo(0,0);
     },
     previousStep() {
-      this.goToRoute(`${this.stepRoutePrefix}step${this.stepCount - 1}`);
+      this.goToRoute(`${this.stepRoutePrefix}-step-${this.stepCount - 1}`);
       window.scrollTo(0,0);
     }
   }
@@ -100,41 +101,7 @@ export default {
 </script>
 
 <style scoped>
-  .mainCard {
-    margin: 20px 0;
-    padding: 10px;
-    width: 100%;
-    /* max-width: 900px; */
-  }
-
   .v-stepper /deep/ .v-icon {
     padding-left: 2px;
-  }
-
-  @media screen and (max-width: 300px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 8rem;
-    }
-  }
-
-  @media screen and (min-width: 301px) and (max-width: 600px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 7rem;
-    }
-  }
-
-  @media screen and (min-width: 601px) and (max-width: 900px) {
-    .mainCard {
-      margin-top: .1vh;
-      padding-top: 10px;
-      width: 100%;
-      margin-bottom: 7rem;
-    }
   }
 </style>

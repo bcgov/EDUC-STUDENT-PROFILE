@@ -4,10 +4,7 @@
     class="full-height"
   >
     <!-- login article -->
-    <article
-      name="session-expired-banner"
-      class="top-banner"
-    >
+    <article name="logout-banner">
       <v-row
         align="center"
         justify="center"
@@ -21,13 +18,13 @@
         >
           <v-card class="session-expired-card">
             <v-card-title class="gov-header">
-              <h4 id="session-expired-text">
-                Session Expired
+              <h4 id="logout_text">
+                Logged Out
               </h4>
             </v-card-title>
-            <v-card-text id="session-expired-descriptor">
+            <v-card-text id="logout_descriptor">
               <v-row style="margin: .3rem">
-                Your secure session has ended as a result of inactivity.
+                You have Logged out.
               </v-row>
               <a
                 id="login-button"
@@ -36,7 +33,7 @@
                 dark
                 color="#003366"
                 @click="clearStorage"
-              >Log In</a><span>again to continue.</span>
+              >Log In</a><span>again if you wish to continue.</span>
             </v-card-text>
           </v-card>
         </v-col>
@@ -48,11 +45,7 @@
 <script>
 import { AuthRoutes } from '../utils/constants';
 import { useAuthStore } from '../store/auth';
-
-
 export default {
-  name: 'SessionExpired',
-
   data() {
     return {
       routes: AuthRoutes
@@ -70,35 +63,14 @@ export default {
 </script>
 
 <style scoped>
+
   .full-height {
     height: 100%;
   }
   .session-expired-card {
     margin-top: 15rem;
     width: 100%;
-    background: #F2E8D5;
+    background: #D9E7D8;
   }
 
-  @media screen and (max-width: 300px) {
-    .session-expired-card {
-      margin-top: 2rem;
-      height: 50%;
-      width: 100%;
-      background: #F2E8D5;
-    }
-  }
-  @media screen and (min-width: 301px) and (max-width: 350px) {
-    .session-expired-card {
-      margin-top: 1rem;
-      width: 100%;
-      background: #F2E8D5;
-    }
-  }
-  @media screen and (min-width: 351px) and (max-width: 450px) {
-    .session-expired-card {
-      margin-top: 8rem;
-      width: 100%;
-      background: #F2E8D5;
-    }
-  }
 </style>

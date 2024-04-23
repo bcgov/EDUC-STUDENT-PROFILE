@@ -1,56 +1,77 @@
 <template>
-  <v-toolbar class="toolbar_header" dense width="100%">
-    <!-- Navbar content -->
-      <img
-              src="@/assets/images/bc-gov-logo.svg"
-              class="img-theme"
-              alt="B.C. Government Logo"
-      >
+  <v-toolbar
+    id="toolbarHeader"
+    dense
+  >
+    <img
+      src="../assets/images/bc-gov-logo.svg"
+      class="img-theme"
+      alt="B.C. Government Logo"
+    >
     <v-toolbar-title><span class="span-title">{{ appTitle }}</span></v-toolbar-title>
 
-    <v-spacer></v-spacer>
+    <v-spacer />
     <div v-if="isAuthenticated && dataReady">
-      <v-menu name="user_options" offset-y>
-        <template v-slot:activator="{ on }">
-          <v-chip tabindex="0" v-on="on" pill color="#003366" dark>
-            <v-avatar left color="info">
+      <v-menu
+        name="user_options"
+      >
+        <template #activator="{ props }">
+          <v-chip
+            tabindex="0"
+            pill
+            color="white"
+            v-bind="props"
+          >
+            <v-avatar
+              start
+              color="info"
+            >
               {{ userInfo.displayName[0] }}
             </v-avatar>
             <span class="display-name">{{ userInfo.displayName }}</span>
           </v-chip>
         </template>
-        <v-list dark color="#003366">
-          <v-list-item style="min-height: 4vh" id="home_button" :href='authRoutes.LOGIN'>
+        <v-list
+          dark
+          color="#003366"
+        >
+          <v-list-item
+            id="home_button"
+            style="min-height: 4vh"
+            :href="authRoutes.LOGIN"
+          >
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item>
-          <v-list-item style="min-height: 4vh" id="logout_button" :href='authRoutes.LOGOUT'>
+          <v-list-item
+            id="logout_button"
+            style="min-height: 4vh"
+            :href="authRoutes.LOGOUT"
+          >
             <v-list-item-title>Logout</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
-
     </div>
     <div v-else-if="isAuthenticated && !dataReady">
-      <v-skeleton-loader type="chip">
-      </v-skeleton-loader>
+      <v-skeleton-loader type="chip" />
     </div>
   </v-toolbar>
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
-import {AuthRoutes} from '@/utils/constants';
+import { mapState } from 'pinia';
+import { useAuthStore } from '../store/auth';
+import { AuthRoutes } from '../utils/constants';
 
 export default {
   data() {
     return {
-      appTitle: process.env.VUE_APP_TITLE,
+      appTitle: import.meta.env.VITE_APP_TITLE,
       authRoutes: AuthRoutes
     };
   },
   computed: {
-    ...mapGetters('auth', ['isAuthenticated']),
-    ...mapGetters('auth', ['userInfo']),
+    ...mapState(useAuthStore, ['isAuthenticated', 'userInfo']),
     dataReady: function () {
       return this.userInfo;
     }
@@ -58,7 +79,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
   .v-icon {
     padding-left: 10px;
   }
@@ -67,19 +88,19 @@ export default {
     text-decoration: none;
   }
 
-  .v-toolbar__content {
+  :deep(.v-toolbar__content) {
     padding: 4px 10px 4px 65px;
   }
 
   .title {
     width: 50%;
     height: auto;
-    max-height: 50px !important;
   }
-  .span-title{
+
+  .span-title {
     color: white;
-    text-align: center !important;
   }
+
   @media screen and (min-width: 601px) {
     .span-title {
       font-size: 20px;
@@ -88,7 +109,7 @@ export default {
       width: 20%;
       max-height: 40px !important;
     }
-    .display-name{
+    .display-name {
       display: inline-block;
     }
   }
@@ -104,7 +125,7 @@ export default {
       max-height: 100px !important;
       padding-right: inherit;
     }
-    .display-name{
+    .display-name {
       display: none;
     }
   }
@@ -119,14 +140,14 @@ export default {
       max-height: 100px !important;
       padding-right: inherit;
     }
-    .display-name{
+    .display-name {
       display: none;
     }
   }
-  .toolbar_header {
-    background-color: rgb(0, 51, 102) !important;
-    border-bottom: 2px solid rgb(252, 186, 25) !important;
-    max-height: 3.5rem;
+
+  #toolbarHeader {
+    background-color: rgb(0, 51, 102);
+    border-bottom: 2px solid rgb(252, 186, 25);
   }
 
   .gov-header .v-btn,

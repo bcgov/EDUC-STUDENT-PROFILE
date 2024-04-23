@@ -1,52 +1,43 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import VueMeta from 'vue-meta';
+import { createRouter, createWebHistory, RouterView } from 'vue-router';
 
-import moment from 'moment';
+import HomePage from './components/HomePage.vue';
+import LogoutContainer from './components/LogoutContainer.vue';
+import SessionExpired from './components/SessionExpired.vue';
+import PenRequestPage from './components/gmp/RequestPage.vue';
+import StudentRequestPage from './components/ump/RequestPage.vue';
+import PenRequestVerification from './components/gmp/Verification.vue';
+import StudentRequestVerification from './components/ump/Verification.vue';
+import ErrorPage from './components/ErrorPage.vue';
+import LoginError from './components/LoginError.vue';
+import UmpContainer from './components/ump/UmpContainer.vue';
+import GmpContainer from './components/gmp/GmpContainer.vue';
+import CurrentInfo from './components/ump/CurrentInfo.vue';
+import StudentRequestForm from './components/ump/RequestForm.vue';
+import StudentRequestSummary from './components/ump/RequestSummary.vue';
+import StudentRequestSubmission from './components/ump/RequestSubmission.vue';
+import PenRequestForm from './components/gmp/RequestForm.vue';
+import PenRequestSummary from './components/gmp/RequestSummary.vue';
+import PenRequestSubmission from './components/gmp/RequestSubmission.vue';
+import { pick, values } from 'lodash';
+import { PenRequestStatuses, StudentRequestStatuses } from './utils/constants';
+import LoginRedirect from './components/LoginRedirect.vue';
+import BackendSessionExpired from './components/BackendSessionExpired.vue';
+import { useAuthStore } from './store/auth';
+import { useUmpStore } from './store/ump';
+import { useGmpStore } from './store/gmp';
+import { usePenRequestStore, useStudentRequestStore } from './store/request';
+import { useRootStore } from './store/root';
 
-import Home from '@/components/Home.vue';
-import Logout from './components/Logout';
-import SessionExpired from './components/SessionExpired';
-import PenRequestPage from '@/components/gmp/RequestPage.vue';
-import StudentRequestPage from '@/components/ump/RequestPage.vue';
-import PenRequestVerification from '@/components/gmp/Verification.vue';
-import StudentRequestVerification from '@/components/ump/Verification.vue';
-import ErrorPage from '@/components/ErrorPage.vue';
-import LoginError from '@/components/LoginError.vue';
-import RouterView from '@/components/RouterView.vue';
-import Ump from '@/components/ump/Ump.vue';
-import Gmp from '@/components/gmp/Gmp.vue';
-import CurrentInfo from './components/ump/CurrentInfo';
-import StudentRequestForm from './components/ump/RequestForm';
-import StudentRequestSummary from './components/ump/RequestSummary';
-import StudentRequestSubmission from './components/ump/RequestSubmission';
-import PenRequestForm from './components/gmp/RequestForm';
-import PenRequestSummary from './components/gmp/RequestSummary';
-import PenRequestSubmission from './components/gmp/RequestSubmission';
-import authStore from './store/modules/auth';
-import store from './store/index';
-import {pick, values} from 'lodash';
-import { PenRequestStatuses, StudentRequestStatuses } from '@/utils/constants';
-import Login from '@/components/Login.vue';
-import BackendSessionExpired from '@/components/BackendSessionExpired';
-
-Vue.prototype.moment = moment;
-
-Vue.use(VueRouter);
-Vue.use(VueMeta);
-// a comment for commit.
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: HomePage,
       meta: {
         requiresAuth: true
       },
-
     },
     {
       path: '/ump',
@@ -58,18 +49,24 @@ const router = new VueRouter({
         {
           path: '',
           name: 'ump',
-          component: Ump,
+          component: UmpContainer,
           meta: {
             requiresAuth: true
           },
-          beforeEnter: (to, from, next) => {
-            store.commit('ump/clearUmpState');
-            const hasInflightGMPRequest = store.getters['penRequest/request'] && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV'])).some(status => status === store.getters['penRequest/request'].penRequestStatusCode);
-            if(authStore.state.isAuthenticated && !store.getters['studentRequest/request'] && !hasInflightGMPRequest) {
-              store.commit('setRequestType','studentRequest');
-              next('ump/request');
-            } else {
-              next();
+          beforeEnter: () => {
+            const rootStore = useRootStore();
+            const umpStore = useUmpStore();
+            const penRequest = usePenRequestStore();
+            const studentRequest = useStudentRequestStore();
+            const authStore = useAuthStore();
+
+            umpStore.$reset();
+            const hasInflightGMPRequest = penRequest.request
+              && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV']))
+                .some(status => status === penRequest.request.penRequestStatusCode);
+            if (authStore.isAuthenticated && !studentRequest.request && !hasInflightGMPRequest) {
+              rootStore.setRequestType('studentRequest');
+              return '/ump/request';
             }
           },
         },
@@ -82,7 +79,7 @@ const router = new VueRouter({
           children: [
             {
               path: '',
-              name: 'step1',
+              name: 'ump-step-1',
               component: CurrentInfo,
               beforeEnter: checkStudentRequestExists,
               meta: {
@@ -92,7 +89,7 @@ const router = new VueRouter({
             },
             {
               path: 'requestForm',
-              name: 'step2',
+              name: 'ump-step-2',
               component: StudentRequestForm,
               beforeEnter: checkStudentRequestExists,
               meta: {
@@ -102,7 +99,7 @@ const router = new VueRouter({
             },
             {
               path: 'requestSummary',
-              name: 'step3',
+              name: 'ump-step-3',
               component: StudentRequestSummary,
               beforeEnter: checkStudentRequestExists,
               meta: {
@@ -112,7 +109,7 @@ const router = new VueRouter({
             },
             {
               path: 'requestSubmission',
-              name: 'step4',
+              name: 'ump-step-4',
               component: StudentRequestSubmission,
               meta: {
                 requiresAuth: true,
@@ -131,25 +128,34 @@ const router = new VueRouter({
     {
       path: '/gmp',
       component: RouterView,
-
       children: [
         {
           path: '',
           name: 'gmp',
-          component: Gmp,
+          component: GmpContainer,
           meta: {
             requiresAuth: true
           },
-          beforeEnter: (to, from, next) => {
-            store.commit('gmp/clearGmpState');
-            const hasInflightOrCompletedUMPRequest = store.getters['studentRequest/request'] && values(pick(StudentRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV', 'COMPLETED'])).some(status => status === store.getters['studentRequest/request'].studentRequestStatusCode);
-            if(authStore.state.isAuthenticated && ((!store.getters['penRequest/request'] && !hasInflightOrCompletedUMPRequest) || hasCompletedPenRequestButNoStudentLinkage())) {
-              store.commit('setRequestType','penRequest');
-              next('gmp/request');
-            } else {
-              next();
+          beforeEnter: () => {
+            const rootStore = useRootStore();
+            const gmpStore = useGmpStore();
+            const penRequest = usePenRequestStore();
+            const studentRequest = useStudentRequestStore();
+            const authStore = useAuthStore();
+
+            gmpStore.$reset();
+            const hasInflightOrCompletedUMPRequest = studentRequest.request
+              && values(pick(StudentRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV', 'COMPLETED']))
+                .some(status => status === studentRequest.request.studentRequestStatusCode);
+
+            if (authStore.isAuthenticated
+                && ((!penRequest.request
+                && !hasInflightOrCompletedUMPRequest) || hasCompletedPenRequestButNoStudentLinkage())) {
+
+              rootStore.setRequestType('penRequest');
+              return { name: 'gmp-step-1' };
             }
-          },
+          }
         },
         {
           path: 'request',
@@ -160,7 +166,7 @@ const router = new VueRouter({
           children: [
             {
               path: '',
-              name: 'gmp-step1',
+              name: 'gmp-step-1',
               component: PenRequestForm,
               beforeEnter: checkPenRequestExists,
               meta: {
@@ -169,7 +175,7 @@ const router = new VueRouter({
             },
             {
               path: 'requestSummary',
-              name: 'gmp-step2',
+              name: 'gmp-step-2',
               component: PenRequestSummary,
               beforeEnter: checkPenRequestExists,
               meta: {
@@ -178,7 +184,7 @@ const router = new VueRouter({
             },
             {
               path: 'requestSubmission',
-              name: 'gmp-step3',
+              name: 'gmp-step-3',
               component: PenRequestSubmission,
               meta: {
                 requiresAuth: true
@@ -204,7 +210,7 @@ const router = new VueRouter({
     {
       path: '/logout',
       name: 'logout',
-      component: Logout
+      component: LogoutContainer
     },
     {
       path: '/session-expired',
@@ -219,10 +225,10 @@ const router = new VueRouter({
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: LoginRedirect
     },
     {
-      path: '*',
+      path: '/:catchAll(.*)',
       name: 'notfound',
       redirect: '/',
       meta: {
@@ -238,48 +244,53 @@ const router = new VueRouter({
   ]
 });
 
-function checkStudentRequestExists(to, from, next) {
-  if(authStore.state.isAuthenticated && (!store.getters['studentRequest/request'] || ['COMPLETED', 'ABANDONED', 'REJECTED'].includes(store.getters['studentRequest/request'].studentRequestStatusCode))) {
-    store.commit('setRequestType','studentRequest');
-    next();
+function checkStudentRequestExists() {
+  const rootStore = useRootStore();
+  const studentRequest = useStudentRequestStore();
+  const authStore = useAuthStore();
+  if (authStore.isAuthenticated
+    && (!studentRequest.request || ['COMPLETED', 'ABANDONED', 'REJECTED']
+      .includes(studentRequest.request.studentRequestStatusCode))) {
+    rootStore.setRequestType('studentRequest');
   } else {
-    next('/ump');
+    return '/ump';
   }
 }
 
 function hasCompletedPenRequestButNoStudentLinkage() {
-  return store.getters['penRequest/request'] && store.getters['penRequest/request'].penRequestStatusCode === PenRequestStatuses.MANUAL && !store.getters['student'];
+  const rootStore = useRootStore();
+  const penRequest = usePenRequestStore();
+  return penRequest?.request?.penRequestStatusCode === PenRequestStatuses.MANUAL && !rootStore.student;
 }
 
-function checkPenRequestExists(to, from, next) {
-  if(authStore.state.isAuthenticated && (!store.getters['penRequest/request'] || ['ABANDONED', 'REJECTED'].includes(store.getters['penRequest/request'].penRequestStatusCode) || hasCompletedPenRequestButNoStudentLinkage())) {
-    store.commit('setRequestType','penRequest');
-    next();
+function checkPenRequestExists() {
+  const rootStore = useRootStore();
+  const penRequest = usePenRequestStore();
+  const authStore = useAuthStore();
+
+  if (authStore.isAuthenticated
+    && (!penRequest.request || ['ABANDONED', 'REJECTED'].includes(penRequest?.request?.penRequestStatusCode)
+      || hasCompletedPenRequestButNoStudentLinkage())) {
+    rootStore.setRequestType('penRequest');
   } else {
-    next('/gmp');
+    return '/gmp';
   }
 }
 
-router.beforeEach((to, _from, next) => {
-  if (to.meta.requiresAuth && authStore.state.isAuthenticated) {
-    store.dispatch('auth/getJwtToken').then(() => {
-      if (!authStore.state.isAuthenticated) {
-        next('/token-expired');
-      } else if(to.meta.notRefreshUserInfo) {
-        next();
+router.beforeEach((to) => {
+  const authStore = useAuthStore();
+
+  if (to.meta.requiresAuth && authStore.isAuthenticated) {
+    authStore.getJwtToken().then(() => {
+      if (!authStore.isAuthenticated) {
+        return '/token-expired';
       } else {
-        store.dispatch('auth/getUserInfo').then(() => {
-          next();
-        }).catch(() => {
-          next('error');
-        });
+        authStore.getUserInfo().then(() => '').catch(() => '/error');
       }
     }).catch(() => {
-      next('/token-expired');
+      return '/token-expired';
     });
   }
-  else{
-    next();
-  }
 });
+
 export default router;
