@@ -257,8 +257,8 @@
     class="bootstrap-warning"
   >
     <p>
-      <strong>Your PEN Request was not actioned within {{ numDaysAllowedInDraftStatus }} days and was therefore
-        cancelled. Please fill out the form again and verify your email to submit a new request.</strong>
+      <strong>Your PEN Request was not actioned within {{ scheduler.numDaysAllowedInDraftStatus }} days and was
+        therefore cancelled. Please fill out the form again and verify your email to submit a new request.</strong>
     </p>
   </v-alert>
 </template>
@@ -282,7 +282,7 @@ export default {
     ...mapState(useAuthStore, ['userInfo']),
     ...mapState(usePenRequestStore, ['request']),
     ...mapState(useRootStore, ['student']),
-    ...mapState(useConfigStore, ['numDaysAllowedInDraftStatus']),
+    ...mapState(useConfigStore, ['scheduler']),
 
     isSagaInProgress() {
       return this.request.sagaInProgress;
@@ -299,12 +299,6 @@ export default {
     timedout() {
       return Math.floor(new Date() - new Date(this.request.statusUpdateDate)) / (1000*60*60) > 24;
     },
-  },
-  async created() {
-    await this.getNumDaysAllowedInDraftStatus();
-  },
-  methods: {
-    ...mapActions(useConfigStore ,['getNumDaysAllowedInDraftStatus']),
   }
 };
 </script>

@@ -2,7 +2,7 @@
   <div style="display: none">
     <a
       id="journey_href"
-      :href="frontEnd.journeyBuilder"
+      :href="frontendConfig.journeyBuilder"
     />
   </div>
 </template>
@@ -15,14 +15,14 @@ import { useConfigStore } from '../store/config';
 export default {
   name: 'ModalJourney',
   computed: {
-    ...mapState(useConfigStore, ['frontEnd'])
+    ...mapState(useConfigStore, ['frontendConfig'])
   },
   async mounted() {
-    if (!this.frontEnd.journeyBuilder) { // Prevent a race condition with App.vue
+    if (!this.frontendConfig.journeyBuilder) { // Prevent a race condition with App.vue
       const configStore = useConfigStore();
-      await configStore.getFrontEndConfig();
+      await configStore.getConfig();
     }
-    this.$nextTick(() => window.location = this.frontEnd.journeyBuilder);
+    this.$nextTick(() => window.location = this.frontendConfig.journeyBuilder);
   },
   methods: {
     logout() {

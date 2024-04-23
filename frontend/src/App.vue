@@ -3,13 +3,13 @@
     <MsieBanner v-if="isIE" />
     <HeaderToolbar />
     <div
-      v-if="frontEnd.bannerColor"
+      v-if="frontendConfig.bannerColor"
       id="bannerEnvironment"
     >
       <v-container>
         <v-row>
           <v-col>
-            <h3>{{ frontEnd.bannerEnvironment }} Environment</h3>
+            <h3>{{ frontendConfig.bannerEnvironment }} Environment</h3>
           </v-col>
         </v-row>
       </v-container>
@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     ...mapState(useAuthStore, ['isAuthenticated', 'loginError', 'isLoading']),
-    ...mapState(useConfigStore, ['frontEnd']),
+    ...mapState(useConfigStore, ['frontendConfig']),
     isIE() {
       return /Trident\/|MSIE/.test(window.navigator.userAgent);
     }
@@ -50,7 +50,7 @@ export default {
   async created() {
     const configStore = useConfigStore();
 
-    await configStore.getFrontEndConfig();
+    await configStore.getConfig();
     this.setLoading(true);
     this.getJwtToken().then(() =>
       Promise.all([
@@ -77,7 +77,7 @@ export default {
 
 <style>
 #bannerEnvironment {
-  background: v-bind('frontEnd.bannerColor');
+  background: v-bind('frontendConfig.bannerColor');
   color: white;
 }
 

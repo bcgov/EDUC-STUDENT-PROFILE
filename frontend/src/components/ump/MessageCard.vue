@@ -254,14 +254,14 @@
     class="pa-3 bootstrap-warning"
   >
     <p class="pb-4">
-      <strong>Your Update PEN Info Request was not actioned within {{ numDaysAllowedInDraftStatus }} days and was
-        therefore cancelled. Please fill out the form again and verify your email to submit a new request.</strong>
+      <strong>Your Update PEN Info Request was not actioned within {{ scheduler.numDaysAllowedInDraftStatus }} days and
+        was therefore cancelled. Please fill out the form again and verify your email to submit a new request.</strong>
     </p>
   </v-alert>
 </template>
 
 <script>
-import { mapState, mapActions } from 'pinia';
+import { mapState } from 'pinia';
 import { useRootStore } from '../../store/root';
 import { useAuthStore } from '../../store/auth';
 import { useStudentRequestStore } from '../../store/request';
@@ -280,7 +280,7 @@ export default {
     ...mapState(useAuthStore, ['userInfo']),
     ...mapState(useStudentRequestStore, ['request']),
     ...mapState(useRootStore, ['student']),
-    ...mapState(useConfigStore, ['numDaysAllowedInDraftStatus']),
+    ...mapState(useConfigStore, ['scheduler']),
     isSagaInProgress() {
       return this.request.sagaInProgress;
     },
@@ -303,11 +303,7 @@ export default {
       return this.fullName(this.student.legalFirstName, this.student.legalMiddleNames, this.student.legalLastName);
     }
   },
-  async created() {
-    await this.getNumDaysAllowedInDraftStatus();
-  },
   methods: {
-    ...mapActions(useConfigStore, ['getNumDaysAllowedInDraftStatus']),
     fullName(...names) {
       return names.filter(Boolean).join(' ').toUpperCase();
     },

@@ -3,8 +3,10 @@ import ApiService from '../common/apiService';
 
 export const useConfigStore = defineStore('config', {
   state: () => ({
-    numDaysAllowedInDraftStatus: null,
-    frontEnd: {
+    scheduler: {
+      numDaysAllowedInDraftStatus: -1
+    },
+    frontendConfig: {
       bannerEnvironment: '',
       bannerColor: '',
       bceidRegUrl: '',
@@ -13,19 +15,10 @@ export const useConfigStore = defineStore('config', {
     }
   }),
   actions: {
-    setNumDaysAllowedInDraftStatus(numDaysAllowedInDraftStatus) {
-      this.numDaysAllowedInDraftStatus = numDaysAllowedInDraftStatus;
-    },
-    setFrontEndConfig(config) {
-      this.frontEnd = config;
-    },
-    async getNumDaysAllowedInDraftStatus() {
-      const response = await ApiService.getConfig('scheduler:numDaysAllowedInDraftStatus');
-      this.setNumDaysAllowedInDraftStatus(response);
-    },
-    async getFrontEndConfig() {
-      const response = await ApiService.getConfig('frontendConfig');
-      this.setFrontEndConfig(response);
+    async getConfig() {
+      const { scheduler, frontendConfig } = await ApiService.getConfig();
+      this.scheduler = scheduler;
+      this.frontendConfig = frontendConfig;
     }
   }
 });
