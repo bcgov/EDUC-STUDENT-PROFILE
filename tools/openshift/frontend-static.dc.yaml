@@ -40,8 +40,6 @@
             - name: tls-certs
               mountPath: "/etc/tls-certs"
               readOnly: true
-            - name: config-env
-              mountPath: "/srv/js/config"
             livenessProbe:
               failureThreshold: 3
               httpGet:
@@ -75,9 +73,6 @@
           - name: tls-certs
             secret:
               secretName: student-profile-frontend-cert
-          - name: config-env
-            configMap:
-              name: student-profile-frontend-config-map
       test: false
       triggers:
       - type: ConfigChange
