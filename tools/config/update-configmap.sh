@@ -111,11 +111,11 @@ fi
 if [ "$envValue" = "dev" ]
 then
   bannerEnvironment="DEV"
-  bannerColor="#dba424"
+  bannerColor="#8d28d7"
 elif [ "$envValue" = "test" ]
 then
   bannerEnvironment="TEST"
-  bannerColor="#8d28d7"
+  bannerColor="#dba424"
 fi
 
 echo Generating private and public keys
