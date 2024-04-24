@@ -116,39 +116,39 @@ jobs:
           oc project ${{ env.OPENSHIFT_NAMESPACE_TEST }}
           # Cancel any rollouts in progress
           oc rollout cancel dc/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
-          || true && echo "No backend rollout in progress"
+            || true && echo "No backend rollout in progress"
           oc rollout cancel dc/${{ env.APP_NAME_FRONTEND }} 2> /dev/null \
-          || true && echo "No frontend rollout in progress"
-          
+            || true && echo "No frontend rollout in progress"
+
           # Create the image stream if it doesn't exist
           oc create imagestream ${{ env.REPO_NAME }}-backend 2> /dev/null || true && echo "Backend image stream in place"
           oc create imagestream ${{ env.REPO_NAME }}-frontend-static 2> /dev/null || true && echo "Frontend image stream in place"
-          
+
           oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-backend:${{ env.TAG }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}-backend:${{ env.TAG }}
           oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-frontend-static:${{ env.TAG }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}-frontend-static:${{ env.TAG }}
 
           # Process and apply backend deployment template
           oc process -f tools/openshift/backend.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_TEST }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_TEST }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_TEST }} -p MIN_CPU=${{ env.MIN_CPU_BACKEND }} -p MAX_CPU=${{ env.MAX_CPU_BACKEND }} -p MIN_MEM=${{ env.MIN_MEM_BACKEND }} -p MAX_MEM=${{ env.MAX_MEM_BACKEND }} -p HOST_ROUTE=${{ env.HOST_ROUTE }}\
           | oc apply -f -
-          
+
           # Process and apply frontend deployment template
           oc process -f tools/openshift/frontend-static.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_TEST }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_TEST }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_TEST }} -p MIN_CPU=${{ env.MIN_CPU_FRONTEND }} -p MAX_CPU=${{ env.MAX_CPU_FRONTEND }} -p MIN_MEM=${{ env.MIN_MEM_FRONTEND }} -p MAX_MEM=${{ env.MAX_MEM_FRONTEND }} -p HOST_ROUTE=${{ env.HOST_ROUTE }} -p CA_CERT="${{ env.CA_CERT }}" -p CERTIFICATE="${{ env.CERTIFICATE }}" -p PRIVATE_KEY="${{ env.PRIVATE_KEY }}"\
-          | oc apply -f -
-          
+            | oc apply -f -
+
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin test ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.SPLUNK_TOKEN }}
-          
+
           # Start rollout (if necessary) and follow it
           oc rollout latest dc/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
-          || true && echo "Rollout in progress"
+            || true && echo "Rollout in progress"
           oc logs -f dc/${{ env.APP_NAME_BACKEND }}
-          
+
           oc rollout latest dc/${{ env.APP_NAME_FRONTEND }} 2> /dev/null \
           || true && echo "Rollout in progress"
-          
+
           # Get status, returns 0 if rollout is successful
           oc rollout status dc/${{ env.APP_NAME_BACKEND }}
           oc rollout status dc/${{ env.APP_NAME_FRONTEND }}
       - name: ZAP Scan
-        uses: zaproxy/action-api-scan@v0.3.0
+        uses: zaproxy/action-full-scan@v0.7.0
         with:
           target: 'https://${{ env.HOST_ROUTE }}'
