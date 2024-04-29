@@ -18,13 +18,15 @@
         </v-row>
         <v-row v-if="item.documents.length > 0">
           <v-col cols="12">
-            <DocumentChip
-              v-for="document in item.documents"
-              :key="document.documentID"
-              :document="document"
-              :undeletable="true"
-              :disabled="document.fileSize === 0"
-            />
+            <v-chip-group>
+              <DocumentChip
+                v-for="document in item.documents"
+                :key="document.documentID"
+                :document="document"
+                :undeletable="true"
+                :disabled="document.fileSize === 0"
+              />
+            </v-chip-group>
           </v-col>
         </v-row>
       </template>
