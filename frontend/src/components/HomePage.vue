@@ -72,7 +72,7 @@
         <v-card
           v-else
           height="100%"
-          prepend-avatar="../assets/images/icon-find-pen.svg"
+          :prepend-avatar="searchIcon"
           title="Get your Personal Education Number (PEN)"
           text="Former students can send a request via an online form to receive their PEN"
           to="gmp"
@@ -85,7 +85,7 @@
         class="px-8"
       >
         <v-card
-          prepend-avatar="../assets/images/updatemypen.svg"
+          :prepend-avatar="updateIcon"
           title="Update My Pen"
           height="100%"
           to="ump"
@@ -115,11 +115,20 @@ import LoginRedirect from './LoginRedirect.vue';
 import ModalJourney from './ModalJourney.vue';
 import UserStudentCard from './UserStudentCard.vue';
 
+import searchIcon from '../assets/images/icon-find-pen.svg';
+import updateIcon from '../assets/images/updatemypen.svg';
+
 export default {
   components: {
     LoginRedirect,
     ModalJourney,
     UserStudentCard,
+  },
+  data() {
+    return {
+      searchIcon,
+      updateIcon
+    };
   },
   computed: {
     ...mapState(useAuthStore, ['isAuthenticated', 'isLoading', 'userInfo']),
