@@ -596,7 +596,7 @@ function uploadFile(requestType) {
         });
       }
 
-      if(!req.session[requestType] || req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
+      if (!req.session[requestType] || req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
         return res.status(HttpStatus.CONFLICT).json({
           message: `Upload ${requestType} file not allowed`
         });

@@ -76,6 +76,8 @@ export default {
 </script>
 
 <style>
+html { overflow-y: auto; }
+
 #bannerEnvironment {
   background: v-bind('frontendConfig.bannerColor');
   color: white;
