@@ -1,12 +1,10 @@
-'use strict';
+import passport from 'passport';
+import express from 'express';
 
-const passport = require('passport');
-const express = require('express');
-const { getUserInfo } = require('../components/request');
+import { getUserInfo } from '../components/request.js';
+import { isValidBackendToken } from '../components/auth.js';
 
 const router = express.Router();
-const auth = require('../components/auth');
-const isValidBackendToken = auth.isValidBackendToken();
-router.get('/', passport.authenticate('jwt', {session: false}), isValidBackendToken, getUserInfo);
+router.get('/', passport.authenticate('jwt', {session: false}), isValidBackendToken(), getUserInfo);
 
-module.exports = router;
+export default router;

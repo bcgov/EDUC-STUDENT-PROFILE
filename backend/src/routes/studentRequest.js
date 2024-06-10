@@ -1,12 +1,30 @@
-'use strict';
+import passport from 'passport';
+import express from 'express';
+import {
+  getCodes,
+  postComment,
+  submitRequest,
+  getComments,
+  verifyEmail,
+  setRequestAsSubsrev,
+  resendVerificationEmail,
+  verifyRequest,
+  verifyPostCommentRequest,
+  deleteDocument,
+  downloadFile,
+  uploadFile,
+  uploadFileWithoutRequest,
+  verifyDocumentId
+} from '../components/request.js';
+import { forwardGetReq } from '../components/utils.js';
+import config from '../config/index.js';
+import {
+  verifyStudentRequestStatus,
+  createStudentRequestCommentPayload,
+  createStudentRequestCommentEvent
+} from '../components/studentRequest.js';
+import * as auth from '../components/auth.js';
 
-const passport = require('passport');
-const express = require('express');
-const { getCodes, postComment, submitRequest, getComments, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, verifyPostCommentRequest, deleteDocument, downloadFile, uploadFile, uploadFileWithoutRequest, verifyDocumentId } = require('../components/request');
-const { forwardGetReq } = require('../components/utils');
-const config = require('../config/index');
-const { verifyStudentRequestStatus, createStudentRequestCommentPayload, createStudentRequestCommentEvent } = require('../components/studentRequest');
-const auth = require('../components/auth');
 const isValidBackendToken = auth.isValidBackendToken();
 const router = express.Router();
 
@@ -68,4 +86,4 @@ router.patch('/requests/:id', passport.authenticate('jwt', {session: false}), is
 
 router.get('/verification', verifyEmail(requestType));
 
-module.exports = router;
+export default router;

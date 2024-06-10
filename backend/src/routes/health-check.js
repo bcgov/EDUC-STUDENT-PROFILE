@@ -1,4 +1,7 @@
-'use strict';
+import REDIS from '../util/redis/redis-client.js';
+import NATS from '../messaging/message-subscriber.js';
+import EXPRESS from 'express';
+
 class HealthCheckController {
   constructor(redis, nats, express) {
     this._redis = redis;
@@ -11,7 +14,7 @@ class HealthCheckController {
     return this._router;
   }
 
-  async healthCheck(req, res) {
+  async healthCheck(_req, res) {
     if (this._redis.isConnectionClosed() || this._nats.isConnectionClosed()) {
       res.sendStatus(503);
     } else {
@@ -20,7 +23,4 @@ class HealthCheckController {
   }
 }
 
-const REDIS = require('../util/redis/redis-client');
-const NATS = require('../messaging/message-subscriber');
-const EXPRESS = require('express');
-module.exports = new HealthCheckController(REDIS, NATS, EXPRESS);
+export default new HealthCheckController(REDIS, NATS, EXPRESS);

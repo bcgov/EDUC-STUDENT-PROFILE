@@ -1,21 +1,33 @@
-'use strict';
+import { LocalDateTime } from '@js-joda/core';
+import lodash from 'lodash';
+import HttpStatus from 'http-status-codes';
+import jsonwebtoken from 'jsonwebtoken';
 
-const { getSessionUser, getAccessToken, deleteData, getData, postData, putData, RequestStatuses, VerificationResults, EmailVerificationStatuses, RequestApps, generateJWTToken, formatCommentTimestamp } = require('./utils');
-const { getApiCredentials } = require('./auth');
-const config = require('../config/index');
-const log = require('./logger');
-const lodash = require('lodash');
-const HttpStatus = require('http-status-codes');
-const jsonwebtoken = require('jsonwebtoken');
-const redisUtil = require('../util/redis/redis-utils');
-const localDateTime = require('@js-joda/core').LocalDateTime;
-const { ServiceError, ConflictStateError } = require('./error');
-const { setPenRequestReplicateStatus } = require('./penRequest');
-const { setStudentRequestReplicateStatus } = require('./studentRequest');
+import {
+  getSessionUser,
+  getAccessToken,
+  deleteData,
+  getData,
+  postData,
+  putData,
+  RequestStatuses,
+  VerificationResults,
+  EmailVerificationStatuses,
+  RequestApps,
+  generateJWTToken,
+  formatCommentTimestamp
+} from './utils.js';
+import { getApiCredentials } from './auth.js';
+import config from '../config/index.js';
+import log from './logger.js';
+import * as redisUtil from '../util/redis/redis-utils.js';
+import { ServiceError, ConflictStateError } from './error.js';
+import { setPenRequestReplicateStatus } from './penRequest.js';
+import { setStudentRequestReplicateStatus } from './studentRequest.js';
 
 let codes = null;
 
-function verifyRequest(requestType) {
+export function verifyRequest(requestType) {
   return function getRequestHandler(req, res, next) {
     const userInfo = getSessionUser(req);
     if(!userInfo) {
@@ -36,7 +48,7 @@ function verifyRequest(requestType) {
   };
 }
 
-function verifyDocumentId(requestType) {
+export function verifyDocumentId(requestType) {
   return function verifyDocumentIdHandler(req, res, next) {
     const userInfo = getSessionUser(req);
     if(!userInfo) {
@@ -57,7 +69,7 @@ function verifyDocumentId(requestType) {
   };
 }
 
-function verifyPostCommentRequest(requestType) {
+export function verifyPostCommentRequest(requestType) {
   return function getRequestHandler(req, res, next) {
     const userInfo = getSessionUser(req);
     if(!userInfo._json || !userInfo._json.digitalIdentityID){
@@ -142,7 +154,7 @@ function getDefaultBcscInput(userInfo) {
   };
 }
 
-async function getUserInfo(req, res) {
+export async function getUserInfo(req, res) {
   const userInfo = getSessionUser(req);
   const correlationID = req.session?.correlationID;
   if(!userInfo || !userInfo.jwt || !userInfo._json || !userInfo._json.digitalIdentityID) {
@@ -202,7 +214,7 @@ async function getUserInfo(req, res) {
   });
 }
 
-function getCodes(requestType) {
+export function getCodes(requestType) {
   return async function getCodesHandler(req, res) {
     try{
       const accessToken = getAccessToken(req);
@@ -282,7 +294,7 @@ async function postRequest(accessToken, reqData, userInfo, requestType, correlat
   }
 }
 
-function submitRequest(requestType, verifyRequestStatus) {
+export function submitRequest(requestType, verifyRequestStatus) {
   return async function submitRequestHandler(req, res) {
     try{
       const userInfo = getSessionUser(req);
@@ -329,7 +341,7 @@ function submitRequest(requestType, verifyRequestStatus) {
   };
 }
 
-function postComment(requestType, createCommentPayload, createCommentEvent, correlationID) {
+export function postComment(requestType, createCommentPayload, createCommentEvent, correlationID) {
   return async function postCommentHandler(req, res) {
     try{
       const userInfo = req.userInfo;
@@ -351,7 +363,7 @@ function postComment(requestType, createCommentPayload, createCommentEvent, corr
   };
 }
 
-function getComments(requestType) {
+export function getComments(requestType) {
   return async function getCommentsHandler(req, res) {
     try{
       const userInfo = getSessionUser(req);
@@ -431,7 +443,7 @@ async function setRequestAsInitrev(requestID, requestType, correlationID) {
   return updateRequestStatus(accessToken, requestID, RequestStatuses.INITREV, requestType, beforeUpdateRequestAsInitrev, correlationID);
 }
 
-function verifyEmailToken(token) {
+export function verifyEmailToken(token) {
   try{
     const tokenPayload = jsonwebtoken.verify(token, config.get('email:secretKey'));
     if(tokenPayload.SCOPE !== 'VERIFY_EMAIL') {
@@ -451,7 +463,7 @@ function verifyEmailToken(token) {
   }
 }
 
-function verifyEmail(requestType) {
+export function verifyEmail(requestType) {
   return async function verifyEmailHandler(req, res) {
     const loggedin = getSessionUser(req);
     const baseUrl = config.get('server:frontend');
@@ -517,7 +529,7 @@ function beforeUpdateRequestAsSubsrev(request, requestType) {
   return request;
 }
 
-function setRequestAsSubsrev(requestType) {
+export function setRequestAsSubsrev(requestType) {
   return async function setRequestAsSubsrevHandler(req, res) {
     try{
       const accessToken = getAccessToken(req);
@@ -556,7 +568,7 @@ function setRequestAsSubsrev(requestType) {
   };
 }
 
-function resendVerificationEmail(requestType) {
+export function resendVerificationEmail(requestType) {
   return async function resendVerificationEmailHandler(req, res) {
     try{
       const accessToken = getAccessToken(req);
@@ -586,7 +598,7 @@ function resendVerificationEmail(requestType) {
   };
 }
 
-function uploadFile(requestType) {
+export function uploadFile(requestType) {
   return async function uploadFileHandler(req, res) {
     try{
       const accessToken = getAccessToken(req);
@@ -616,7 +628,7 @@ function uploadFile(requestType) {
   };
 }
 
-function uploadFileWithoutRequest(requestType) {
+export function uploadFileWithoutRequest(requestType) {
   return async function uploadFileHandler(req, res) {
     try{
       const accessToken = getAccessToken(req);
@@ -665,7 +677,7 @@ async function getDocument(token, requestID, documentID, requestType, includeDoc
   }
 }
 
-function deleteDocument(requestType) {
+export function deleteDocument(requestType) {
   return async function deleteDocumentHandler(req, res) {
     try{
       const accessToken = getAccessToken(req);
@@ -704,7 +716,7 @@ function deleteDocument(requestType) {
   };
 }
 
-function downloadFile(requestType) {
+export function downloadFile(requestType) {
   return async function downloadFileHandler(req, res) {
     try{
       const accessToken = getAccessToken(req);
@@ -729,22 +741,3 @@ function downloadFile(requestType) {
     }
   };
 }
-
-module.exports = {
-  getUserInfo,
-  getCodes,
-  submitRequest,
-  postComment,
-  getComments,
-  verifyEmail,
-  verifyEmailToken,
-  setRequestAsSubsrev,
-  resendVerificationEmail,
-  verifyRequest,
-  verifyPostCommentRequest,
-  deleteDocument,
-  downloadFile,
-  uploadFile,
-  uploadFileWithoutRequest,
-  verifyDocumentId,
-};

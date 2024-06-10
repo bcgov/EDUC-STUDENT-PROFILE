@@ -1,33 +1,34 @@
-'use strict';
-const config = require('../config/index');
-const log = require('../components/logger');
-const SagaMessageHandler = require('./handlers/profile-request-saga-message-handler');
+import config from '../config/index.js';
+import log from '../components/logger.js';
+import { ProfileRequestSagaMessageHandler } from './handlers/profile-request-saga-message-handler.js';
+import nats from 'nats';
+
 let connection={};
-const server = config.get('messaging:natsUrl');
-const nats = require('nats');
 let connectionClosed = false;
+
+const server = config.get('messaging:natsUrl');
+console.log('server:', server);
 const natsOptions = {
-  url: server,
   servers: [server],
   maxReconnectAttempts: 60,
   name: 'STUDENT-PROFILE-NODE',
-  reconnectTimeWait: 5000, // wait 5 seconds before retrying...
+  reconnectTimeWait: 5000,
   waitOnFirstConnect: true,
   pingInterval: 5000
 };
 
-const NATS = {
-  init(){
+export const NATS = {
+  async init() {
     try {
-      connection = nats.connect(server, natsOptions);
-    }catch (e) {
+      connection = await nats.connect(natsOptions);
+    } catch (e) {
       log.error(`error ${e}`);
     }
   },
-  callbacks(){
+  eventCallbacks() {
     connection.on('connect', function () {
       log.info('NATS connected!', connection?.currentServer?.url?.host);
-      SagaMessageHandler.subscribe(connection);
+      ProfileRequestSagaMessageHandler.subscribe(connection);
     });
 
     connection.on('error', function (reason) {
@@ -48,7 +49,7 @@ const NATS = {
     });
   },
   close(){
-    if(connection){
+    if (connection){
       connection.close();
     }
   },
@@ -58,4 +59,4 @@ const NATS = {
 
 };
 
-module.exports = NATS;
+export default NATS;

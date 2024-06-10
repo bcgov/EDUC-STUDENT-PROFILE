@@ -1,10 +1,12 @@
-'use strict';
-const nconf = require('nconf');
-const dotenv = require('dotenv');
-const path = require('path');
+import nconf from 'nconf';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath, URL } from 'url';
+
 dotenv.config();
 
 const env = process.env.NODE_ENV || 'local';
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 nconf.argv().env().file({ file: path.join(__dirname, `${env}.json`) });
 
@@ -19,7 +21,7 @@ nconf.overrides({
   }
 });
 
-nconf.defaults({
+export default nconf.defaults({
   environment: env,
   logoutEndpoint:
     process.env.SOAM_URL + '/auth/realms/master/protocol/openid-connect/logout',
@@ -93,5 +95,3 @@ nconf.defaults({
     natsCluster: process.env.NATS_CLUSTER
   }
 });
-
-module.exports = nconf;

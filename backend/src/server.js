@@ -1,17 +1,17 @@
-'use strict';
+import http from 'http';
+import { LocalDateTime } from '@js-joda/core';
 
-const config = require('./config/index');
-const http = require('http');
-//const fs = require('fs')
-const log = require('./components/logger');
-const localDateTime = require('@js-joda/core').LocalDateTime;
-//Add timestamp to log
-Object.defineProperty(log, 'heading', { get: () => { return localDateTime.now().toString(); } });
+import config from './config/index.js';
+import log from './components/logger.js';
+import { NATS } from './messaging/message-subscriber.js';
+import './schedulers/student-profile-saga-check-scheduler.js';
 
-const dotenv = require('dotenv');
+Object.defineProperty(log, 'heading', { get: () => { return LocalDateTime.now().toString(); } });
+
+import dotenv from 'dotenv';
 dotenv.config();
 
-const app = require('./app');
+import app from './app.js';
 
 /**
  * Get port from environment and store in Express.
@@ -28,8 +28,6 @@ app.set('port', port);
 // };
 
 const server = http.createServer(app);
-const NATS = require('./messaging/message-subscriber');
-require('./schedulers/student-profile-saga-check-scheduler');
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -107,8 +105,8 @@ process.on('SIGTERM', () => {
     log.info('process terminated');
   });
 });
-//exports are purely for testing
-module.exports = {
+
+export default {
   normalizePort,
   onError,
   onListening,

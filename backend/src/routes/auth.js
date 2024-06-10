@@ -1,17 +1,13 @@
-'use strict';
+import { v4 as uuidv4 } from 'uuid';
+import { body, validationResult } from 'express-validator';
+import passport from 'passport';
+import express from 'express';
 
-const config = require('../config/index');
-const passport = require('passport');
-const express = require('express');
-const auth = require('../components/auth');
-const log = require('../components/logger');
-const {v4: uuidv4} = require('uuid');
-const {
-  body,
-  validationResult
-} = require('express-validator');
+import config from '../config/index.js';
+import * as auth from '../components/auth.js';
+import log from '../components/logger.js';
+
 const router = express.Router();
-
 
 router.get('/', (_req, res) => {
   res.status(200).json({
@@ -152,7 +148,7 @@ async function generateTokens(req, res) {
   if (result && result.jwt && result.refreshToken) {
     req.user.jwt = result.jwt;
     req.user.refreshToken = result.refreshToken;
-    req.user.jwtFrontend = auth.generateUiToken();
+    req.user.jwtFrontend = generateUiToken();
     const responseJson = {
       jwtFrontend: req.user.jwtFrontend
     };
@@ -170,4 +166,5 @@ router.get('/user-session-remaining-time', passport.authenticate('jwt', {session
     return res.sendStatus(401);
   }
 });
-module.exports = router;
+
+export default router;

@@ -1,6 +1,6 @@
-'use strict';
-const log = require('../../components/logger');
-const redisUtil = require('../../util/redis/redis-utils');
+import log from '../../components/logger.js';
+import { removeProfileRequestSagaRecordFromRedis } from '../../util/redis/redis-utils.js';
+
 const SagaTopics = ['PEN_REQUEST_COMMENTS_SAGA_TOPIC','STUDENT_PROFILE_COMMENTS_SAGA_TOPIC'];
 
 function subscribeSagaMessages(nats, topic, handleMessage) {
@@ -16,19 +16,14 @@ function subscribeSagaMessages(nats, topic, handleMessage) {
 async function handleProfileRequestSagaMessage(msg) {
   const event = JSON.parse(msg); // it is always a JSON string of Event object.
   if('COMPLETED' === event.sagaStatus || 'FORCE_STOPPED' === event.sagaStatus){
-    await redisUtil.removeProfileRequestSagaRecordFromRedis(event);
+    await removeProfileRequestSagaRecordFromRedis(event);
   }
 }
 
-
-
-const ProfileRequestSagaMessageHandler = {
+export const ProfileRequestSagaMessageHandler = {
   subscribe(nats) {
     SagaTopics.forEach((topic) => {
       subscribeSagaMessages(nats, topic, handleProfileRequestSagaMessage);
     });
   },
-
 };
-
-module.exports = ProfileRequestSagaMessageHandler;
