@@ -88,7 +88,6 @@ router.get('/logout', async (req, res, next) => {
     }
     res.redirect(config.get('siteMinder_logout_endpoint') + retUrl);
   });
-  req.session.destroy();
 });
 
 const UnauthorizedRsp = {
