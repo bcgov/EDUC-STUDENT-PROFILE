@@ -25,13 +25,12 @@ import studentRequestRouter from './routes/studentRequest.js';
 import penRequestRouter from './routes/penRequest.js';
 import configRouter from './routes/config.js';
 import promMid from 'express-prometheus-middleware';
-import { NATS } from './messaging/message-subscriber.js';
+import { init as initNats } from './messaging/message-subscriber.js';
 import healthCheckController from './routes/health-check.js';
 
 dotenv.config();
 const apiRouter = express.Router();
-NATS.init()
-NATS.eventCallbacks();
+initNats();
 
 //initialize app
 const app = express();

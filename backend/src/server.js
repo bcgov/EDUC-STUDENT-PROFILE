@@ -3,7 +3,7 @@ import { LocalDateTime } from '@js-joda/core';
 
 import config from './config/index.js';
 import log from './components/logger.js';
-import { NATS } from './messaging/message-subscriber.js';
+import { close as closeNats } from './messaging/message-subscriber.js';
 import './schedulers/student-profile-saga-check-scheduler.js';
 
 Object.defineProperty(log, 'heading', { get: () => { return LocalDateTime.now().toString(); } });
@@ -93,14 +93,14 @@ function onListening() {
 }
 
 process.on('SIGINT',() => {
-  NATS.close();
+  closeNats();
   server.close(() => {
     log.info('process terminated');
   });
 });
 
 process.on('SIGTERM', () => {
-  NATS.close();
+  closeNats();
   server.close(() => {
     log.info('process terminated');
   });
