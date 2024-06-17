@@ -55,7 +55,7 @@ export async function renew(refreshToken) {
     if(response && response.data && response.data.access_token && response.data.refresh_token){
       result.jwt = response.data.access_token;
       result.refreshToken = response.data.refresh_token;
-    } else{
+    } else {
       log.error('Access token or refresh token not retreived properly');
     }
   } catch (error) {
@@ -73,14 +73,14 @@ export async function refreshJWT(req, _res, next) {
     if (!!req && !!req.user && !!req.user.jwt) {
       log.verbose('refreshJWT', 'User & JWT exists');
 
-      if (auth.isTokenExpired(req.user.jwt)) {
+      if (isTokenExpired(req.user.jwt)) {
         log.verbose('refreshJWT', 'JWT has expired');
 
-        if (!!req.user.refreshToken && auth.isRenewable(req.user.refreshToken)) {
+        if (!!req.user.refreshToken && isRenewable(req.user.refreshToken)) {
           log.verbose('refreshJWT', 'Can refresh JWT token');
 
           // Get new JWT and Refresh Tokens and update the request
-          const result = await auth.renew(req.user.refreshToken);
+          const result = await renew(req.user.refreshToken);
           req.user.jwt = result.jwt; // eslint-disable-line require-atomic-updates
           req.user.refreshToken = result.refreshToken; // eslint-disable-line require-atomic-updates
         } else {
