@@ -2,7 +2,7 @@ import safeStringify from 'fast-safe-stringify';
 import RedLock from 'redlock';
 import {LocalDateTime} from '@js-joda/core';
 
-import Redis from './redis-client.js';
+import { getRedisClient } from './redis-client.js';
 import log from '../../components/logger.js';
 
 const profileRequestSagaEventKey = 'PROFILE_REQUEST_SAGA_EVENTS';
@@ -14,7 +14,7 @@ let redLock;
  */
 export async function createProfileRequestSagaRecordInRedis(event) {
   try {
-    const redisClient = Redis.getRedisClient();
+    const redisClient = getRedisClient();
     if (redisClient) {
       if (event) {
         event.createDateTime = LocalDateTime.now().toString(); // store the timestamp so that it can be checked through scheduler.
@@ -30,7 +30,7 @@ export async function createProfileRequestSagaRecordInRedis(event) {
 
 export async function removeProfileRequestSagaRecordFromRedis(event) {
   let recordFoundFromRedis = false;
-  const redisClient = Redis.getRedisClient();
+  const redisClient = getRedisClient();
   if (redisClient) {
     try {
       const result = await redisClient.smembers(profileRequestSagaEventKey);
@@ -56,7 +56,7 @@ export async function removeProfileRequestSagaRecordFromRedis(event) {
 }
 
 export async function getProfileRequestSagaEvents() {
-  const redisClient = Redis.getRedisClient();
+  const redisClient = getRedisClient();
   if (redisClient) {
     return redisClient.smembers(profileRequestSagaEventKey);
   } else {
@@ -86,7 +86,7 @@ export async function isSagaInProgressForDigitalID(digitalID) {
 }
 
 export async function removeSagaRecordFromRedis(sagaId, eventToDelete) {
-  const redisClient = Redis.getRedisClient();
+  const redisClient = getRedisClient();
   try {
     await this.getRedLock().lock(`locks:profile-request-saga:deleteFromSet-${sagaId}`, 600);
     await redisClient.srem(profileRequestSagaEventKey, safeStringify(eventToDelete));
@@ -96,7 +96,7 @@ export async function removeSagaRecordFromRedis(sagaId, eventToDelete) {
 }
 
 export async function addElementToSagaRecordInRedis(sagaId, eventToAdd) {
-  const redisClient = Redis.getRedisClient();
+  const redisClient = getRedisClient();
   try {
     await this.getRedLock().lock(`locks:profile-request-saga:addToSet-${sagaId}`, 600);
     await redisClient.sadd(profileRequestSagaEventKey, safeStringify(eventToAdd));
@@ -110,7 +110,7 @@ export function getRedLock() {
     return redLock; // reusable red lock object.
   } else {
     redLock = new RedLock(
-      [Redis.getRedisClient()],
+      [getRedisClient()],
       {
         // the expected clock drift; for more details
         // see http://redis.io/topics/distlock

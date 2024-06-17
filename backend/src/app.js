@@ -11,9 +11,9 @@ import helmet from 'helmet';
 import cors from 'cors';
 import noCache from 'nocache';
 import bodyParser from 'body-parser';
-import connectRedis from 'connect-redis';
+import RedisStore from 'connect-redis';
 
-import RedisClient from './util/redis/redis-client.js';
+import { init as initRedis, getRedisClient } from './util/redis/redis-client.js';
 import config from './config/index.js';
 import log from './components/logger.js';
 import * as utils from './components/utils.js';
@@ -57,10 +57,9 @@ const logStream = {
   }
 };
 
-RedisClient.init();
-const RedisStore = connectRedis(session);
+initRedis();
 const dbSession = new RedisStore({
-  client: redisClient.getRedisClient(),
+  client: getRedisClient(),
   prefix: 'student-profile-sess:',
 });
 
@@ -85,6 +84,7 @@ app.use(session({
 }));
 
 app.use(healthCheckController.router);
+
 //initialize routing and session. Cookies are now only reachable via requests (not js)
 app.use(passport.initialize());
 app.use(passport.session());
