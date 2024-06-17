@@ -89,7 +89,7 @@ app.use(healthCheckController.router);
 app.use(passport.initialize());
 app.use(passport.session());
 
-function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) {
+async function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) {
   passport.use(strategyName, new OidcStrategy({
     issuer: discovery.issuer,
     authorizationURL: discovery.authorization_endpoint,
@@ -144,12 +144,12 @@ utils.getOidcDiscovery().then(discovery => {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: config.get('tokenGenerate:publicKey'),
     ignoreExpiration: true
-  }, (jwtPayload, done) => {
+  }, function(jwtPayload, done) {
     if ((typeof (jwtPayload) === 'undefined') || (jwtPayload === null)) {
       return done('No JWT token', null);
     }
 
-    done(null, {
+    return done(null, {
       email: jwtPayload.email,
       familyName: jwtPayload.family_name,
       givenName: jwtPayload.given_name,
@@ -160,10 +160,10 @@ utils.getOidcDiscovery().then(discovery => {
     });
   }));
 });
+
 //functions for serializing/deserializing users
 passport.serializeUser((user, next) => next(null, user));
 passport.deserializeUser((obj, next) => next(null, obj));
-
 
 // GetOK Base API Directory
 apiRouter.get('/', (_req, res) => {
