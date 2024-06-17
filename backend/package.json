@@ -25,7 +25,6 @@
     "test:unit-linux": "export NODE_ENV=test && npm run test"
   },
   "dependencies": {
-    "@babel/runtime": "^7.24.7",
     "@js-joda/core": "^5.2.0",
     "@js-joda/locale_en": "^4.7.0",
     "atob": "^2.1.2",
@@ -65,16 +64,6 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.16.8",
-    "@babel/core": "^7.16.8",
-    "@babel/eslint-parser": "^7.13.14",
-    "@babel/helper-plugin-utils": "^7.13.0",
-    "@babel/node": "^7.14.2",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/plugin-transform-async-to-generator": "^7.13.0",
-    "@babel/plugin-transform-runtime": "^7.16.10",
-    "@babel/preset-env": "^7.14.1",
-    "@babel/preset-stage-2": "^7.8.3",
     "axios-mock-adapter": "^1.19.0",
     "babel-jest": "^29.7.0",
     "babel-plugin-rewire": "^1.2.0",
