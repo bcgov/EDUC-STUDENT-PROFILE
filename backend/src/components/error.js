@@ -1,8 +1,6 @@
-'use strict';
+import HttpStatus from 'http-status-codes';
 
-const HttpStatus = require('http-status-codes');
-
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(status = HttpStatus.INTERNAL_SERVER_ERROR, data, reason, ...params) {
     super(...params);
 
@@ -20,7 +18,7 @@ class ApiError extends Error {
   }
 }
 
-class ServiceError extends Error {
+export class ServiceError extends Error {
   constructor(errorSource, reason, ...params) {
     super(...params);
 
@@ -33,16 +31,10 @@ class ServiceError extends Error {
   }
 }
 
-class ConflictStateError extends Error {
+export class ConflictStateError extends Error {
   constructor(...params) {
     super(...params);
 
     this.name = 'ConflictStateError';
   }
 }
-
-module.exports = {
-  ApiError,
-  ServiceError,
-  ConflictStateError
-};

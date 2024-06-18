@@ -1,11 +1,12 @@
-'use strict';
-const CronJob = require('cron').CronJob;
-const config = require('../config/index');
-const log = require('../components/logger');
-const {getApiCredentials} = require('../components/auth');
-const {getDataWithParams, putData, getData, postData} = require('../components/utils');
-const localDateTime = require('@js-joda/core').LocalDateTime;
-const redisUtil = require('../util/redis/redis-utils');
+import { LocalDateTime } from '@js-joda/core';
+import { CronJob } from 'cron';
+
+import config from '../config/index.js';
+import log from '../components/logger.js';
+import { getApiCredentials } from '../components/auth.js';
+import { getDataWithParams, putData, getData, postData } from '../components/utils.js';
+import { getRedLock } from '../util/redis/redis-utils.js';
+
 const schedulerCronPenRequestDraft = config.get('scheduler:schedulerCronProfileRequestDraft');
 const numDaysAllowedInDraftStatus = config.get('scheduler:numDaysAllowedInDraftStatus');
 const expectedDraftRequests = config.get('scheduler:expectedDraftRequests');
@@ -25,17 +26,17 @@ function getSearchCriteriaList(requestType, dateTime, statusCodeValue) {
 }
 
 function getSearchListCriteriaForDraftRequests(requestType) {
-  const dateTime = localDateTime.now().minusDays(numDaysAllowedInDraftStatus);
+  const dateTime = LocalDateTime.now().minusDays(numDaysAllowedInDraftStatus);
   return getSearchCriteriaList(requestType, dateTime, 'DRAFT');
 }
 
 function getSearchListCriteriaForAbandoningReturnedRequests(requestType) {
-  const dateTime = localDateTime.now().minusDays(numDaysAllowedInReturnedStatusBeforeAbandoned);
+  const dateTime = LocalDateTime.now().minusDays(numDaysAllowedInReturnedStatusBeforeAbandoned);
   return getSearchCriteriaList(requestType, dateTime, 'RETURNED');
 }
 
 function getSearchListCriteriaForSendingEmailForReturnedRequests(requestType) {
-  const dateTime = localDateTime.now().minusDays(numDaysAllowedInReturnedStatusBeforeEmail);
+  const dateTime = LocalDateTime.now().minusDays(numDaysAllowedInReturnedStatusBeforeEmail);
   return getSearchCriteriaList(requestType, dateTime, 'RETURNED');
 }
 
@@ -53,7 +54,7 @@ async function findAndMoveRequestsToAbandoned(searchListCriteria, token, request
   const result = await getDataWithParams(token, config.get(`${requestType}:apiEndpoint`) + '/paginated', params);
   if (result['content'] && result['content'].length > 0) {
     result['content'].forEach(element => {
-      element.statusUpdateDate = localDateTime.now().toString();
+      element.statusUpdateDate = LocalDateTime.now().toString();
       element[`${requestType}StatusCode`] = 'ABANDONED';
       const putDataResult = putData(token, element, config.get(`${requestType}:apiEndpoint`));
       updateReqResult.push(putDataResult);
@@ -62,7 +63,7 @@ async function findAndMoveRequestsToAbandoned(searchListCriteria, token, request
 }
 
 const draftToAbandonRequestJob = new CronJob(schedulerCronPenRequestDraft, async () => {
-  const redLock = redisUtil.getRedLock();
+  const redLock = getRedLock();
   try {
     await redLock.lock('locks:student-profile-request:draft-abandoned', 6000); // no need to release the lock as it will auto expire after 6000 ms.
     const data = await getApiCredentials(config.get('oidc:clientId'), config.get('oidc:clientSecret'));
@@ -142,8 +143,7 @@ async function findAndSendEmailForStaleReturnedRequests(requestType, token) {
   }
 }
 
-const scheduler = {
+export default {
   draftToAbandonRequestJob: draftToAbandonRequestJob
 };
-module.exports = scheduler;
 

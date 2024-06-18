@@ -1,12 +1,28 @@
-'use strict';
+import passport from 'passport';
+import express from 'express';
+import {
+  getCodes,
+  postComment,
+  submitRequest,
+  getComments,
+  verifyEmail,
+  setRequestAsSubsrev,
+  resendVerificationEmail,
+  verifyRequest,
+  verifyPostCommentRequest,
+  deleteDocument,
+  downloadFile,
+  uploadFile
+} from '../components/request.js';
+import { forwardGetReq } from '../components/utils.js';
+import config from '../config/index.js';
+import {
+  verifyPenRequestStatus,
+  createPenRequestCommentPayload,
+  createPenRequestCommentEvent
+} from '../components/penRequest.js';
+import * as auth from '../components/auth.js';
 
-const passport = require('passport');
-const express = require('express');
-const { getCodes, postComment, submitRequest, getComments, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, verifyPostCommentRequest, deleteDocument, downloadFile, uploadFile } = require('../components/request');
-const { forwardGetReq } = require('../components/utils');
-const config = require('../config/index');
-const { verifyPenRequestStatus, createPenRequestCommentPayload, createPenRequestCommentEvent } = require('../components/penRequest');
-const auth = require('../components/auth');
 const isValidBackendToken = auth.isValidBackendToken();
 const router = express.Router();
 
@@ -62,4 +78,4 @@ router.patch('/requests/:id', passport.authenticate('jwt', {session: false}), is
 
 router.get('/verification', verifyEmail(requestType));
 
-module.exports = router;
+export default router;

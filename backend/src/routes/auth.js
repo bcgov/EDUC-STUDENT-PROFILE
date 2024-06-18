@@ -1,17 +1,13 @@
-'use strict';
+import { v4 as uuidv4 } from 'uuid';
+import { body, validationResult } from 'express-validator';
+import passport from 'passport';
+import express from 'express';
 
-const config = require('../config/index');
-const passport = require('passport');
-const express = require('express');
-const auth = require('../components/auth');
-const log = require('../components/logger');
-const {v4: uuidv4} = require('uuid');
-const {
-  body,
-  validationResult
-} = require('express-validator');
+import config from '../config/index.js';
+import * as auth from '../components/auth.js';
+import log from '../components/logger.js';
+
 const router = express.Router();
-
 
 router.get('/', (_req, res) => {
   res.status(200).json({
@@ -67,30 +63,34 @@ addBaseRouterGet('oidcBceidGMP', '/login_bceid_gmp');
 addBaseRouterGet('oidcBceidUMP', '/login_bceid_ump');
 
 //removes tokens and destroys session
-router.get('/logout', async (req, res) => {
-  req.logout();
-  req.session.destroy();
-  let retUrl;
-  if (req.query && req.query.sessionExpired) {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/session-expired');
-  } else if (req.query && req.query.loginError) {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/login-error');
-  } else if (req.query && req.query.loginBcsc) {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc');
-  } else if (req.query && req.query.loginBcscGMP) {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_gmp');
-  } else if (req.query && req.query.loginBcscUMP) {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bcsc_ump');
-  } else if (req.query && req.query.loginBceid) {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid');
-  } else if (req.query && req.query.loginBceidGMP) {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_gmp');
-  } else if (req.query && req.query.loginBceidUMP) {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/api/auth/login_bceid_ump');
-  } else {
-    retUrl = encodeURIComponent(config.get('logoutEndpoint') + '?post_logout_redirect_uri=' + config.get('server:frontend') + '/logout');
-  }
-  res.redirect(config.get('siteMinder_logout_endpoint') + retUrl);
+router.get('/logout', async (req, res, next) => {
+  let retUrl = encodeURIComponent(config.get('logoutEndpoint')
+    + '?post_logout_redirect_uri='
+    + config.get('server:frontend'));
+
+  req.logout(err => {
+    if (err) return next(err);
+    if (req?.query?.sessionExpired) {
+      retUrl += '/session-expired';
+    } else if (req?.query?.loginError) {
+      retUrl += '/login-error';
+    } else if (req?.query?.loginBcsc) {
+      retUrl += '/api/auth/login_bcsc';
+    } else if (req?.query?.loginBcscGMP) {
+      retUrl += '/api/auth/login_bcsc_gmp';
+    } else if (req?.query?.loginBcscUMP) {
+      retUrl += '/api/auth/login_bcsc_ump';
+    } else if (req?.query?.loginBceid) {
+      retUrl += '/api/auth/login_bceid';
+    } else if (req?.query?.loginBceidGMP) {
+      retUrl += '/api/auth/login_bceid_gmp';
+    } else if (req?.query?.loginBceidUMP) {
+      retUrl += '/api/auth/login_bceid_ump';
+    } else {
+      retUrl += '/logout';
+    }
+    res.redirect(config.get('siteMinder_logout_endpoint') + retUrl);
+  });
 });
 
 const UnauthorizedRsp = {
@@ -147,6 +147,7 @@ router.get('/token', auth.refreshJWT, (req, res) => {
     res.status(401).json(UnauthorizedRsp);
   }
 });
+
 async function generateTokens(req, res) {
   const result = await auth.renew(req.user.refreshToken);
   if (result && result.jwt && result.refreshToken) {
@@ -170,4 +171,5 @@ router.get('/user-session-remaining-time', passport.authenticate('jwt', {session
     return res.sendStatus(401);
   }
 });
-module.exports = router;
+
+export default router;
