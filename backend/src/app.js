@@ -118,7 +118,7 @@ async function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_
 const parseJwt = (token) => {
   try {
     return JSON.parse(atob(token.split('.')[1]));
-  } catch (e) {
+  } catch {
     return null;
   }
 };

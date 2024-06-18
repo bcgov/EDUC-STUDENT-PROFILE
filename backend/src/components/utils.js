@@ -254,5 +254,5 @@ export function formatCommentTimestamp(time) {
 }
 
 export function prettyStringify(obj, indent = 2) {
-  return JSON.stringify(obj, null, indent)
+  return JSON.stringify(obj, null, indent);
 }

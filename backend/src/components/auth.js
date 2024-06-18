@@ -2,7 +2,7 @@ import axios from 'axios';
 import jsonwebtoken from 'jsonwebtoken';
 import qs from 'querystring';
 import HttpStatus from 'http-status-codes';
-import lodash from 'lodash'
+import lodash from 'lodash';
 
 import { ApiError } from './error.js';
 import { getOidcDiscovery, prettyStringify } from './utils.js';
@@ -81,8 +81,8 @@ export async function refreshJWT(req, _res, next) {
 
           // Get new JWT and Refresh Tokens and update the request
           const result = await renew(req.user.refreshToken);
-          req.user.jwt = result.jwt; // eslint-disable-line require-atomic-updates
-          req.user.refreshToken = result.refreshToken; // eslint-disable-line require-atomic-updates
+          req.user.jwt = result.jwt;  
+          req.user.refreshToken = result.refreshToken;  
         } else {
           log.verbose('refreshJWT', 'Cannot refresh JWT token');
           delete req.user;

@@ -270,7 +270,7 @@ async function sendVerificationEmail(accessToken, emailAddress, requestId, ident
     const payload = {
       SCOPE: 'VERIFY_EMAIL'
     };
-    reqData.jwtToken = await generateJWTToken(requestId, emailAddress, 'VerifyEmailAPI', 'HS256', payload);
+    reqData.jwtToken = generateJWTToken(requestId, emailAddress, 'VerifyEmailAPI', 'HS256', payload);
     return await postData(accessToken, reqData, url, correlationID);
   } catch (e) {
     throw new ServiceError('sendVerificationEmail error', e);
@@ -430,7 +430,7 @@ function beforeUpdateRequestAsInitrev(request, requestType) {
     throw new ConflictStateError(`Current ${requestType} Email Verification Status: ` + request.emailVerified);
   }
 
-  request.initialSubmitDate = localDateTime.now().toString();
+  request.initialSubmitDate = LocalDateTime.now().toString();
   request.emailVerified = EmailVerificationStatuses.VERIFIED;
 
   return request;
@@ -506,7 +506,7 @@ async function updateRequestStatus(accessToken, requestID, requestStatus, reques
 
     let request = beforeUpdate(data, requestType);
     request[`${requestType}StatusCode`] = requestStatus;
-    request.statusUpdateDate = localDateTime.now().toString();
+    request.statusUpdateDate = LocalDateTime.now().toString();
 
     data = await putData(accessToken, request, endpoint, correlationID);
     data.digitalID = null;

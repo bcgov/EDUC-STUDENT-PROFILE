@@ -47,7 +47,7 @@ export async function init() {
   try {
     connection = await nats.connect(natsOptions);
     listenForEvents();
-    connection.closed().then(err => log.error(`connection closed ${err ? "with error: " + err.message : ""}`));
+    connection.closed().then(err => log.error(`connection closed ${err ? 'with error: ' + err.message : ''}`));
   } catch (e) {
     log.error(`error ${e}`);
   }
