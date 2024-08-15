@@ -54,8 +54,7 @@ on:
 jobs:
   build-and-deploy-test:
     name: Build and deploy to OpenShift TEST
-    # ubuntu-20.04 can also be used.
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     environment: test
 
     outputs:
