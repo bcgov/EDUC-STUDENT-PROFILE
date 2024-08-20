@@ -27,7 +27,7 @@ app.set('port', port);
 //   cert: fs.readFileSync('/etc/tls-certs/tls.crt')
 // };
 
-const server = http.createServer(app);
+export const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -38,7 +38,7 @@ server.on('listening', onListening);
 /**
  * Normalize a port into a number, string, or false.
  */
-function normalizePort(val) {
+export function normalizePort(val) {
   const portNum = parseInt(val, 10);
 
   if (isNaN(portNum)) {
@@ -57,7 +57,7 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
-function onError(error) {
+export function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -84,7 +84,7 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-function onListening() {
+export function onListening() {
   const addr = server.address();
   const bind = typeof addr === 'string' ?
     'pipe ' + addr :
@@ -106,9 +106,3 @@ process.on('SIGTERM', () => {
   });
 });
 
-export default {
-  normalizePort,
-  onError,
-  onListening,
-  server
-};

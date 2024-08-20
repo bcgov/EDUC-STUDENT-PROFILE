@@ -12,6 +12,14 @@ import log from './logger.js';
 
 let discovery = null;
 
+export function setDiscovery(value) {
+  discovery = value;
+}
+
+export function getDiscovery() {
+  return discovery;
+}
+
 axios.interceptors.request.use((axiosRequestConfig) => {
   axiosRequestConfig.headers['X-Client-Name'] = 'PEN-STUDENT-PROFILE';
   return axiosRequestConfig;
@@ -30,7 +38,7 @@ export async function getOidcDiscovery() {
   return discovery;
 }
 
-function minify(obj, keys = ['documentData']) {
+export function minify(obj, keys = ['documentData']) {
   return lodash.transform(obj, (result, value, key) =>
     result[key] = keys.includes(key) && lodash.isString(value) ? value.substring(0, 1) + ' ...' : value);
 }
@@ -255,4 +263,32 @@ export function formatCommentTimestamp(time) {
 
 export function prettyStringify(obj, indent = 2) {
   return JSON.stringify(obj, null, indent);
+}
+
+export function getStudent(userInfo) {
+  return {
+    studentID: userInfo._json.studentID,
+    pen: userInfo._json.pen,
+    legalLastName: userInfo._json.legalLastName,
+    legalFirstName: userInfo._json.legalFirstName || null,
+    legalMiddleNames: userInfo._json.legalMiddleNames || null,
+    email: userInfo._json.email || null,
+    dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
+  };
+}
+
+export function getDefaultBcscInput(userInfo) {
+  let middleNames = '';
+  if(userInfo._json.givenNames) {
+    let givenArray = (userInfo._json.givenNames).split(' ');
+    givenArray.shift();
+    middleNames = givenArray.join(' ');
+  }
+  return {
+    legalLastName: userInfo._json.surname,
+    legalFirstName: userInfo._json.givenName,
+    legalMiddleNames: middleNames,
+    email: userInfo._json.email,
+    dob: userInfo._json.birthDate
+  };
 }

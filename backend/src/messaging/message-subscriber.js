@@ -34,8 +34,12 @@ async function listenForEvents() {
 }
 
 export function close() {
-  if (connection){
-    connection.close();
+  if (connection) {
+    try {
+      connection.close();
+    } catch(e) {
+      log.error('Could not close connection!', e);
+    }
   }
 }
 

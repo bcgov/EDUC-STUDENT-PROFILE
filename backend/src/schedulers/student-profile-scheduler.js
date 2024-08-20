@@ -7,7 +7,7 @@ import { getApiCredentials } from '../components/auth.js';
 import { getDataWithParams, putData, getData, postData } from '../components/utils.js';
 import { getRedLock } from '../util/redis/redis-utils.js';
 
-const schedulerCronPenRequestDraft = config.get('scheduler:schedulerCronProfileRequestDraft');
+const abandonPenRequestDraftSchedule = config.get('scheduler:schedulerCronProfileRequestDraft');
 const numDaysAllowedInDraftStatus = config.get('scheduler:numDaysAllowedInDraftStatus');
 const expectedDraftRequests = config.get('scheduler:expectedDraftRequests');
 const numDaysAllowedInReturnedStatusBeforeEmail = config.get('scheduler:numDaysAllowedInReturnStatusBeforeEmail');
@@ -62,29 +62,10 @@ async function findAndMoveRequestsToAbandoned(searchListCriteria, token, request
   }
 }
 
-const draftToAbandonRequestJob = new CronJob(schedulerCronPenRequestDraft, async () => {
-  const redLock = getRedLock();
-  try {
-    await redLock.lock('locks:student-profile-request:draft-abandoned', 6000); // no need to release the lock as it will auto expire after 6000 ms.
-    const data = await getApiCredentials(config.get('oidc:clientId'), config.get('oidc:clientSecret'));
-    await Promise.allSettled([
-      findAndUpdateDraftRequestsToAbandoned('penRequest', data.accessToken),
-      findAndUpdateDraftRequestsToAbandoned('studentRequest', data.accessToken),
-      findAndUpdateReturnedRequestsToAbandoned('penRequest', data.accessToken),
-      findAndUpdateReturnedRequestsToAbandoned('studentRequest', data.accessToken),
-      findAndSendEmailForStaleReturnedRequests('penRequest', data.accessToken),
-      findAndSendEmailForStaleReturnedRequests('studentRequest', data.accessToken)
-    ]);
-  } catch (e) {
-    log.debug(`locks:student-profile-request:draft-abandoned, check other pods. ${e}`);
-  }
-});
-
-
 async function findAndUpdateDraftRequestsToAbandoned(requestType, token) {
   try {
     const updateReqResult = [];
-    log.info(`starting job for moving ${requestType}s in draft status for more than ${numDaysAllowedInDraftStatus} days to abandon status based on cron ${schedulerCronPenRequestDraft}, ${process.pid}`);
+    log.info(`starting job for moving ${requestType}s in draft status for more than ${numDaysAllowedInDraftStatus} days to abandon status based on cron ${abandonPenRequestDraftSchedule}, ${process.pid}`);
     let searchListCriteria = getSearchListCriteriaForDraftRequests(requestType);
     await findAndMoveRequestsToAbandoned(searchListCriteria, token, requestType, updateReqResult);
     await Promise.allSettled(updateReqResult);
@@ -98,7 +79,7 @@ async function findAndUpdateDraftRequestsToAbandoned(requestType, token) {
 async function findAndUpdateReturnedRequestsToAbandoned(requestType, token) {
   try {
     const updateReqResult = [];
-    log.info(`starting job for moving ${requestType}s in returned status for more than ${numDaysAllowedInReturnedStatusBeforeAbandoned} days to abandon status based on cron ${schedulerCronPenRequestDraft}, ${process.pid}`);
+    log.info(`starting job for moving ${requestType}s in returned status for more than ${numDaysAllowedInReturnedStatusBeforeAbandoned} days to abandon status based on cron ${abandonPenRequestDraftSchedule}, ${process.pid}`);
     let searchListCriteria = getSearchListCriteriaForAbandoningReturnedRequests(requestType);
     await findAndMoveRequestsToAbandoned(searchListCriteria, token, requestType, updateReqResult);
     await Promise.allSettled(updateReqResult);
@@ -112,7 +93,7 @@ async function findAndSendEmailForStaleReturnedRequests(requestType, token) {
     const urlPath = requestType === 'penRequest' ? 'gmp' : 'ump';
     const sendEmailNotifications = [];
     const emailRequests = [];
-    log.info(`starting job for triggering email for ${requestType}s in returned status for more than ${numDaysAllowedInReturnedStatusBeforeEmail} days based on cron ${schedulerCronPenRequestDraft}, ${process.pid}`);
+    log.info(`starting job for triggering email for ${requestType}s in returned status for more than ${numDaysAllowedInReturnedStatusBeforeEmail} days based on cron ${abandonPenRequestDraftSchedule}, ${process.pid}`);
     let searchListCriteria = getSearchListCriteriaForSendingEmailForReturnedRequests(requestType);
     const params = getSearchCriteriaParam(searchListCriteria);
     const result = await getDataWithParams(token, config.get(`${requestType}:apiEndpoint`) + '/paginated', params);
@@ -143,7 +124,23 @@ async function findAndSendEmailForStaleReturnedRequests(requestType, token) {
   }
 }
 
-export default {
-  draftToAbandonRequestJob: draftToAbandonRequestJob
-};
+async function abandonPenRequestDraftJob() {
+  const redLock = getRedLock();
+  try {
+    await redLock.lock('locks:student-profile-request:draft-abandoned', 6000); // no need to release the lock as it will auto expire after 6000 ms.
+    const data = await getApiCredentials(config.get('oidc:clientId'), config.get('oidc:clientSecret'));
+    await Promise.allSettled([
+      findAndUpdateDraftRequestsToAbandoned('penRequest', data.accessToken),
+      findAndUpdateDraftRequestsToAbandoned('studentRequest', data.accessToken),
+      findAndUpdateReturnedRequestsToAbandoned('penRequest', data.accessToken),
+      findAndUpdateReturnedRequestsToAbandoned('studentRequest', data.accessToken),
+      findAndSendEmailForStaleReturnedRequests('penRequest', data.accessToken),
+      findAndSendEmailForStaleReturnedRequests('studentRequest', data.accessToken)
+    ]);
+  } catch (e) {
+    log.debug(`locks:student-profile-request:draft-abandoned, check other pods. ${e}`);
+  }
+}
 
+export const draftToAbandonRequestJob
+  = new CronJob(abandonPenRequestDraftSchedule, abandonPenRequestDraftJob);

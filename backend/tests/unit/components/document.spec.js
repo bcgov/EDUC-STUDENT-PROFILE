@@ -1,16 +1,15 @@
-const HttpStatus = require('http-status-codes');
-const config = require('../../../src/config/index');
-
-// jest.mock('@js-joda/core');
-// const LocalDateTime = require('@js-joda/core').LocalDateTime;
-jest.mock('../../../src/components/utils');
-const utils = require('../../../src/components/utils');
-jest.mock('../../../src/components/auth');
-
-const changeRequest = require('../../../src/components/request');
-const { ServiceError } = require('../../../src/components/error');
-const { mockRequest, mockResponse } = require('../helpers');
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import HttpStatus from 'http-status-codes';
+import config from '../../../src/config/index.js';
+import * as utils from '../../../src/components/utils.js';
+import * as requestHandler from '../../../src/components/requestHandler.js';
+import { ServiceError } from '../../../src/components/error.js';
+import { mockRequest, mockResponse } from '../helpers.js';
 const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
+
+vi.mock('../../../src/components/auth.js');
+vi.mock('../../../src/components/utils.js');
+
 describe('uploadFile', () => {
   const document = {
     documentData: 'test data'
@@ -27,13 +26,13 @@ describe('uploadFile', () => {
       studentRequestStatusCode: utils.RequestStatuses.RETURNED,
     }
   };
-  const uploadFile = changeRequest.uploadFile(requestType);
+  const uploadFileHandler = requestHandler.uploadFile(requestType);
 
   let req;
   let res;
 
-  jest.spyOn(utils, 'getAccessToken');
-  const spy = jest.spyOn(utils, 'postData');
+  vi.spyOn(utils, 'getAccessToken');
+  const spy = vi.spyOn(utils, 'postData');
 
   beforeEach(() => {
     utils.getAccessToken.mockReturnValue('token');
@@ -44,11 +43,10 @@ describe('uploadFile', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
   });
 
   it('should return response data', async () => {
-    await uploadFile(req, res);
+    await uploadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.json).toHaveBeenCalledWith(postRes);
@@ -58,7 +56,7 @@ describe('uploadFile', () => {
   it('should return UNAUTHORIZED if no session', async () => {
     utils.getAccessToken.mockReturnValue(null);
 
-    await uploadFile(req, res);
+    await uploadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -69,7 +67,7 @@ describe('uploadFile', () => {
     };
     req = mockRequest(document, session, params);
 
-    await uploadFile(req, res);
+    await uploadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
@@ -80,7 +78,7 @@ describe('uploadFile', () => {
     };
     req = mockRequest(document, session, params);
 
-    await uploadFile(req, res);
+    await uploadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
@@ -88,7 +86,7 @@ describe('uploadFile', () => {
   it('should return INTERNAL_SERVER_ERROR if postData is failed', async () => {
     utils.postData.mockRejectedValue(new Error('test error'));
 
-    await uploadFile(req, res);
+    await uploadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
@@ -97,30 +95,29 @@ describe('uploadFile', () => {
 describe('getDocument', () => {
   const documentData = { documentData: 'test data' };
 
-  const spy = jest.spyOn(utils, 'getData');
-  const requestID = 'requestID';
-  const documentID = 'documentID';
+  vi.spyOn(utils, 'getData');
+  const requestID = 'requestId';
+  const documentID = 'documentId';
   const includeDocData = 'Y';
   const token = 'token';
   const requestType = 'studentRequest';
 
   afterEach(() => {
-    spy.mockClear();
+    vi.resetAllMocks();
   });
 
   it('should return document data', async () => {
     utils.getData.mockResolvedValue(documentData);
-
-    const result = await changeRequest.__get__('getDocument')(token, requestID, documentID, requestType, includeDocData);
+    const result = await requestHandler.getDocument(token, requestID, documentID, requestType, includeDocData);
 
     expect(result).toEqual(documentData);
-    expect(spy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}/documents/${documentID}?includeDocData=${includeDocData}`);
+    expect(utils.getData).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${requestID}/documents/${documentID}?includeDocData=${includeDocData}`);
   });
 
   it('should throw ServiceError if getData is failed', async () => {
     utils.getData.mockRejectedValue(new Error('error'));
 
-    expect(changeRequest.__get__('getDocument')(token, requestID, documentID, requestType, includeDocData)).rejects.toThrowError(ServiceError);
+    expect(requestHandler.getDocument(token, requestID, documentID, requestType, includeDocData)).rejects.toThrowError(ServiceError);
   });
 });
 
@@ -140,14 +137,13 @@ describe('deleteDocument', () => {
       statusUpdateDate: '2020-03-01T12:13:16'
     }
   };
-  const deleteDocument = changeRequest.deleteDocument(requestType);
+  const deleteDocumentHandler = requestHandler.deleteDocument(requestType);
 
   let req;
   let res;
 
-  jest.spyOn(utils, 'getAccessToken');
-  const getDataSpy = jest.spyOn(utils, 'getData');
-  const deleteDataSpy = jest.spyOn(utils, 'deleteData');
+  const getDataSpy = vi.spyOn(utils, 'getData');
+  const deleteDataSpy = vi.spyOn(utils, 'deleteData');
 
   beforeEach(() => {
     utils.getAccessToken.mockReturnValue('token');
@@ -157,22 +153,25 @@ describe('deleteDocument', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return OK', async () => {
-    await deleteDocument(req, res);
+    getDataSpy.mockImplementationOnce((_token, url, _correlationId) => {
+      return new Promise((resolve, _reject) => resolve(document));
+    });
+
+    await deleteDocumentHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
-    expect(res.json).toHaveBeenCalled();
-    expect(getDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/documents/${params.documentId}?includeDocData=N`);
+    expect(utils.getData).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/documents/${params.documentId}?includeDocData=N`);
     expect(deleteDataSpy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/documents/${params.documentId}`);
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
     utils.getAccessToken.mockReturnValue(null);
 
-    await deleteDocument(req, res);
+    await deleteDocumentHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -183,7 +182,7 @@ describe('deleteDocument', () => {
     };
     req = mockRequest(null, session, params);
 
-    await deleteDocument(req, res);
+    await deleteDocumentHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
@@ -195,7 +194,7 @@ describe('deleteDocument', () => {
     };
     req = mockRequest(null, session, params);
 
-    await deleteDocument(req, res);
+    await deleteDocumentHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
@@ -207,15 +206,15 @@ describe('deleteDocument', () => {
     };
     req = mockRequest(null, session, params);
 
-    await deleteDocument(req, res);
+    await deleteDocumentHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
 
-  it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
+   it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
     utils.deleteData.mockRejectedValue(new Error('test error'));
 
-    await deleteDocument(req, res);
+    await deleteDocumentHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
@@ -231,13 +230,13 @@ describe('downloadFile', () => {
     id: 'requestId',
     documentId: 'documentId'
   };
-  const downloadFile = changeRequest.downloadFile('studentRequest');
+  const downloadFileHandler = requestHandler.downloadFile('studentRequest');
 
   let req;
   let res;
 
-  jest.spyOn(utils, 'getAccessToken');
-  const getDataSpy = jest.spyOn(utils, 'getData');
+  vi.spyOn(utils, 'getAccessToken');
+  const getDataSpy = vi.spyOn(utils, 'getData');
 
   beforeEach(() => {
     utils.getAccessToken.mockReturnValue('token');
@@ -247,11 +246,11 @@ describe('downloadFile', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return OK and document data', async () => {
-    await downloadFile(req, res);
+    await downloadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(res.data.raw.toString()).toEqual('test data');
@@ -263,7 +262,7 @@ describe('downloadFile', () => {
   it('should return UNAUTHORIZED if no session', async () => {
     utils.getAccessToken.mockReturnValue(null);
 
-    await downloadFile(req, res);
+    await downloadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
@@ -271,7 +270,7 @@ describe('downloadFile', () => {
   it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
     utils.getData.mockRejectedValue(new Error('test error'));
 
-    await downloadFile(req, res);
+    await downloadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });

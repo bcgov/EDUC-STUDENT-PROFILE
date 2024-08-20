@@ -18,7 +18,7 @@ import config from './config/index.js';
 import log from './components/logger.js';
 import * as utils from './components/utils.js';
 import * as auth from './components/auth.js';
-import scheduler from './schedulers/student-profile-scheduler.js';
+import { draftToAbandonRequestJob } from './schedulers/student-profile-scheduler.js';
 import authRouter from './routes/auth.js';
 import userRouter from './routes/user.js';
 import studentRequestRouter from './routes/studentRequest.js';
@@ -206,6 +206,7 @@ process.on('unhandledRejection', err => {
   log.error('Unhandled Rejection at:', err?.stack || err);
   // res.redirect(config.get('server:frontend') + '/error?message=unhandled_rejection');
 });
-scheduler.draftToAbandonRequestJob.start();
+
+draftToAbandonRequestJob.start();
 
 export default app;
