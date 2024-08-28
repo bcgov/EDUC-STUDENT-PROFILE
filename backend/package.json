@@ -15,6 +15,7 @@
     "lint": "node_modules/.bin/eslint . --no-fix --ignore-pattern 'node_modules'",
     "test": "NODE_ENV=test vitest run",
     "test:watch": "vitest",
+    "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "clean": "rm -rf coverage dist",
     "purge": "rm -rf node_modules",
     "reinstall": "npm run purge && npm install",
