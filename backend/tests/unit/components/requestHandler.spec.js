@@ -1,6 +1,5 @@
 import HttpStatus from 'http-status-codes';
 import _ from 'lodash';
-import config from '../../../src/config/index.js';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import * as requestHandler from '../../../src/components/requestHandler.js';
@@ -13,7 +12,6 @@ import redis from 'redis-mock';
 import * as redisClient from '../../../src/util/redis/redis-client.js';
 import * as redisUtil from '../../../src/util/redis/redis-utils.js';
 import * as email from '../../../src/components/email.js';
-import { getDigitalIdData } from '../../../src/components/request.js';
 
 const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
 
@@ -234,7 +232,7 @@ describe('getUserInfo', () => {
   });
 
   it('should return INTERNAL_SERVER_ERROR if exceptions thrown', async () => {
-    getDigitalIdData.mockRejectedValueOnce(new ServiceError('Test Error'))
+    getDigitalIdData.mockRejectedValueOnce(new ServiceError('Test Error'));
 
     await requestHandler.getUserInfo(req, res);
 

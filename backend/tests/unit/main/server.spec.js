@@ -7,13 +7,13 @@ import * as server from '../../../src/server.js';
 vi.mock('ioredis', () => {
   return {
     detault: redis
-  }
+  };
 });
 
 vi.mock('../../../src/app.js', () => {
   return {
     default: express()
-  }
+  };
 });
 
 afterAll(() => {

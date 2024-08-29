@@ -157,9 +157,7 @@ describe('deleteDocument', () => {
   });
 
   it('should return OK', async () => {
-    getDataSpy.mockImplementationOnce((_token, url, _correlationId) => {
-      return new Promise((resolve, _reject) => resolve(document));
-    });
+    getDataSpy.mockResolvedValueOnce(document);
 
     await deleteDocumentHandler(req, res);
 
@@ -211,7 +209,7 @@ describe('deleteDocument', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
 
-   it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
+  it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
     utils.deleteData.mockRejectedValue(new Error('test error'));
 
     await deleteDocumentHandler(req, res);
