@@ -36,8 +36,8 @@ jobs:
         with:
           node-version: '18.x'
       - run: npm ci
-      - run: npm run lint:fix
-      - run: npm run test:unit
+      - run: npm run lint
+      - run: npm test
         env:
           NODE_ENV: 'test'
       - name: Run Trivy vulnerability scanner in repo mode
