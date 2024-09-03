@@ -1,5 +1,4 @@
-import { Strategy as JWTStrategy } from 'passport-jwt';
-import { ExtractJwt } from 'passport-jwt';
+import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
 import { Strategy as OidcStrategy } from 'passport-openidconnect-keycloak-idp';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
