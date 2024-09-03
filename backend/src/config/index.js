@@ -93,5 +93,10 @@ export default nconf.defaults({
   messaging: {
     natsUrl: process.env.NATS_URL,
     natsCluster: process.env.NATS_CLUSTER
+  },
+  rateLimit: {
+    enabled: process.env.RATE_LIMIT_ENABLED,
+    windowInSec: process.env.RATE_LIMIT_WINDOW_IN_SEC,
+    limit: process.env.RATE_LIMIT_LIMIT
   }
 });

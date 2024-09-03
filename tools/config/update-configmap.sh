@@ -118,6 +118,10 @@ then
   bannerColor="#dba424"
 fi
 
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_WINDOW_IN_SEC="60"
+RATE_LIMIT_LIMIT="1000"
+
 echo Generating private and public keys
 ssh-keygen -b 4096 -t rsa -f tempPenBackendkey -m pem -q -N ""
 UI_PRIVATE_KEY_VAL="$(cat tempPenBackendkey)"
@@ -165,6 +169,9 @@ oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map \
   --from-literal=BANNER_COLOR="$bannerColor" \
   --from-literal=BANNER_ENVIRONMENT="$bannerEnvironment" \
   --from-literal=NODE_ENV="openshift" \
+  --from-literal=RATE_LIMIT_ENABLED="$RATE_LIMIT_ENABLED" \
+  --from-literal=RATE_LIMIT_WINDOW_IN_SEC="$RATE_LIMIT_WINDOW_IN_SEC" \
+  --from-literal=RATE_LIMIT_LIMIT="$RATE_LIMIT_LIMIT" \
   --dry-run -o yaml | oc apply -f -
 
 echo
