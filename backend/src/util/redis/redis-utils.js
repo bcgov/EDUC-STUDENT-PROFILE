@@ -28,24 +28,32 @@ export async function createProfileRequestSagaRecordInRedis(event) {
   }
 }
 
+async function removeFinishedEventInEventList(event, elements) {
+  let recordFound = false;
+  for (const element of elements) {
+    const eventArrayElement = JSON.parse(element);
+    if ((eventArrayElement.sagaId && event.sagaId && eventArrayElement.sagaId === event.sagaId)
+      && ('COMPLETED' === event.sagaStatus || 'FORCE_STOPPED' === event.sagaStatus)) {
+      log.info('going to delete this event record as it is completed or force stopped. SAGA ID'
+        + ` :: ${eventArrayElement.sagaId} AND STATUS :: ${event.sagaStatus}`);
+      recordFound = true;
+      await this.removeSagaRecordFromRedis(event.sagaId, eventArrayElement);
+      log.info('Event record deleted from REDIS. SAGA ID'
+        + ` :: ${eventArrayElement.sagaId} AND STATUS :: ${event.sagaStatus}`);
+      break;
+    }
+  }
+  return recordFound;
+}
+
 export async function removeProfileRequestSagaRecordFromRedis(event) {
   let recordFoundFromRedis = false;
   const redisClient = getRedisClient();
   if (redisClient) {
     try {
-      const result = await redisClient.smembers(profileRequestSagaEventKey);
-      if (result && result.length > 0) {
-        for (const element of result) {
-          const eventArrayElement = JSON.parse(element);
-          if ((eventArrayElement.sagaId && event.sagaId && eventArrayElement.sagaId === event.sagaId) && ('COMPLETED' === event.sagaStatus || 'FORCE_STOPPED' === event.sagaStatus)) {
-            log.info(`going to delete this event record as it is completed or force stopped. SAGA ID :: ${eventArrayElement.sagaId} AND STATUS :: ${event.sagaStatus}`);
-            recordFoundFromRedis = true;
-            await this.removeSagaRecordFromRedis(event.sagaId, eventArrayElement);
-            log.info(`Event record deleted from REDIS. SAGA ID :: ${eventArrayElement.sagaId} AND STATUS :: ${event.sagaStatus}`);
-            break;
-          }
-        }
-      }
+      /** @type {String[]} */
+      const jsonStringEvents = await redisClient.smembers(profileRequestSagaEventKey);
+      recordFoundFromRedis = removeFinishedEventInEventList(event, jsonStringEvents);
     } catch (e) {
       log.error(`Error ${e}`);
     }
