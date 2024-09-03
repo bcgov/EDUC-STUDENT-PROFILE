@@ -12,6 +12,7 @@ import cors from 'cors';
 import noCache from 'nocache';
 import bodyParser from 'body-parser';
 import RedisStore from 'connect-redis';
+import { rateLimit } from 'express-rate-limit';
 
 import { init as initRedis, getRedisClient } from './util/redis/redis-client.js';
 import config from './config/index.js';
@@ -164,6 +165,23 @@ utils.getOidcDiscovery().then(discovery => {
 //functions for serializing/deserializing users
 passport.serializeUser((user, next) => next(null, user));
 passport.deserializeUser((obj, next) => next(null, obj));
+
+// Implement rate limiting
+if (config.get('rateLimit:enabled')) {
+  const windowInSec = config.get('rateLimit:windowInSec');
+  const limit = config.get('rateLimit:limit');
+  const limiter = rateLimit({
+    windowMs: windowInSec * 1000,
+    limit,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: false,
+    message: async () => `You may only make ${limit} requests `
+      + `every ${windowInSec} seconds`
+  });
+
+  app.use(limiter);
+}
 
 // GetOK Base API Directory
 apiRouter.get('/', (_req, res) => {

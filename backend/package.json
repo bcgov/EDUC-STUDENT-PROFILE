@@ -34,6 +34,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-prometheus-middleware": "^1.2.0",
+    "express-rate-limit": "^7.4.0",
     "express-session": "^1.18.0",
     "express-validator": "^7.2.0",
     "fast-safe-stringify": "^2.1.1",

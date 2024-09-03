@@ -95,8 +95,8 @@ export default nconf.defaults({
     natsCluster: process.env.NATS_CLUSTER
   },
   rateLimit: {
-    enabled: process.env.RATE_LIMIT_ENABLED,
-    windowInSec: process.env.RATE_LIMIT_WINDOW_IN_SEC,
-    limit: process.env.RATE_LIMIT_LIMIT
+    enabled: process.env.RATE_LIMIT_ENABLED || false,
+    windowInSec: process.env.RATE_LIMIT_WINDOW_IN_SEC || 60,
+    limit: process.env.RATE_LIMIT_LIMIT || 100
   }
 });
