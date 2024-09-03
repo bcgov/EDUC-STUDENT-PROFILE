@@ -1,7 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-//import jsonwebtoken from 'jsonwebtoken';
 
 import * as auth from '../../../src/components/auth.js';
 import * as utils from '../../../src/components/utils.js';

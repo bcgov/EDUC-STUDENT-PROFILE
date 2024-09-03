@@ -39,7 +39,8 @@ export function verifyRequest(requestType) {
     }
 
     const requestID = req.params.id;
-    if(!req || !req.session || !req.session[requestType] || req.session[requestType][`${requestType}ID`] !== requestID) {
+    const sessionRequestType = req?.session?.[requestType];
+    if(!sessionRequestType || sessionRequestType?.[`${requestType}ID`] !== requestID) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: 'Wrong requestID'
       });
@@ -60,7 +61,8 @@ export function verifyDocumentId(requestType) {
     }
 
     const documentID = req.params.documentId;
-    if(!req || !req.session || !req.session[`${requestType}DocumentIDs`] || !req.session[`${requestType}DocumentIDs`].includes(documentID)) {
+    const reqSessionDocumentIds = req?.session?.[`${requestType}DocumentIDs`];
+    if (!reqSessionDocumentIds.includes(documentID)) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: 'documentID not found in session'
       });
@@ -73,7 +75,7 @@ export function verifyDocumentId(requestType) {
 export function verifyPostCommentRequest(requestType) {
   return function getRequestHandler(req, res, next) {
     const userInfo = getSessionUser(req);
-    if(!userInfo._json || !userInfo._json.digitalIdentityID){
+    if(!userInfo?._json?.digitalIdentityID){
       return res.status(HttpStatus.UNAUTHORIZED).json({
         message: 'No session data'
       });
@@ -85,7 +87,10 @@ export function verifyPostCommentRequest(requestType) {
       });
     }
     const requestID = req.params.id;
-    if(!req || !req.session || !req.session[requestType] || req.session[requestType][`${requestType}ID`] !== requestID || req.session[requestType][`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
+    const sessionRequestType = req?.session?.[requestType];
+    if(!sessionRequestType
+      || sessionRequestType?.[`${requestType}ID`] !== requestID
+      || sessionRequestType?.[`${requestType}StatusCode`] !== RequestStatuses.RETURNED) {
       return res.status(HttpStatus.CONFLICT).json({
         message: `Post ${requestType} comment not allowed`
       });
@@ -100,7 +105,7 @@ export function verifyPostCommentRequest(requestType) {
 export async function getUserInfo(req, res) {
   const userInfo = getSessionUser(req);
   const correlationID = req.session?.correlationID;
-  if(!userInfo || !userInfo.jwt || !userInfo._json || !userInfo._json.digitalIdentityID) {
+  if(!userInfo?.jwt || !userInfo?._json?.digitalIdentityID) {
     return res.status(HttpStatus.UNAUTHORIZED).json({
       message: 'No session data'
     });
@@ -132,7 +137,7 @@ export async function getUserInfo(req, res) {
       student = getStudent(userInfo);
     }
 
-    if (req && req.session) {
+    if (req?.session) {
       req.session.digitalIdentityData = digitalIdData;
       req.session.digitalIdentityData.identityTypeLabel = identityType.label;
       req.session.studentRequest = studentRequest;
@@ -199,7 +204,7 @@ export function submitRequest(requestType, verifyRequestStatus) {
 
       const accessToken = userInfo.jwt;
 
-      if (req && req.session && req.session[requestType] && verifyRequestStatus(req)) {
+      if (req?.session?.[requestType] && verifyRequestStatus(req)) {
         return res.status(HttpStatus.CONFLICT).json({
           message: `Submit ${requestType} not allowed`
         });
@@ -279,7 +284,11 @@ export function getComments(requestType) {
         },
         messages: []
       };
-      apiResData.sort((a,b) => (a.commentTimestamp > b.commentTimestamp) ? 1 : ((b.commentTimestamp > a.commentTimestamp) ? -1 : 0));
+      apiResData.sort((a,b) => {
+        if (a.commentTimestamp > b.commentTimestamp) return 1;
+        if (b.commentTimestamp > a.commentTimestamp) return -1;
+        return 0;
+      });
 
       apiResData.forEach(element => {
         const participant = {
@@ -287,7 +296,7 @@ export function getComments(requestType) {
           id: (element.staffMemberIDIRGUID ? element.staffMemberIDIRGUID : '1')
         };
 
-        if (participant && participant.id && participant.id.toUpperCase() !== response.myself.id.toUpperCase()) {
+        if (participant?.id?.toUpperCase() !== response.myself.id.toUpperCase()) {
           const index = response.participants.findIndex((e) => e.id === participant.id);
 
           if (index === -1) {
