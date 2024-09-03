@@ -61,7 +61,7 @@ export function verifyDocumentId(requestType) {
     }
 
     const documentID = req.params.documentId;
-    const reqSessionDocumentIds = req?.session?.[`${requestType}DocumentIDs`];
+    const reqSessionDocumentIds = req?.session?.[`${requestType}DocumentIDs`] || [];
     if (!reqSessionDocumentIds.includes(documentID)) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: 'documentID not found in session'
@@ -211,7 +211,8 @@ export function submitRequest(requestType, verifyRequestStatus) {
       }
 
       //attach documents
-      if (req?.session?.[`${requestType}DocumentIDs`]?.length > 0 && req.body?.documentIDs) {
+      const documentIds = req?.session?.[`${requestType}DocumentIDs`] || [];
+      if (documentIds.length > 0 && req.body?.documentIDs) {
         req.body.documentIDs = req.body.documentIDs.filter(documentID => req.session[`${requestType}DocumentIDs`].includes(documentID));
       }
 
@@ -296,7 +297,9 @@ export function getComments(requestType) {
           id: (element.staffMemberIDIRGUID ? element.staffMemberIDIRGUID : '1')
         };
 
-        if (participant?.id?.toUpperCase() !== response.myself.id.toUpperCase()) {
+        /** @type {String} */
+        const participantId = participant?.id || '';
+        if (participantId.toUpperCase() !== response.myself.id.toUpperCase()) {
           const index = response.participants.findIndex((e) => e.id === participant.id);
 
           if (index === -1) {
