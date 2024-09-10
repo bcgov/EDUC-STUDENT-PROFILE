@@ -40,6 +40,7 @@ import {
   VStepperWindow,
   VStepperWindowItem,
   VTable,
+  VTextarea,
   VTextField,
   VToolbar,
   VToolbarTitle
@@ -94,6 +95,7 @@ export default new createVuetify({
     VStepperWindow,
     VStepperWindowItem,
     VTable,
+    VTextarea,
     VTextField,
     VToolbar,
     VToolbarTitle

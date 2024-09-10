@@ -588,7 +588,7 @@ function resendVerificationEmail(requestType) {
 
 function uploadFile(requestType) {
   return async function uploadFileHandler(req, res) {
-    try{
+    try {
       const accessToken = getAccessToken(req);
       if(!accessToken) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
