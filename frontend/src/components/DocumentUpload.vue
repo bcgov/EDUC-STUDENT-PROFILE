@@ -16,7 +16,7 @@
           label="Document Type"
         />
         <v-file-input
-          v-model="fileArray"
+          v-model="inputFile"
           :rules="fileRules"
           :accept="fileAccept"
           placeholder="Select your file"
@@ -103,7 +103,7 @@ export default {
       buttonKey: 0,
       documentTypeCode: null,
       fileAccept: '',
-      fileArray: [],
+      inputFile: null,
       fileFormats: 'PDF, JPEG, and PNG',
       fileInputError: [],
       fileRules: [],
@@ -120,7 +120,7 @@ export default {
       return getRequestStore().requestID;
     },
     dataReady () {
-      return this.validForm && this.fileArray;
+      return this.validForm && this.inputFile;
     },
     documentTypes() {
       return sortBy(this.documentTypeCodes, ['displayOrder']).map(code =>
@@ -170,13 +170,12 @@ export default {
     submitRequest() {
       if (this.dataReady) {
         try {
-          const [ file ] = this.fileArray;
           this.active = true;
           const reader = new FileReader();
           reader.onload = this.uploadFile;
           reader.onabort = this.handleFileReadErr;
           reader.onerror = this.handleFileReadErr;
-          reader.readAsBinaryString(file);
+          reader.readAsBinaryString(this.inputFile);
         } catch (e) {
           this.handleFileReadErr();
           throw e;
@@ -188,12 +187,11 @@ export default {
       this.setErrorAlert('Sorry, an unexpected error seems to have occurred. Try uploading your files later.');
     },
     async uploadFile(env) {
-      const [ file ] = this.fileArray;
       let document = {
         documentTypeCode: this.documentTypeCode,
-        fileName: getFileNameWithMaxNameLength(file.name),
-        fileExtension: file.type,
-        fileSize: file.size,
+        fileName: getFileNameWithMaxNameLength(this.inputFile.name),
+        fileExtension: this.inputFile.type,
+        fileSize: this.inputFile.size,
         documentData: btoa(env.target.result)
       };
 
