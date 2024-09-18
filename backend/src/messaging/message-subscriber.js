@@ -1,61 +1,58 @@
-'use strict';
-const config = require('../config/index');
-const log = require('../components/logger');
-const SagaMessageHandler = require('./handlers/profile-request-saga-message-handler');
+import config from '../config/index.js';
+import log from '../components/logger.js';
+import { ProfileRequestSagaMessageHandler } from './handlers/profile-request-saga-message-handler.js';
+import nats from 'nats';
+
+/**
+ * Shared NATS connection object
+ * @type {nats.NatsConnection}
+ */
 let connection={};
-const server = config.get('messaging:natsUrl');
-const nats = require('nats');
 let connectionClosed = false;
+
+const server = config.get('messaging:natsUrl');
+
+/** @type {nats.ConnectionOptions} */
 const natsOptions = {
-  url: server,
   servers: [server],
   maxReconnectAttempts: 60,
   name: 'STUDENT-PROFILE-NODE',
-  reconnectTimeWait: 5000, // wait 5 seconds before retrying...
+  reconnectTimeWait: 5000,
   waitOnFirstConnect: true,
   pingInterval: 5000
 };
 
-const NATS = {
-  init(){
+async function listenForEvents() {
+  log.info(`Connected to NATS: ${connection.getServer()}`);
+
+  ProfileRequestSagaMessageHandler.subscribe(connection);
+  for await (const status of connection.status()) {
+    if (status.type != 'pingTimer') {
+      log.info(`NATS ${status.type}: ${JSON.stringify(status.data)}`);
+    }
+  }
+}
+
+export function close() {
+  if (connection) {
     try {
-      connection = nats.connect(server, natsOptions);
-    }catch (e) {
-      log.error(`error ${e}`);
-    }
-  },
-  callbacks(){
-    connection.on('connect', function () {
-      log.info('NATS connected!', connection?.currentServer?.url?.host);
-      SagaMessageHandler.subscribe(connection);
-    });
-
-    connection.on('error', function (reason) {
-      log.error(`error on NATS ${reason}`);
-    });
-    connection.on('connection_lost', (error) => {
-      log.error('disconnected from NATS', error);
-    });
-    connection.on('close', (error) => {
-      log.error('NATS closed', error);
-      connectionClosed = true;
-    });
-    connection.on('reconnecting', () => {
-      log.error('NATS reconnecting');
-    });
-    connection.on('reconnect', () => {
-      log.info('NATS reconnected');
-    });
-  },
-  close(){
-    if(connection){
       connection.close();
+    } catch(e) {
+      log.error('Could not close connection!', e);
     }
-  },
-  isConnectionClosed() {
-    return connectionClosed;
-  },
+  }
+}
 
-};
+export function isConnectionClosed() {
+  return connectionClosed;
+}
 
-module.exports = NATS;
+export async function init() {
+  try {
+    connection = await nats.connect(natsOptions);
+    listenForEvents();
+    connection.closed().then(err => log.error(`connection closed ${err ? 'with error: ' + err.message : ''}`));
+  } catch (e) {
+    log.error(`error ${e}`);
+  }
+}

@@ -1,18 +1,22 @@
-const HttpStatus = require('http-status-codes');
-const config = require('../../../src/config/index');
+import HttpStatus from 'http-status-codes';
+import config from '../../../src/config/index';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-const LocalDateTime = require('@js-joda/core').LocalDateTime;
-jest.mock('../../../src/components/utils');
-const utils = require('../../../src/components/utils');
-const redisUtil = require('../../../src/util/redis/redis-utils');
-jest.mock('../../../src/components/auth');
+import { LocalDateTime } from '@js-joda/core';
+import * as redisUtil from '../../../src/util/redis/redis-utils.js';
 const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
-const changeRequest = require('../../../src/components/request');
-const { mockRequest, mockResponse } = require('../helpers');
-const { createStudentRequestCommentPayload, createStudentRequestCommentEvent } = require('../../../src/components/studentRequest');
+import * as changeRequestHandler from '../../../src/components/requestHandler.js';
+import { mockRequest, mockResponse } from '../helpers.js';
+import {
+  createStudentRequestCommentPayload,
+  createStudentRequestCommentEvent
+} from '../../../src/components/studentRequest.js';
+
+vi.mock('../../../src/components/utils.js');
+vi.mock('../../../src/components/auth.js');
+import * as utils from '../../../src/components/utils.js';
 
 describe('verifyPostComment', () => {
-
   const params = {
     id: 'requestId',
   };
@@ -31,12 +35,12 @@ describe('verifyPostComment', () => {
     }
   };
 
-  const verifyPostCommentRequest = changeRequest.verifyPostCommentRequest(requestType);
+  const verifyPostCommentRequest = changeRequestHandler.verifyPostCommentRequest(requestType);
 
   let req;
   let res;
 
-  jest.spyOn(utils, 'getAccessToken');
+  vi.spyOn(utils, 'getAccessToken');
 
   beforeEach(() => {
     utils.getAccessToken.mockReturnValue('token');
@@ -46,8 +50,9 @@ describe('verifyPostComment', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
+
   it('should return UNAUTHORIZED if no session', async () => {
     utils.getAccessToken.mockReturnValue(null);
 
@@ -106,15 +111,15 @@ describe('postComment', () => {
     }
   };
 
-  const postComment = changeRequest.postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent, correlationID);
+  const postComment = changeRequestHandler.postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent, correlationID);
 
   let req;
   let res;
 
-  jest.spyOn(LocalDateTime, 'now');
-  jest.spyOn(utils, 'getAccessToken');
-  jest.spyOn(redisUtil, 'createProfileRequestSagaRecordInRedis');
-  const spy = jest.spyOn(utils, 'postData');
+  vi.spyOn(LocalDateTime, 'now');
+  vi.spyOn(utils, 'getAccessToken');
+  vi.spyOn(redisUtil, 'createProfileRequestSagaRecordInRedis');
+  const spy = vi.spyOn(utils, 'postData');
 
   beforeEach(() => {
     LocalDateTime.now.mockReturnValue(localDateTime);
@@ -127,7 +132,7 @@ describe('postComment', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return saga id', async () => {
@@ -177,13 +182,13 @@ describe('getComments', () => {
       digitalIdentityID: 'ac337def-794b-169f-8170-653e2f7c0011'
     }
   };
-  const getComments = changeRequest.getComments('studentRequest');
+  const getComments = changeRequestHandler.getComments('studentRequest');
 
   let req;
   let res;
 
-  jest.spyOn(utils, 'getSessionUser');
-  const spy = jest.spyOn(utils, 'getData');
+  vi.spyOn(utils, 'getSessionUser');
+  const spy = vi.spyOn(utils, 'getData');
 
   beforeEach(() => {
     utils.getSessionUser.mockReturnValue(sessionUser);
@@ -196,7 +201,7 @@ describe('getComments', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return sorted comment data if multiple comments', async () => {

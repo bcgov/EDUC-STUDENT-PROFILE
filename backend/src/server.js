@@ -1,17 +1,17 @@
-'use strict';
+import http from 'http';
+import { LocalDateTime } from '@js-joda/core';
 
-const config = require('./config/index');
-const http = require('http');
-//const fs = require('fs')
-const log = require('./components/logger');
-const localDateTime = require('@js-joda/core').LocalDateTime;
-//Add timestamp to log
-Object.defineProperty(log, 'heading', { get: () => { return localDateTime.now().toString(); } });
+import config from './config/index.js';
+import log from './components/logger.js';
+import { close as closeNats } from './messaging/message-subscriber.js';
+import './schedulers/student-profile-saga-check-scheduler.js';
 
-const dotenv = require('dotenv');
+Object.defineProperty(log, 'heading', { get: () => { return LocalDateTime.now().toString(); } });
+
+import dotenv from 'dotenv';
 dotenv.config();
 
-const app = require('./app');
+import app from './app.js';
 
 /**
  * Get port from environment and store in Express.
@@ -27,9 +27,7 @@ app.set('port', port);
 //   cert: fs.readFileSync('/etc/tls-certs/tls.crt')
 // };
 
-const server = http.createServer(app);
-const NATS = require('./messaging/message-subscriber');
-require('./schedulers/student-profile-saga-check-scheduler');
+export const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -40,7 +38,7 @@ server.on('listening', onListening);
 /**
  * Normalize a port into a number, string, or false.
  */
-function normalizePort(val) {
+export function normalizePort(val) {
   const portNum = parseInt(val, 10);
 
   if (isNaN(portNum)) {
@@ -59,7 +57,7 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
-function onError(error) {
+export function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -86,7 +84,7 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-function onListening() {
+export function onListening() {
   const addr = server.address();
   const bind = typeof addr === 'string' ?
     'pipe ' + addr :
@@ -95,22 +93,16 @@ function onListening() {
 }
 
 process.on('SIGINT',() => {
-  NATS.close();
+  closeNats();
   server.close(() => {
     log.info('process terminated');
   });
 });
 
 process.on('SIGTERM', () => {
-  NATS.close();
+  closeNats();
   server.close(() => {
     log.info('process terminated');
   });
 });
-//exports are purely for testing
-module.exports = {
-  normalizePort,
-  onError,
-  onListening,
-  server
-};
+

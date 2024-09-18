@@ -1,23 +1,32 @@
-'use strict';
+import axios from 'axios';
+import HttpStatus from 'http-status-codes';
+import lodash from 'lodash';
+import jsonwebtoken from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
+import { LocalDateTime, DateTimeFormatter } from '@js-joda/core';
+import { Locale } from '@js-joda/locale_en';
 
-const axios = require('axios');
-const config = require('../config/index');
-const log = require('./logger');
-const HttpStatus = require('http-status-codes');
-const lodash = require('lodash');
-const {ApiError} = require('./error');
-const jsonwebtoken = require('jsonwebtoken');
-const {v4: uuidv4} = require('uuid');
-const {LocalDateTime, DateTimeFormatter} = require('@js-joda/core');
-const {Locale} = require('@js-joda/locale_en');
+import config from '../config/index.js';
+import { ApiError } from './error.js';
+import log from './logger.js';
+
 let discovery = null;
+
+export function setDiscovery(value) {
+  discovery = value;
+}
+
+export function getDiscovery() {
+  return discovery;
+}
 
 axios.interceptors.request.use((axiosRequestConfig) => {
   axiosRequestConfig.headers['X-Client-Name'] = 'PEN-STUDENT-PROFILE';
   return axiosRequestConfig;
 });
+
 // Returns OIDC Discovery values
-async function getOidcDiscovery() {
+export async function getOidcDiscovery() {
   if (!discovery) {
     try {
       const response = await axios.get(config.get('oidc:discovery'));
@@ -29,23 +38,23 @@ async function getOidcDiscovery() {
   return discovery;
 }
 
-function minify(obj, keys = ['documentData']) {
+export function minify(obj, keys = ['documentData']) {
   return lodash.transform(obj, (result, value, key) =>
     result[key] = keys.includes(key) && lodash.isString(value) ? value.substring(0, 1) + ' ...' : value);
 }
 
-function getSessionUser(req) {
+export function getSessionUser(req) {
   log.verbose('getSessionUser', req.session);
   const session = req.session;
   return session && session.passport && session.passport.user;
 }
 
-function getAccessToken(req) {
+export function getAccessToken(req) {
   const user = getSessionUser(req);
   return user && user.jwt;
 }
 
-async function deleteData(token, url, correlationID) {
+export async function deleteData(token, url, correlationID) {
   try {
     const delConfig = {
       headers: {
@@ -68,7 +77,7 @@ async function deleteData(token, url, correlationID) {
   }
 }
 
-async function forwardGetReq(req, res, url) {
+export async function forwardGetReq(req, res, url) {
   try {
     const accessToken = getAccessToken(req);
     if (!accessToken) {
@@ -88,7 +97,7 @@ async function forwardGetReq(req, res, url) {
   }
 }
 
-async function getData(token, url, correlationID) {
+export async function getData(token, url, correlationID) {
   try {
     const getDataConfig = {
       headers: {
@@ -111,7 +120,7 @@ async function getData(token, url, correlationID) {
   }
 }
 
-async function getDataWithParams(token, url, params, correlationID) {
+export async function getDataWithParams(token, url, params, correlationID) {
   try {
     params.headers = {
       Authorization: `Bearer ${token}`,
@@ -132,7 +141,7 @@ async function getDataWithParams(token, url, params, correlationID) {
   }
 }
 
-async function forwardPostReq(req, res, url) {
+export async function forwardPostReq(req, res, url) {
   try {
     const accessToken = getAccessToken(req);
     if (!accessToken) {
@@ -151,7 +160,7 @@ async function forwardPostReq(req, res, url) {
   }
 }
 
-async function postData(token, data, url, correlationID) {
+export async function postData(token, data, url, correlationID) {
   try {
     const postDataConfig = {
       headers: {
@@ -180,7 +189,7 @@ async function postData(token, data, url, correlationID) {
   }
 }
 
-async function putData(token, data, url, correlationID) {
+export async function putData(token, data, url, correlationID) {
   try {
     const putDataConfig = {
       headers: {
@@ -206,7 +215,7 @@ async function putData(token, data, url, correlationID) {
   }
 }
 
-const RequestStatuses = Object.freeze({
+export const RequestStatuses = Object.freeze({
   DRAFT: 'DRAFT',
   INITREV: 'INITREV',
   RETURNED: 'RETURNED',
@@ -215,27 +224,27 @@ const RequestStatuses = Object.freeze({
   ABANDONED: 'ABANDONED'
 });
 
-const EmailVerificationStatuses = Object.freeze({
+export const EmailVerificationStatuses = Object.freeze({
   VERIFIED: 'Y',
   NOT_VERIFIED: 'N'
 });
 
-const VerificationResults = Object.freeze({
+export const VerificationResults = Object.freeze({
   TOKEN_ERROR: 'token-error',
   SERVER_ERROR: 'server-error',
   EXPIRED: 'expired',
   OK: 'ok'
 });
 
-const RequestApps = Object.freeze({
+export const RequestApps = Object.freeze({
   penRequest: 'gmp',
   studentRequest: 'ump'
 });
 
-function generateJWTToken(jwtid, subject, issuer, algorithm, payload) {
-
+export function generateJWTToken(jwtid, subject, issuer, algorithm, payload) {
   const tokenTTL = config.get('email:tokenTTL'); // this should be in minutes
   const jwtSecretKey = config.get('email:secretKey');
+
   let sign_options_schema = {
     expiresIn: tokenTTL * 60,
     algorithm: algorithm,
@@ -247,29 +256,39 @@ function generateJWTToken(jwtid, subject, issuer, algorithm, payload) {
   return jsonwebtoken.sign(payload, jwtSecretKey, sign_options_schema);
 }
 
-function formatCommentTimestamp(time) {
+export function formatCommentTimestamp(time) {
   const timestamp = LocalDateTime.parse(time);
   return timestamp.format(DateTimeFormatter.ofPattern('yyyy-MM-dd h:mma').withLocale(Locale.CANADA));
 }
 
-const utils = {
-  getOidcDiscovery,
-  prettyStringify: (obj, indent = 2) => JSON.stringify(obj, null, indent),
-  getSessionUser,
-  getAccessToken,
-  deleteData,
-  forwardGetReq,
-  getDataWithParams,
-  getData,
-  forwardPostReq,
-  postData,
-  putData,
-  RequestStatuses,
-  VerificationResults,
-  EmailVerificationStatuses,
-  RequestApps,
-  generateJWTToken,
-  formatCommentTimestamp
-};
+export function prettyStringify(obj, indent = 2) {
+  return JSON.stringify(obj, null, indent);
+}
 
-module.exports = utils;
+export function getStudent(userInfo) {
+  return {
+    studentID: userInfo._json.studentID,
+    pen: userInfo._json.pen,
+    legalLastName: userInfo._json.legalLastName,
+    legalFirstName: userInfo._json.legalFirstName || null,
+    legalMiddleNames: userInfo._json.legalMiddleNames || null,
+    email: userInfo._json.email || null,
+    dob: new Date(userInfo._json.dob).toJSON().slice(0, 10),
+  };
+}
+
+export function getDefaultBcscInput(userInfo) {
+  let middleNames = '';
+  if(userInfo._json.givenNames) {
+    let givenArray = (userInfo._json.givenNames).split(' ');
+    givenArray.shift();
+    middleNames = givenArray.join(' ');
+  }
+  return {
+    legalLastName: userInfo._json.surname,
+    legalFirstName: userInfo._json.givenName,
+    legalMiddleNames: middleNames,
+    email: userInfo._json.email,
+    dob: userInfo._json.birthDate
+  };
+}
