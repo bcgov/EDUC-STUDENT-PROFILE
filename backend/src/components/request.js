@@ -1,9 +1,8 @@
 import config from '../config/index.js';
 import _ from 'lodash';
 import HttpStatus from 'http-status-codes';
-import { EmailVerificationStatuses } from './utils.js';
+import { EmailVerificationStatuses, getData, postData } from './utils.js';
 import { ServiceError } from './error.js';
-import { getData, postData } from './utils.js';
 import * as redisUtil from '../util/redis/redis-utils.js';
 
 export async function postRequest(accessToken, reqData, userInfo, requestType, correlationID) {

@@ -2,11 +2,10 @@ import HttpStatus from 'http-status-codes';
 import config from '../../../src/config/index.js';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { postRequest, getDigitalIdData, getLatestRequest } from '../../../src/components/request.js';
-import { ServiceError } from '../../../src/components/error.js';
+import { ServiceError, ApiError } from '../../../src/components/error.js';
 import * as utils from '../../../src/components/utils.js';
 import { setStudentRequestReplicateStatus } from '../../../src/components/studentRequest.js';
 import { LocalDateTime } from '@js-joda/core';
-import { ApiError } from '../../../src/components/error.js';
 
 const correlationID = '67590460-efe3-4e84-9f9a-9acffda79657';
 
