@@ -5,6 +5,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { LocalDateTime, DateTimeFormatter } from '@js-joda/core';
 import { Locale } from '@js-joda/locale_en';
+import { validate } from 'uuid';
 
 import config from '../config/index.js';
 import { ApiError } from './error.js';
@@ -290,5 +291,54 @@ export function getDefaultBcscInput(userInfo) {
     legalMiddleNames: middleNames,
     email: userInfo._json.email,
     dob: userInfo._json.birthDate
+  };
+}
+
+export function isValidStringParam(paramName) {
+  return function(req, res, next) {
+    if (!req.params[paramName]) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'No request parameter was provided.'
+      });
+    }
+    if (typeof req.params[paramName] !== 'string') {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Not a valid string'
+      });
+    }
+    return next();
+  };
+}
+
+export function isValidUUIDParam(paramName) {
+  return function(req, res, next) {
+    if (!req.params[paramName]) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'No request parameter was provided.'
+      });
+    }
+
+    if (!validate(req.params[paramName])) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Not a valid UUID provided for request parameter.'
+      });
+    }
+    return next();
+  };
+}
+
+export function isValidUUIDQueryParam(paramName) {
+  return function(req, res, next) {
+    if (!req.query[paramName]) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'No query parameter was provided.'
+      });
+    }
+    if (!validate(req.query[paramName])) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Not a valid UUID provided for query parameter.'
+      });
+    }
+    return next();
   };
 }

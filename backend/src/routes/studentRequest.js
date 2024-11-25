@@ -17,7 +17,7 @@ import {
   verifyDocumentId
 } from '../components/requestHandler.js';
 
-import { forwardGetReq } from '../components/utils.js';
+import { forwardGetReq, isValidStringParam, isValidUUIDParam } from '../components/utils.js';
 import config from '../config/index.js';
 import {
   verifyStudentRequestStatus,
@@ -59,31 +59,46 @@ router.get('/file-requirements', passport.authenticate('jwt', {session: false}),
   (req, res) => forwardGetReq(req, res, config.get('studentRequest:apiEndpoint') + '/file-requirements')
 );
 
-router.post('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, uploadFile(requestType)]);
+router.post('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [verifyStudentRequest, uploadFile(requestType)]);
 
 router.post('/requests/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, uploadFileWithoutRequest(requestType));
 
-router.get('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, verifyStudentRequest,
+router.get('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, 
+  verifyStudentRequest, isValidUUIDParam('id'),
   (req, res) => forwardGetReq(req, res, `${config.get('studentRequest:apiEndpoint')}/${req.params.id}/documents`)
 );
 
-router.get('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, verifyStudentRequest,
+router.get('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  verifyStudentRequest, isValidUUIDParam('id'), isValidUUIDParam('documentId'),
   (req, res) => forwardGetReq(req, res, `${config.get('studentRequest:apiEndpoint')}/${req.params.id}/documents/${req.params.documentId}`)
 );
 // special case this does not use frontend axios, so need to refresh here to handle expired jwt.
-router.get('/requests/:id/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken, [verifyStudentRequest, downloadFile(requestType)]);
+router.get('/requests/:id/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken,
+  isValidUUIDParam('id'), isValidUUIDParam('documentId'), isValidStringParam('fileName'),
+  [verifyStudentRequest, downloadFile(requestType)]);
 router.get('/requests/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken, [verifyStudentRequestDocumentId, downloadFile(requestType)]);
 
-router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, deleteDocument(requestType)]);
-router.delete('/requests/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequestDocumentId, deleteDocument(requestType)]);
+router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), isValidUUIDParam('documentId'), [verifyStudentRequest, deleteDocument(requestType)]);
 
-router.get('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, getComments(requestType)]);
+router.delete('/requests/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('documentId'), [verifyStudentRequestDocumentId, deleteDocument(requestType)]);
 
-router.post('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyPostCommentRequest(requestType), postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent)]);
+router.get('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [verifyStudentRequest, getComments(requestType)]);
 
-router.post('/requests/:id/verification-email', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, resendVerificationEmail(requestType)]);
+router.post('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [
+    verifyPostCommentRequest(requestType),
+    postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent)
+  ]);
 
-router.patch('/requests/:id', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, setRequestAsSubsrev(requestType)]);
+router.post('/requests/:id/verification-email', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [verifyStudentRequest, resendVerificationEmail(requestType)]);
+
+router.patch('/requests/:id', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [verifyStudentRequest, setRequestAsSubsrev(requestType)]);
 
 router.get('/verification', verifyEmail(requestType));
 
