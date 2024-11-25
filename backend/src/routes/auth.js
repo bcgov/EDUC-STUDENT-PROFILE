@@ -55,6 +55,7 @@ router.get('/error', (_req, res) => {
 
 function addBaseRouterGet(strategyName, callbackURI) {
   router.get(callbackURI, passport.authenticate(strategyName, {
+    scope: ['openid', 'profile'],
     failureRedirect: 'error'
   }));
 }
