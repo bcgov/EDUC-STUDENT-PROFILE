@@ -27,6 +27,7 @@ import { setPenRequestReplicateStatus } from './penRequest.js';
 import { setStudentRequestReplicateStatus } from './studentRequest.js';
 import { sendVerificationEmail } from './email.js';
 import { updateRequestStatus } from './requestStatus.js';
+import { validate } from 'uuid';
 
 export function verifyRequest(requestType) {
   return function getRequestHandler(req, res, next) {
@@ -562,12 +563,16 @@ export async function getDocument(token, requestID, documentID, requestType, inc
 
 export function deleteDocument(requestType) {
   return async function deleteDocumentHandler(req, res) {
-    try{
+    try {
       const accessToken = getAccessToken(req);
       if (!accessToken) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
           message: 'No access token'
         });
+      }
+
+      if (!validate(req.params.documentId) || (req.params.id && !validate(req.params.id))) {
+        throw Error('deleteDocument malformed UUIDs');
       }
 
       let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'N');
@@ -581,7 +586,7 @@ export function deleteDocument(requestType) {
 
       const endpoint = config.get(`${requestType}:apiEndpoint`);
       let url;
-      if(req.params.id) {
+      if (req.params.id) {
         url = `${endpoint}/${req.params.id}/documents/${req.params.documentId}`;
       } else {
         url = `${endpoint}/documents/${req.params.documentId}`;
