@@ -127,8 +127,8 @@ describe('deleteDocument', () => {
     createDate: '2020-03-02T12:13:14'
   };
   const params = {
-    id: 'requestId',
-    documentId: 'documentId'
+    id: '057ce5c1-1b82-45c9-8898-7f490325c291',
+    documentId: 'dce4717a-5e9a-447f-b3df-51eb2fe236e7'
   };
   const requestType = 'studentRequest';
   const session = {
@@ -207,6 +207,22 @@ describe('deleteDocument', () => {
     await deleteDocumentHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
+  });
+
+  it('should return INTERNAL_SERVER_ERROR if id param is malformed', async () => {
+    const theseParams = { ...params, id: 'not a UUID' };
+    req = mockRequest(null, session, theseParams);
+
+    await deleteDocumentHandler(req, res);
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+  });
+
+  it('should return INTERNAL_SERVER_ERROR if documentId param is malformed', async () => {
+    const theseParams = { ...params, documentId: 'not a UUID' };
+    req = mockRequest(null, session, theseParams);
+
+    await deleteDocumentHandler(req, res);
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
   });
 
   it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
