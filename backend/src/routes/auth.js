@@ -65,12 +65,17 @@ addBaseRouterGet('oidcBceidUMP', '/login_bceid_ump');
 
 //removes tokens and destroys session
 router.get('/logout', async (req, res, next) => {
-  const makeUrl = endpoint => encodeURIComponent(
-    config.get('logoutEndpoint')
-    + `?post_logout_redirect_uri=${config.get('server:frontend')}`
-    + endpoint
-    + `&client_id=${config.get('oidc:clientId')}`
-  );
+  let idToken = req?.session?.passport?.user?.idToken;
+
+  const makeUrl = endpoint => {
+    console.log(req.user);
+    return encodeURIComponent(
+      config.get('logoutEndpoint')
+        + `?post_logout_redirect_uri=${config.get('server:frontend')}`
+        + endpoint
+        + (idToken ? `&id_token_hint=${idToken}` : `&client_id=${config.get('oidc:clientId')}`)
+    );
+  };
 
   let retUrl;
   req.logout(err => {
@@ -94,6 +99,7 @@ router.get('/logout', async (req, res, next) => {
     } else {
       retUrl = makeUrl('/logout');
     }
+    console.log('RET ::: ', retUrl);
     res.redirect(config.get('siteMinder_logout_endpoint') + retUrl);
   });
 });

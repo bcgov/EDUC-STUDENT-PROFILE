@@ -100,7 +100,7 @@ async function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_
     callbackURL: callbackURI,
     scope: discovery.scopes_supported,
     kc_idp_hint: kc_idp_hint
-  }, (_issuer, profile, _context, _idToken, accessToken, refreshToken, done) => {
+  }, (_issuer, profile, _context, idToken, accessToken, refreshToken, done) => {
     if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
       (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
       return done('No access token', null);
@@ -110,6 +110,7 @@ async function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_
     profile.jwtFrontend = auth.generateUiToken();
     profile.jwt = accessToken;
     profile.refreshToken = refreshToken;
+    profile.idToken = idToken;
     profile._json = parseJwt(accessToken);
     return done(null, profile);
   }));
