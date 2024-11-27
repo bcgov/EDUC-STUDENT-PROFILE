@@ -27,7 +27,6 @@ import { setPenRequestReplicateStatus } from './penRequest.js';
 import { setStudentRequestReplicateStatus } from './studentRequest.js';
 import { sendVerificationEmail } from './email.js';
 import { updateRequestStatus } from './requestStatus.js';
-import { validate } from 'uuid';
 
 export function verifyRequest(requestType) {
   return function getRequestHandler(req, res, next) {
@@ -273,10 +272,6 @@ export function getComments(requestType) {
         });
       }
 
-      if (!validate(req.params.id)) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ messsage: 'invalid request ID' });
-      }
-
       const accessToken = userInfo.jwt;
       const endpoint = config.get(`${requestType}:apiEndpoint`);
       const url = `${endpoint}/${req.params.id}/comments`;
@@ -502,12 +497,6 @@ export function uploadFile(requestType) {
         });
       }
 
-      if (req.params.id && !validate(req.params.id)) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          message: 'Malformed request id'
-        });
-      }
-
       const endpoint = config.get(`${requestType}:apiEndpoint`);
       const url = `${endpoint}/${req.params.id}/documents`;
 
@@ -581,12 +570,6 @@ export function deleteDocument(requestType) {
         });
       }
 
-      if (!validate(req.params.documentId) || (req.params.id && !validate(req.params.id))) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          message: 'Malformed request id or documentId'
-        });
-      }
-
       let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'N');
 
       if(req.params.id && (!req.session[requestType] || resData.createDate <= req.session[requestType].statusUpdateDate ||
@@ -623,12 +606,6 @@ export function downloadFile(requestType) {
       if(!accessToken) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
           message: 'No access token'
-        });
-      }
-
-      if (!validate(req.params.documentId) || (req.params.id && !validate(req.params.id))) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-          message: 'Malformed request id or documentId'
         });
       }
 

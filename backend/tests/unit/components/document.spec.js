@@ -93,15 +93,6 @@ describe('uploadFile', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
 
-  it('should return BAD_REQUEST if request id is malformed', async () => {
-    req = mockRequest(document, session, {...params, id: 'malformed'});
-    req.session.correlationID=correlationID;
-
-    await uploadFileHandler(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-  });
-
   it('should return INTERNAL_SERVER_ERROR if postData is failed', async () => {
     req = mockRequest(document, session, params);
     req.session.correlationID=correlationID;
@@ -231,22 +222,6 @@ describe('deleteDocument', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
 
-  it('should return BAD_REQUEST if id param is malformed', async () => {
-    const theseParams = { ...params, id: 'not a UUID' };
-    req = mockRequest(null, session, theseParams);
-
-    await deleteDocumentHandler(req, res);
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-  });
-
-  it('should return BAD_REQUEST if documentId param is malformed', async () => {
-    const theseParams = { ...params, documentId: 'not a UUID' };
-    req = mockRequest(null, session, theseParams);
-
-    await deleteDocumentHandler(req, res);
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-  });
-
   it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
     utils.deleteData.mockRejectedValue(new Error('test error'));
 
@@ -302,22 +277,6 @@ describe('downloadFile', () => {
     await downloadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
-  });
-
-  it('should return BAD_REQUEST if request id is malformed', async () => {
-    req = mockRequest(null, null, {...params, id: 'malformed'});
-
-    await downloadFileHandler(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-  });
-
-  it('should return BAD_REQUEST if documentId is malformed', async () => {
-    req = mockRequest(null, null, {...params, documentId: 'malformed'});
-
-    await downloadFileHandler(req, res);
-
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
   });
 
   it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {

@@ -17,7 +17,7 @@ import {
   verifyDocumentId
 } from '../components/requestHandler.js';
 
-import { forwardGetReq, isValidStringParam, isValidUUIDParam } from '../components/utils.js';
+import { forwardGetReq, isValidUUIDParam } from '../components/utils.js';
 import config from '../config/index.js';
 import {
   verifyStudentRequestStatus,
@@ -74,10 +74,11 @@ router.get('/requests/:id/documents/:documentId', passport.authenticate('jwt', {
   (req, res) => forwardGetReq(req, res, `${config.get('studentRequest:apiEndpoint')}/${req.params.id}/documents/${req.params.documentId}`)
 );
 // special case this does not use frontend axios, so need to refresh here to handle expired jwt.
-router.get('/requests/:id/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken,
-  isValidUUIDParam('id'), isValidUUIDParam('documentId'), isValidStringParam('fileName'),
-  [verifyStudentRequest, downloadFile(requestType)]);
-router.get('/requests/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken, [verifyStudentRequestDocumentId, downloadFile(requestType)]);
+router.get('/requests/:id/documents/:documentId/download', auth.refreshJWT, isValidBackendToken,
+  isValidUUIDParam('id'), isValidUUIDParam('documentId'), [verifyStudentRequest, downloadFile(requestType)]);
+
+router.get('/requests/documents/:documentId/download', auth.refreshJWT, isValidBackendToken,
+  isValidUUIDParam('documentId'), [verifyStudentRequestDocumentId, downloadFile(requestType)]);
 
 router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken,
   isValidUUIDParam('id'), isValidUUIDParam('documentId'), [verifyStudentRequest, deleteDocument(requestType)]);

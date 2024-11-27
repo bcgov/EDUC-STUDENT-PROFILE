@@ -15,7 +15,7 @@ import {
   uploadFile
 } from '../components/requestHandler.js';
 
-import { forwardGetReq, isValidStringParam, isValidUUIDParam } from '../components/utils.js';
+import { forwardGetReq, isValidUUIDParam } from '../components/utils.js';
 import config from '../config/index.js';
 import {
   verifyPenRequestStatus,
@@ -67,9 +67,8 @@ router.get('/requests/:id/documents/:documentId', passport.authenticate('jwt', {
     forwardGetReq(req, res, `${config.get('penRequest:apiEndpoint')}/${req.params.id}/documents/${req.params.documentId}`)
 );
 // special case this does not use frontend axios, so need to refresh here to handle expired jwt.
-router.get('/requests/:id/documents/:documentId/download/:fileName', auth.refreshJWT, isValidBackendToken,
-  isValidUUIDParam('id'), isValidUUIDParam('documentId'), isValidStringParam('fileName'),
-  [verifyPenRequest, downloadFile(requestType)]);
+router.get('/requests/:id/documents/:documentId/download', auth.refreshJWT, isValidBackendToken,
+  isValidUUIDParam('id'), isValidUUIDParam('documentId'), [verifyPenRequest, downloadFile(requestType)]);
 
 router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken,
   isValidUUIDParam('id'), isValidUUIDParam('documentId'), [verifyPenRequest, deleteDocument(requestType)]);

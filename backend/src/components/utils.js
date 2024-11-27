@@ -294,22 +294,6 @@ export function getDefaultBcscInput(userInfo) {
   };
 }
 
-export function isValidStringParam(paramName) {
-  return function(req, res, next) {
-    if (!req.params[paramName]) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: 'No request parameter was provided.'
-      });
-    }
-    if (typeof req.params[paramName] !== 'string') {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: 'Not a valid string'
-      });
-    }
-    return next();
-  };
-}
-
 export function isValidUUIDParam(paramName) {
   return function(req, res, next) {
     if (!req.params[paramName]) {
