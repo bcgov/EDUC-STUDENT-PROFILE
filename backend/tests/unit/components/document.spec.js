@@ -241,8 +241,8 @@ describe('downloadFile', () => {
     fileExtension: 'image/jpeg'
   };
   const params = {
-    id: 'requestId',
-    documentId: 'documentId'
+    id: 'dca481a2-8f36-4994-8e2f-2c95e1219223',
+    documentId: '1adbe2f3-cde8-4400-86e8-c2ddef4ea720'
   };
   const downloadFileHandler = requestHandler.downloadFile('studentRequest');
 
@@ -255,7 +255,6 @@ describe('downloadFile', () => {
   beforeEach(() => {
     utils.getAccessToken.mockReturnValue('token');
     utils.getData.mockResolvedValue(document);
-    req = mockRequest(null, null, params);
     res = mockResponse();
   });
 
@@ -264,6 +263,7 @@ describe('downloadFile', () => {
   });
 
   it('should return OK and document data', async () => {
+    req = mockRequest(null, null, params);
     await downloadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
@@ -274,6 +274,7 @@ describe('downloadFile', () => {
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
+    req = mockRequest(null, null, params);
     utils.getAccessToken.mockReturnValue(null);
 
     await downloadFileHandler(req, res);
@@ -281,7 +282,24 @@ describe('downloadFile', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
   });
 
+  it('should return BAD_REQUEST if request id is malformed', async () => {
+    req = mockRequest(null, null, {...params, id: 'malformed'});
+
+    await downloadFileHandler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+  });
+
+  it('should return BAD_REQUEST if documentId is malformed', async () => {
+    req = mockRequest(null, null, {...params, documentId: 'malformed'});
+
+    await downloadFileHandler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+  });
+
   it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
+    req = mockRequest(null, null, params);
     utils.getData.mockRejectedValue(new Error('test error'));
 
     await downloadFileHandler(req, res);

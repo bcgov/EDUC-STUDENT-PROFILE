@@ -620,6 +620,12 @@ export function downloadFile(requestType) {
         });
       }
 
+      if (!validate(req.params.documentId) || (req.params.id && !validate(req.params.id))) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: 'Malformed request id or documentId'
+        });
+      }
+
       let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'Y');
 
       res.setHeader('Content-disposition', 'attachment; filename=' + resData.fileName?.replace(/ /g, '_').replace(/,/g, '_').trim());
