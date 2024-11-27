@@ -502,6 +502,12 @@ export function uploadFile(requestType) {
         });
       }
 
+      if (req.params.id && !validate(req.params.id)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: 'Malformed request id'
+        });
+      }
+
       const endpoint = config.get(`${requestType}:apiEndpoint`);
       const url = `${endpoint}/${req.params.id}/documents`;
 

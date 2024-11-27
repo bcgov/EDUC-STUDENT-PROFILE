@@ -18,7 +18,7 @@ describe('uploadFile', () => {
     documentID: 'documentId',
   };
   const params = {
-    id: 'requestId',
+    id: 'd74a0213-9a70-4306-8765-37a72435de66',
   };
   const requestType = 'studentRequest';
   const session = {
@@ -37,8 +37,6 @@ describe('uploadFile', () => {
   beforeEach(() => {
     utils.getAccessToken.mockReturnValue('token');
     utils.postData.mockResolvedValue(postRes);
-    req = mockRequest(document, session, params);
-    req.session.correlationID=correlationID;
     res = mockResponse();
   });
 
@@ -46,6 +44,9 @@ describe('uploadFile', () => {
   });
 
   it('should return response data', async () => {
+    req = mockRequest(document, session, params);
+    req.session.correlationID=correlationID;
+
     await uploadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
@@ -54,6 +55,9 @@ describe('uploadFile', () => {
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
+    req = mockRequest(document, session, params);
+    req.session.correlationID=correlationID;
+
     utils.getAccessToken.mockReturnValue(null);
 
     await uploadFileHandler(req, res);
@@ -65,6 +69,10 @@ describe('uploadFile', () => {
     const session = {
       request: null,
     };
+
+    req = mockRequest(document, session, params);
+    req.session.correlationID=correlationID;
+
     req = mockRequest(document, session, params);
 
     await uploadFileHandler(req, res);
@@ -76,14 +84,28 @@ describe('uploadFile', () => {
     const session = {
       studentRequestStatusCode: utils.RequestStatuses.INITREV,
     };
+
     req = mockRequest(document, session, params);
+    req.session.correlationID=correlationID;
 
     await uploadFileHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
 
+  it('should return BAD_REQUEST if request id is malformed', async () => {
+    req = mockRequest(document, session, {...params, id: 'malformed'});
+    req.session.correlationID=correlationID;
+
+    await uploadFileHandler(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+  });
+
   it('should return INTERNAL_SERVER_ERROR if postData is failed', async () => {
+    req = mockRequest(document, session, params);
+    req.session.correlationID=correlationID;
+
     utils.postData.mockRejectedValue(new Error('test error'));
 
     await uploadFileHandler(req, res);
