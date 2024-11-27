@@ -65,7 +65,7 @@ describe('DocumentChip.vue', () => {
     const listHtml = wrapper.find('.v-list').html();
     expect(listHtml).toContain('Canadian Passport');
     expect(listHtml).toContain(document.fileName);
-    expect(listHtml).toContain(`${ApiRoutes[requestType].REQUEST}/requestID/documents/${document.documentID}/download/${document.fileName}`);
+    expect(listHtml).toContain(`${ApiRoutes[requestType].REQUEST}/requestID/documents/${document.documentID}/download`);
     expect(listHtml).toContain('2020-03-01, 13:23:34');
     expect(listHtml).toContain('1 MB');
     expect(wrapper.find('.v-card').html()).toContain('Delete');
