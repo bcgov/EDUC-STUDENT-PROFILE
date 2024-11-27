@@ -265,12 +265,16 @@ export function postComment(requestType, createCommentPayload, createCommentEven
 
 export function getComments(requestType) {
   return async function getCommentsHandler(req, res) {
-    try{
+    try {
       const userInfo = getSessionUser(req);
       if(!userInfo) {
         return res.status(HttpStatus.UNAUTHORIZED).json({
           message: 'No session data'
         });
+      }
+
+      if (!validate(req.params.id)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ messsage: 'invalid request ID' });
       }
 
       const accessToken = userInfo.jwt;
@@ -572,7 +576,9 @@ export function deleteDocument(requestType) {
       }
 
       if (!validate(req.params.documentId) || (req.params.id && !validate(req.params.id))) {
-        throw Error('deleteDocument malformed UUIDs');
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          message: 'Malformed request id or documentId'
+        });
       }
 
       let resData = await getDocument(accessToken, req.params.id, req.params.documentId, requestType, 'N');

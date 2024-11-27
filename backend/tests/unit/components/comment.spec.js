@@ -172,7 +172,7 @@ describe('getComments', () => {
   const getRes = [];
 
   const params = {
-    id: 'requestId',
+    id: 'ce085322-fc20-4648-b876-3f635ab5002b',
   };
   const sessionUser = {
     jwt: 'token',
@@ -193,10 +193,6 @@ describe('getComments', () => {
   beforeEach(() => {
     utils.getSessionUser.mockReturnValue(sessionUser);
     utils.getData.mockResolvedValue(getRes);
-    req = mockRequest(null, null, params);
-    req.session={
-      correlationID
-    };
     res = mockResponse();
   });
 
@@ -205,6 +201,11 @@ describe('getComments', () => {
   });
 
   it('should return sorted comment data if multiple comments', async () => {
+    req = mockRequest(null, null, params);
+    req.session = {
+      correlationID
+    };
+
     const getRes = [
       {
         commentTimestamp: '2020-02-04T12:00:00',
@@ -284,6 +285,10 @@ describe('getComments', () => {
   });
 
   it('should return empty array of messages when no comment', async () => {
+    req = mockRequest(null, null, params);
+    req.session = {
+      correlationID
+    };
 
     await getComments(req, res);
 
@@ -301,7 +306,23 @@ describe('getComments', () => {
     expect(spy).toHaveBeenCalledWith('token', `${config.get('studentRequest:apiEndpoint')}/${params.id}/comments`,correlationID);
   });
 
+  it('should return BAD_REQUEST if request ID is malformed', async () => {
+    req = mockRequest(null, null, {...params, id: 'malformed' });
+    req.session = {
+      correlationID
+    };
+
+    await getComments(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+  });
+
   it('should return UNAUTHORIZED if no session', async () => {
+    req = mockRequest(null, null, params);
+    req.session = {
+      correlationID
+    };
+
     utils.getSessionUser.mockReturnValue(null);
 
     await getComments(req, res);
@@ -310,6 +331,11 @@ describe('getComments', () => {
   });
 
   it('should return INTERNAL_SERVER_ERROR if getData is failed', async () => {
+    req = mockRequest(null, null, params);
+    req.session = {
+      correlationID
+    };
+
     utils.getData.mockRejectedValue(new Error('test error'));
 
     await getComments(req, res);

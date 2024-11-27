@@ -209,20 +209,20 @@ describe('deleteDocument', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatus.CONFLICT);
   });
 
-  it('should return INTERNAL_SERVER_ERROR if id param is malformed', async () => {
+  it('should return BAD_REQUEST if id param is malformed', async () => {
     const theseParams = { ...params, id: 'not a UUID' };
     req = mockRequest(null, session, theseParams);
 
     await deleteDocumentHandler(req, res);
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
   });
 
-  it('should return INTERNAL_SERVER_ERROR if documentId param is malformed', async () => {
+  it('should return BAD_REQUEST if documentId param is malformed', async () => {
     const theseParams = { ...params, documentId: 'not a UUID' };
     req = mockRequest(null, session, theseParams);
 
     await deleteDocumentHandler(req, res);
-    expect(res.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
   });
 
   it('should return INTERNAL_SERVER_ERROR if deleteData is failed', async () => {
