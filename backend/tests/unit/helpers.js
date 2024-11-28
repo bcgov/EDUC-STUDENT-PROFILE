@@ -1,6 +1,6 @@
-'use strict';
+import { vi } from 'vitest';
 
-const mockRequest = (body, session = {}, params = {}, query = {}) => {
+export const mockRequest = (body, session = {}, params = {}, query = {}) => {
   return {
     body,
     session,
@@ -9,26 +9,21 @@ const mockRequest = (body, session = {}, params = {}, query = {}) => {
   };
 };
 
-const mockResponse = () => {
-  const res = {data: {}};
-  res.status = jest.fn().mockImplementation((v) => {
+export const mockResponse = (data = {}) => {
+  const res = {data};
+  res.status = vi.fn().mockImplementation(v => {
     res.data.status = v;
     return res;
   });
-  res.json = jest.fn().mockImplementation((v) => {
+  res.json = vi.fn().mockImplementation(v => {
     res.data.json = v;
-    return res; 
+    return res;
   });
-  res.redirect = jest.fn().mockReturnValue(res);
-  res.send = jest.fn().mockImplementation((v) => {
+  res.redirect = vi.fn().mockReturnValue(res);
+  res.send = vi.fn().mockImplementation(v => {
     res.data.raw = v;
-    return res; 
+    return res;
   });
-  res.setHeader = jest.fn().mockReturnValue(res);
+  res.setHeader = vi.fn().mockReturnValue(res);
   return res;
-};
-
-module.exports = {
-  mockRequest,
-  mockResponse,
 };

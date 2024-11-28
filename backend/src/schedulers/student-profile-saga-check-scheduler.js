@@ -1,15 +1,21 @@
-'use strict';
-const CronJob = require('cron').CronJob;
-const config = require('../config/index');
-const log = require('../components/logger');
-const {getApiCredentials} = require('../components/auth');
-const safeStringify = require('fast-safe-stringify');
-const {getData} = require('../components/utils');
+import { CronJob } from 'cron';
+import safeStringify from 'fast-safe-stringify';
+
+import config from '../config/index.js';
+import log from '../components/logger.js';
+import { getApiCredentials } from '../components/auth.js';
+import { getData } from '../components/utils.js';
+import { LocalDateTime } from '@js-joda/core';
+
+import {
+  removeProfileRequestSagaRecordFromRedis,
+  getRedLock,
+  getProfileRequestSagaEvents
+} from '../util/redis/redis-utils.js';
+
 const schedulerCronStaleSagaRecordRedis = config.get('scheduler:schedulerCronStaleSagaRecordRedis');
 const minimumTimeBeforeSagaIsStale = config.get('scheduler:minTimeBeforeSagaIsStaleInMinutes'); // should be in minutes.
 log.info(`${schedulerCronStaleSagaRecordRedis} :: ${minimumTimeBeforeSagaIsStale}`);
-const redisUtil = require('../util/redis/redis-utils');
-const {LocalDateTime} = require('@js-joda/core');
 
 /**
  * This method will check whether the saga record was created 15 minutes before, if so add it to the list
@@ -46,7 +52,7 @@ async function removeStaleSagas(staleSagas) {
             sagaId: sagaFromAPI.sagaId,
             sagaStatus: sagaFromAPI.status
           };
-          await redisUtil.removeProfileRequestSagaRecordFromRedis(event);
+          await removeProfileRequestSagaRecordFromRedis(event);
         } else {
           log.warn(`saga ${sagaFromAPI.sagaId} is not yet completed.`);
         }
@@ -62,10 +68,10 @@ async function removeStaleSagas(staleSagas) {
 try {
   const removeStaleSagaRecordFromRedis = new CronJob(schedulerCronStaleSagaRecordRedis, async () => {
     log.debug('starting findAndRemoveStaleSagaRecord');
-    const redLock = redisUtil.getRedLock();
+    const redLock = getRedLock();
     try {
       await redLock.lock('locks:remove-stale-saga-record-student-profile', 6000); // no need to release the lock as it will auto expire after 6000 ms.
-      const staleSagas = findStaleSagaRecords(await redisUtil.getProfileRequestSagaEvents());
+      const staleSagas = findStaleSagaRecords(await getProfileRequestSagaEvents());
       log.debug(`found ${staleSagas.length} stale GMP or UMP saga records`);
 
       if (staleSagas.length > 0) {

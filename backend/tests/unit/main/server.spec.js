@@ -1,15 +1,21 @@
-const redis = require('redis-mock');
-const express = require('express');
+import { describe, it, expect, afterAll, vi } from 'vitest';
+import redis from 'redis-mock';
+import express from 'express';
 
-jest.doMock('ioredis', () => {
-  return redis;
+import * as server from '../../../src/server.js';
+
+vi.mock('ioredis', () => {
+  return {
+    detault: redis
+  };
 });
 
-jest.doMock('../../../src/app', () => {
-  return express();
+vi.mock('../../../src/app.js', () => {
+  return {
+    default: express()
+  };
 });
 
-const server = require('../../../src/server');
 afterAll(() => {
   server.server.close();
 });

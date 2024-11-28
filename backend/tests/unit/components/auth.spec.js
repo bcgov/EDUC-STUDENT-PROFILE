@@ -1,9 +1,11 @@
-const axios = require('axios');
-const MockAdapter = require('axios-mock-adapter');
-//const jsonwebtoken = require('jsonwebtoken');
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
-const auth = require('../../../src/components/auth');
-const utils = require('../../../src/components/utils');
+import * as auth from '../../../src/components/auth.js';
+import * as utils from '../../../src/components/utils.js';
+
+vi.mock('../../../src/components/utils');
 
 const mockAxios = new MockAdapter(axios);
 
@@ -52,8 +54,7 @@ describe('renew', () => {
     scopes_supported: ['openid', 'offline_access'],
   };
 
-  const spy = jest.spyOn(utils, 'getOidcDiscovery');
-  jest.mock('../../../src/components/utils');
+  const spy = vi.spyOn(utils, 'getOidcDiscovery');
 
   afterEach(() => {
     spy.mockClear();
@@ -93,8 +94,7 @@ describe('renew', () => {
 });
 
 describe('refreshJWT', () => {
-  const spy = jest.spyOn(auth, 'renew');
-  jest.mock('../../../src/components/auth');
+  const spy = vi.spyOn(auth, 'renew');
 
   afterEach(() => {
     spy.mockClear();
