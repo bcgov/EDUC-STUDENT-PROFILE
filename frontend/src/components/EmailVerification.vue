@@ -26,13 +26,11 @@
               </h4>
             </v-card-title>
             <v-card-text id="verification_descriptor">
-              <v-card
+              <v-alert
                 v-if="status === verificationResults.OK"
                 height="100%"
                 width="100%"
-                variant="outlined"
-                color="#C3F1E8"
-                class="pa-3"
+                class="bootstrap-success"
               >
                 <p class="mb-2">
                   <strong> Your email has been verified and your {{ requestName }} request has now been submitted for
@@ -46,14 +44,12 @@
                     {{ appName }} after one business day to check on status of your request
                   </li>
                 </ul>
-              </v-card>
-              <v-card
+              </v-alert>
+              <v-alert
                 v-else-if="status === verificationResults.EXPIRED"
                 height="100%"
                 width="100%"
-                variant="outlined"
-                color="#FFECA9"
-                class="pa-3"
+                class="bootstrap-warning"
               >
                 <p class="mb-2">
                   <strong>Your email verification was not completed within the 24 hour time limit. Please repeat the
@@ -64,14 +60,12 @@
                   <li>Go to your email inbox and check for an email from {{ ministry }}. Check your spam folder too</li>
                   <li>Open the email and click on the link within 24 hours to complete the verification process</li>
                 </ol>
-              </v-card>
-              <v-card
+              </v-alert>
+              <v-alert
                 v-else-if="status === verificationResults.TOKEN_ERROR"
                 height="100%"
                 width="100%"
-                variant="outlined"
-                color="#FFECA9"
-                class="pa-3"
+                class="bootstrap-warning"
               >
                 <p class="mb-2">
                   <strong>Sorry, your email verification could not be completed, for the following reason:</strong>
@@ -89,14 +83,12 @@
                   If this does not work, login to the {{ appName }} application again and use the Resend Email
                   Verification action to get a new verification link.
                 </p>
-              </v-card>
-              <v-card
+              </v-alert>
+              <v-alert
                 v-else
                 height="100%"
                 width="100%"
-                variant="outlined"
-                color="#FFECA9"
-                class="pa-3"
+                class="bootstrap-warning"
               >
                 <p class="mb-2">
                   <strong>Sorry, Your email verification could not be completed, for the following reason:</strong>
@@ -110,7 +102,7 @@
                   Retry email verification again later. If this issue persists for more than one business day, please
                   contact pens.coordinator@gov.bc.ca.
                 </p>
-              </v-card>
+              </v-alert>
               <p
                 v-if="status === verificationResults.OK || status === verificationResults.EXPIRED"
                 class="mt-5 mb-0"
@@ -126,12 +118,10 @@
                 <v-btn
                   id="login-button"
                   :href="authRoutes.LOGIN"
-                  class="ma-2"
-                  theme="dark"
                   color="#003366"
                   @click="clearStorage"
                 >
-                  Log In <v-icon>$sign_in</v-icon>
+                  Log In <v-icon icon="mdi-login" />
                 </v-btn>
               </v-row>
             </v-card-actions>
@@ -154,7 +144,7 @@ export default {
       required: true
     },
     appName: {
-      type: Function,
+      type: String,
       required: true
     },
   },
