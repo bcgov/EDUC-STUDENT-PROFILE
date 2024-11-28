@@ -131,9 +131,9 @@ export default {
     },
     documentUrl() {
       if (this.requestID) {
-        return `${ApiRoutes[this.requestType].REQUEST}/${this.requestID}/documents/${this.document.documentID}/download/${this.document.fileName}`;
+        return `${ApiRoutes[this.requestType].REQUEST}/${this.requestID}/documents/${this.document.documentID}/download`;
       } else {
-        return `${ApiRoutes[this.requestType].REQUEST}/documents/${this.document.documentID}/download/${this.document.fileName}`;
+        return `${ApiRoutes[this.requestType].REQUEST}/documents/${this.document.documentID}/download`;
       }
     },
   },

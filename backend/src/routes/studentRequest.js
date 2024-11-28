@@ -1,12 +1,31 @@
-'use strict';
+import passport from 'passport';
+import express from 'express';
+import {
+  getCodes,
+  postComment,
+  submitRequest,
+  getComments,
+  verifyEmail,
+  setRequestAsSubsrev,
+  resendVerificationEmail,
+  verifyRequest,
+  verifyPostCommentRequest,
+  deleteDocument,
+  downloadFile,
+  uploadFile,
+  uploadFileWithoutRequest,
+  verifyDocumentId
+} from '../components/requestHandler.js';
 
-const passport = require('passport');
-const express = require('express');
-const { getCodes, postComment, submitRequest, getComments, verifyEmail, setRequestAsSubsrev, resendVerificationEmail, verifyRequest, verifyPostCommentRequest, deleteDocument, downloadFile, uploadFile, uploadFileWithoutRequest, verifyDocumentId } = require('../components/request');
-const { forwardGetReq } = require('../components/utils');
-const config = require('../config/index');
-const { verifyStudentRequestStatus, createStudentRequestCommentPayload, createStudentRequestCommentEvent } = require('../components/studentRequest');
-const auth = require('../components/auth');
+import { forwardGetReq, isValidUUIDParam } from '../components/utils.js';
+import config from '../config/index.js';
+import {
+  verifyStudentRequestStatus,
+  createStudentRequestCommentPayload,
+  createStudentRequestCommentEvent
+} from '../components/studentRequest.js';
+import * as auth from '../components/auth.js';
+
 const isValidBackendToken = auth.isValidBackendToken();
 const router = express.Router();
 
@@ -40,32 +59,48 @@ router.get('/file-requirements', passport.authenticate('jwt', {session: false}),
   (req, res) => forwardGetReq(req, res, config.get('studentRequest:apiEndpoint') + '/file-requirements')
 );
 
-router.post('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, uploadFile(requestType)]);
+router.post('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [verifyStudentRequest, uploadFile(requestType)]);
 
 router.post('/requests/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, uploadFileWithoutRequest(requestType));
 
-router.get('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, verifyStudentRequest,
+router.get('/requests/:id/documents', passport.authenticate('jwt', {session: false}), isValidBackendToken, 
+  verifyStudentRequest, isValidUUIDParam('id'),
   (req, res) => forwardGetReq(req, res, `${config.get('studentRequest:apiEndpoint')}/${req.params.id}/documents`)
 );
 
-router.get('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, verifyStudentRequest,
+router.get('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  verifyStudentRequest, isValidUUIDParam('id'), isValidUUIDParam('documentId'),
   (req, res) => forwardGetReq(req, res, `${config.get('studentRequest:apiEndpoint')}/${req.params.id}/documents/${req.params.documentId}`)
 );
 // special case this does not use frontend axios, so need to refresh here to handle expired jwt.
-router.get('/requests/:id/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken, [verifyStudentRequest, downloadFile(requestType)]);
-router.get('/requests/documents/:documentId/download/:fileName',auth.refreshJWT, isValidBackendToken, [verifyStudentRequestDocumentId, downloadFile(requestType)]);
+router.get('/requests/:id/documents/:documentId/download', auth.refreshJWT, isValidBackendToken,
+  isValidUUIDParam('id'), isValidUUIDParam('documentId'), [verifyStudentRequest, downloadFile(requestType)]);
 
-router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, deleteDocument(requestType)]);
-router.delete('/requests/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequestDocumentId, deleteDocument(requestType)]);
+router.get('/requests/documents/:documentId/download', auth.refreshJWT, isValidBackendToken,
+  isValidUUIDParam('documentId'), [verifyStudentRequestDocumentId, downloadFile(requestType)]);
 
-router.get('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, getComments(requestType)]);
+router.delete('/requests/:id/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), isValidUUIDParam('documentId'), [verifyStudentRequest, deleteDocument(requestType)]);
 
-router.post('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyPostCommentRequest(requestType), postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent)]);
+router.delete('/requests/documents/:documentId', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('documentId'), [verifyStudentRequestDocumentId, deleteDocument(requestType)]);
 
-router.post('/requests/:id/verification-email', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, resendVerificationEmail(requestType)]);
+router.get('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [verifyStudentRequest, getComments(requestType)]);
 
-router.patch('/requests/:id', passport.authenticate('jwt', {session: false}), isValidBackendToken, [verifyStudentRequest, setRequestAsSubsrev(requestType)]);
+router.post('/requests/:id/comments', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [
+    verifyPostCommentRequest(requestType),
+    postComment(requestType, createStudentRequestCommentPayload, createStudentRequestCommentEvent)
+  ]);
+
+router.post('/requests/:id/verification-email', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [verifyStudentRequest, resendVerificationEmail(requestType)]);
+
+router.patch('/requests/:id', passport.authenticate('jwt', {session: false}), isValidBackendToken,
+  isValidUUIDParam('id'), [verifyStudentRequest, setRequestAsSubsrev(requestType)]);
 
 router.get('/verification', verifyEmail(requestType));
 
-module.exports = router;
+export default router;
