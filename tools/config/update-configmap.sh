@@ -229,4 +229,4 @@ oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-flb-sc-config-map"
 
 echo Removing un-needed config entries
 oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env "dc/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_ID-
-oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env "dc/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_SECRET-f
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env "dc/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_SECRET-
