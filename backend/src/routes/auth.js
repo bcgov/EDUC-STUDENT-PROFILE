@@ -68,7 +68,6 @@ router.get('/logout', async (req, res, next) => {
   let idToken = req?.session?.passport?.user?.idToken;
 
   const makeUrl = endpoint => {
-    console.log(req.user);
     return encodeURIComponent(
       config.get('logoutEndpoint')
         + `?post_logout_redirect_uri=${config.get('server:frontend')}`
@@ -99,7 +98,6 @@ router.get('/logout', async (req, res, next) => {
     } else {
       retUrl = makeUrl('/logout');
     }
-    console.log('RET ::: ', retUrl);
     res.redirect(config.get('siteMinder_logout_endpoint') + retUrl);
   });
 });
