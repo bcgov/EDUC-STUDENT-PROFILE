@@ -68,7 +68,6 @@ const router = createRouter({
                 && (!studentRequest.request || studentRequest.request.studentRequestStatusCode === 'COMPLETED')
                 && !hasInflightGMPRequest) {
               rootStore.setRequestType('studentRequest');
-              console.log('request should reset');
               studentRequest.$reset();
               return '/ump/request';
             }
