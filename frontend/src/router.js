@@ -64,8 +64,12 @@ const router = createRouter({
             const hasInflightGMPRequest = penRequest.request
               && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV']))
                 .some(status => status === penRequest.request.penRequestStatusCode);
-            if (authStore.isAuthenticated && !studentRequest.request && !hasInflightGMPRequest) {
+            if (authStore.isAuthenticated
+                && (!studentRequest.request || studentRequest.request.studentRequestStatusCode === 'COMPLETED')
+                && !hasInflightGMPRequest) {
               rootStore.setRequestType('studentRequest');
+              console.log('request should reset');
+              studentRequest.$reset();
               return '/ump/request';
             }
           },
@@ -248,6 +252,7 @@ function checkStudentRequestExists() {
   const rootStore = useRootStore();
   const studentRequest = useStudentRequestStore();
   const authStore = useAuthStore();
+
   if (authStore.isAuthenticated
     && (!studentRequest.request || ['COMPLETED', 'ABANDONED', 'REJECTED']
       .includes(studentRequest.request.studentRequestStatusCode))) {
