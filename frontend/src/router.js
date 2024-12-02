@@ -281,11 +281,16 @@ router.beforeEach((to) => {
   const authStore = useAuthStore();
 
   if (to.meta.requiresAuth && authStore.isAuthenticated) {
-    authStore.getJwtToken().then(() => {
+    authStore.getJwtToken().then(async () => {
       if (!authStore.isAuthenticated) {
         return '/token-expired';
       } else {
-        authStore.getUserInfo().then(() => '').catch(() => '/error');
+        try {
+          await authStore.getUserInfo();
+          return '';
+        } catch {
+          return '/error';
+        }
       }
     }).catch(() => {
       return '/token-expired';
