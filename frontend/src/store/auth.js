@@ -58,15 +58,20 @@ export const useAuthStore = defineStore('auth', {
       this.setJwtToken();
       this.setUserInfo();
     },
-    async getUserInfo() {
+    async getUserRequests() {
       const studentRequest = useStudentRequestStore();
       const penRequest = usePenRequestStore();
+
+      const userInfoRes = await ApiService.getUserInfo();
+
+      studentRequest.setRequest(userInfoRes.data.studentRequest);
+      penRequest.setRequest(userInfoRes.data.penRequest);
+    },
+    async getUserInfo() {
       const rootStore = useRootStore();
       const userInfoRes = await ApiService.getUserInfo();
 
       this.setUserInfo(userInfoRes.data);
-      studentRequest.setRequest(userInfoRes.data.studentRequest);
-      penRequest.setRequest(userInfoRes.data.penRequest);
       rootStore.setStudent(userInfoRes.data.student);
     },
     async getInitialToken() {

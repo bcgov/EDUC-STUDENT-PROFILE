@@ -56,7 +56,8 @@ export default {
       Promise.all([
         this.getPenRequestCodes('penRequest'),
         this.getStudentRequestCodes('studentRequest'),
-        this.getUserInfo()
+        this.getUserInfo(),
+        this.getUserRequests()
       ])
     ).catch(e => {
       if (!e.response || e.response.status !== HttpStatus.UNAUTHORIZED) {
@@ -68,7 +69,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions(useAuthStore, ['setLoading', 'getJwtToken', 'getUserInfo', 'logout']),
+    ...mapActions(useAuthStore, ['setLoading', 'getJwtToken', 'getUserInfo', 'getUserRequests', 'logout']),
     ...mapActions(useStudentRequestStore, { getStudentRequestCodes: 'getCodes'}),
     ...mapActions(usePenRequestStore, { getPenRequestCodes: 'getCodes'}),
   }

@@ -64,8 +64,11 @@ const router = createRouter({
             const hasInflightGMPRequest = penRequest.request
               && values(pick(PenRequestStatuses, ['DRAFT', 'INITREV', 'RETURNED', 'SUBSREV']))
                 .some(status => status === penRequest.request.penRequestStatusCode);
-            if (authStore.isAuthenticated && !studentRequest.request && !hasInflightGMPRequest) {
+            if (authStore.isAuthenticated
+                && (!studentRequest.request || studentRequest.request.studentRequestStatusCode === 'COMPLETED')
+                && !hasInflightGMPRequest) {
               rootStore.setRequestType('studentRequest');
+              studentRequest.$reset();
               return '/ump/request';
             }
           },
@@ -248,6 +251,7 @@ function checkStudentRequestExists() {
   const rootStore = useRootStore();
   const studentRequest = useStudentRequestStore();
   const authStore = useAuthStore();
+
   if (authStore.isAuthenticated
     && (!studentRequest.request || ['COMPLETED', 'ABANDONED', 'REJECTED']
       .includes(studentRequest.request.studentRequestStatusCode))) {
@@ -281,11 +285,16 @@ router.beforeEach((to) => {
   const authStore = useAuthStore();
 
   if (to.meta.requiresAuth && authStore.isAuthenticated) {
-    authStore.getJwtToken().then(() => {
+    authStore.getJwtToken().then(async () => {
       if (!authStore.isAuthenticated) {
         return '/token-expired';
       } else {
-        authStore.getUserInfo().then(() => '').catch(() => '/error');
+        try {
+          await authStore.getUserInfo();
+          return '';
+        } catch {
+          return '/error';
+        }
       }
     }).catch(() => {
       return '/token-expired';
