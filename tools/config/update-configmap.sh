@@ -177,7 +177,7 @@ oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-backend-config-map
 
 echo
 echo Setting environment variables for "$APP_NAME-backend-$SOAM_KC_REALM_ID" application
-oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env --from="configmap/$APP_NAME-backend-config-map" "dc/$APP_NAME-backend-$SOAM_KC_REALM_ID"
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env --from="configmap/$APP_NAME-backend-config-map" "deployment/$APP_NAME-backend-$SOAM_KC_REALM_ID"
 
 echo Creating config map "$APP_NAME-frontend-config-map"
 oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-frontend-config-map" \
@@ -186,7 +186,7 @@ oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-frontend-config-ma
   --dry-run -o yaml | oc apply -f -
 echo
 echo Setting environment variables for "$APP_NAME-frontend-$SOAM_KC_REALM_ID" application
-oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env --from="configmap/$APP_NAME-frontend-config-map" "dc/$APP_NAME-frontend-$SOAM_KC_REALM_ID"
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env --from="configmap/$APP_NAME-frontend-config-map" "deployment/$APP_NAME-frontend-$SOAM_KC_REALM_ID"
 
 SPLUNK_URL="gww.splunk.educ.gov.bc.ca"
 FLB_CONFIG="[SERVICE]
@@ -228,5 +228,5 @@ echo Creating config map "$APP_NAME-flb-sc-config-map"
 oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-flb-sc-config-map" --from-literal=fluent-bit.conf="$FLB_CONFIG" --from-literal=parsers.conf="$PARSER_CONFIG" --dry-run -o yaml | oc apply -f -
 
 echo Removing un-needed config entries
-oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env "dc/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_ID-
-oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env "dc/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_SECRET-
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env "deployment/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_ID-
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env "deployment/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_SECRET-

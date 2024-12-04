@@ -1,7 +1,7 @@
 name: Build & Deploy to DEV
 
 env:
-  # 🖊️ EDIT your repository secrets to log into your OpenShift cluster and set up the context.
+  # EDIT your repository secrets to log into your OpenShift cluster and set up the context.
   # See https://github.com/redhat-actions/oc-login#readme for how to retrieve these values.
   # To get a permanent token, refer to https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions
   OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
@@ -13,13 +13,13 @@ env:
   CERTIFICATE: ${{ secrets.CERT }}
   PRIVATE_KEY: ${{ secrets.PRIV_KEY }}
 
-  # 🖊️ EDIT to change the image registry settings.
+  # EDIT to change the image registry settings.
   # Registries such as GHCR, Quay.io, and Docker Hub are supported.
   IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
   IMAGE_REGISTRY_USER: ${{ github.actor }}
   IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
 
-  # 🖊️ EDIT to specify custom tags for the container image, or default tags will be generated below.
+  # EDIT to specify custom tags for the container image, or default tags will be generated below.
   IMAGE_TAGS: ""
 
   IMAGE_NAME: student-profile-master
@@ -85,18 +85,18 @@ jobs:
                 core.error(`Secret "${name}" is not set`);
                 return true;
               }
-              core.info(`✔️ Secret "${name}" is set`);
+              core.info(`Secret "${name}" is set`);
               return false;
             });
             if (missingSecrets.length > 0) {
-              core.setFailed(`❌ At least one required secret is not set in the repository. \n` +
+              core.setFailed(`At least one required secret is not set in the repository. \n` +
                 "You can add it using:\n" +
                 "GitHub UI: https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository \n" +
                 "GitHub CLI: https://cli.github.com/manual/gh_secret_set \n" +
                 "Also, refer to https://github.com/redhat-actions/oc-login#getting-started-with-the-action-or-see-example");
             }
             else {
-              core.info(`✅ All the required secrets are set`);
+              core.info(`All the required secrets are set`);
             }
       - name: Check out repository
         uses: actions/checkout@v3
