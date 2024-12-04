@@ -142,7 +142,6 @@ objects:
       targetPort: 443
     selector:
       app: "${APP_NAME}-backend-${BRANCH}"
-      deploymentconfig: "${APP_NAME}-backend-${BRANCH}"
 - apiVersion: v1
   kind: Route
   metadata:
