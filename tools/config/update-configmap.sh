@@ -173,20 +173,20 @@ oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-backend-config-map
   --from-literal=RATE_LIMIT_ENABLED="$RATE_LIMIT_ENABLED" \
   --from-literal=RATE_LIMIT_WINDOW_IN_SEC="$RATE_LIMIT_WINDOW_IN_SEC" \
   --from-literal=RATE_LIMIT_LIMIT="$RATE_LIMIT_LIMIT" \
-  --dry-run -o yaml | oc apply -f -
+  --dry-run=client -o yaml | oc apply -f -
 
 echo
-echo Setting environment variables for "$APP_NAME-backend-$SOAM_KC_REALM_ID" application
-oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env --from="configmap/$APP_NAME-backend-config-map" "deployment/$APP_NAME-backend-$SOAM_KC_REALM_ID"
+echo Setting environment variables for "$APP_NAME-backend-$ENV_VALUE" application
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env --from="configmap/$APP_NAME-backend-config-map" "deployment/$APP_NAME-backend-$ENV_VALUE"
 
 echo Creating config map "$APP_NAME-frontend-config-map"
 oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-frontend-config-map" \
   --from-literal=TZ="$TZVALUE" \
   --from-literal=HOST_ROUTE="$HOST_ROUTE" \
-  --dry-run -o yaml | oc apply -f -
+  --dry-run=client -o yaml | oc apply -f -
 echo
-echo Setting environment variables for "$APP_NAME-frontend-$SOAM_KC_REALM_ID" application
-oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env --from="configmap/$APP_NAME-frontend-config-map" "deployment/$APP_NAME-frontend-$SOAM_KC_REALM_ID"
+echo Setting environment variables for "$APP_NAME-frontend-$ENV_VALUE" application
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env --from="configmap/$APP_NAME-frontend-config-map" "deployment/$APP_NAME-frontend-$ENV_VALUE"
 
 SPLUNK_URL="gww.splunk.educ.gov.bc.ca"
 FLB_CONFIG="[SERVICE]
@@ -225,7 +225,7 @@ PARSER_CONFIG="
 "
 
 echo Creating config map "$APP_NAME-flb-sc-config-map"
-oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-flb-sc-config-map" --from-literal=fluent-bit.conf="$FLB_CONFIG" --from-literal=parsers.conf="$PARSER_CONFIG" --dry-run -o yaml | oc apply -f -
+oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-flb-sc-config-map" --from-literal=fluent-bit.conf="$FLB_CONFIG" --from-literal=parsers.conf="$PARSER_CONFIG" --dry-run=client -o yaml | oc apply -f -
 
 echo Removing un-needed config entries
 oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env "deployment/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_ID-

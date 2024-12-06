@@ -13,7 +13,7 @@
         openshift.io/generated-by: OpenShiftNewApp
       labels:
         app: "${APP_NAME}-frontend-${BRANCH}"
-      name: "${APP_NAME}-frontend-${BRANCH}"
+      name: "${APP_NAME}-frontend-${APP_ENV}"
     spec:
       replicas: ${{MIN_REPLICAS}}
       selector:
@@ -170,6 +170,9 @@
     required: true
   - name: APP_NAME
     description: Application name
+    required: true
+  - name: APP_ENV
+    description: Application environment
     required: true
   - name: HOST_ROUTE
     description: The host the route will use to expose service outside cluster

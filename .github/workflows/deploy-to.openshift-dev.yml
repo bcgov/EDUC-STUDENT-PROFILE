@@ -27,6 +27,7 @@ env:
   ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca
 
   APP_NAME: "student-profile"
+  APP_ENV: dev
   REPO_NAME: "educ-student-profile"
   BRANCH: "master"
   APP_NAME_BACKEND: "student-profile-backend-master"
@@ -201,6 +202,7 @@ jobs:
           # Process and apply backend deployment template
           oc process \
             -f tools/openshift/backend.deployment.yaml \
+            -p APP_ENV=${{ env.APP_ENV }} \
             -p APP_NAME=${{ env.APP_NAME }} \
             -p REPO_NAME=${{ env.REPO_NAME }} \
             -p BRANCH=${{ env.BRANCH }} \
@@ -218,6 +220,7 @@ jobs:
           # Process and apply frontend deployment template
           oc process \
             -f tools/openshift/frontend-static.deployment.yaml \
+            -p APP_ENV=${{ env.APP_ENV }} \
             -p APP_NAME=${{ env.APP_NAME }} \
             -p REPO_NAME=${{ env.REPO_NAME }} \
             -p BRANCH=${{ env.BRANCH }} \
@@ -235,7 +238,12 @@ jobs:
             -p PRIVATE_KEY="${{ env.PRIVATE_KEY }}" \
             | oc apply -f -
 
-          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin dev ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.SPLUNK_TOKEN }}
+          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh \
+            | bash /dev/stdin ${{ env.APP_ENV }} \
+            ${{ env.APP_NAME }} \
+            ${{ env.NAMESPACE }} \
+            ${{ env.COMMON_NAMESPACE }} \
+            ${{ env.SPLUNK_TOKEN }}
 
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
