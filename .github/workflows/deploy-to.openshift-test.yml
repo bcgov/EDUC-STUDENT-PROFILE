@@ -134,7 +134,15 @@ jobs:
           oc process -f tools/openshift/frontend-static.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_TEST }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_TEST }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_TEST }} -p MIN_CPU=${{ env.MIN_CPU_FRONTEND }} -p MAX_CPU=${{ env.MAX_CPU_FRONTEND }} -p MIN_MEM=${{ env.MIN_MEM_FRONTEND }} -p MAX_MEM=${{ env.MAX_MEM_FRONTEND }} -p HOST_ROUTE=${{ env.HOST_ROUTE }} -p CA_CERT="${{ env.CA_CERT }}" -p CERTIFICATE="${{ env.CERTIFICATE }}" -p PRIVATE_KEY="${{ env.PRIVATE_KEY }}"\
             | oc apply -f -
 
-          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin test ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.SPLUNK_TOKEN }}
+          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh \
+            | bash /dev/stdin \
+            test \
+            ${{ env.APP_NAME }} \
+            ${{ env.NAMESPACE }} \
+            ${{ env.COMMON_NAMESPACE }} \
+            ${{ env.SPLUNK_TOKEN }} \
+            ${{ env.BRANCH }}
+
 
           # Start rollout (if necessary) and follow it
           oc rollout latest dc/${{ env.APP_NAME_BACKEND }} 2> /dev/null \

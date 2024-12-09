@@ -235,7 +235,14 @@ jobs:
             -p PRIVATE_KEY="${{ env.PRIVATE_KEY }}" \
             | oc apply -f -
 
-          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin dev ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.SPLUNK_TOKEN }}
+          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh \
+            | bash /dev/stdin \
+            dev \
+            ${{ env.APP_NAME }} \
+            ${{ env.NAMESPACE }} \
+            ${{ env.COMMON_NAMESPACE }} \
+            ${{ env.SPLUNK_TOKEN }} \
+            ${{ env.BRANCH }}
 
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
