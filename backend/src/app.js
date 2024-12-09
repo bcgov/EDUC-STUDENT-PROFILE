@@ -98,7 +98,7 @@ async function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_
     clientID: config.get('oidc:clientId'),
     clientSecret: config.get('oidc:clientSecret'),
     callbackURL: callbackURI,
-    scope: discovery.scopes_supported,
+    scope: 'openid profile',
     kc_idp_hint: kc_idp_hint
   }, (_issuer, profile, _context, idToken, accessToken, refreshToken, done) => {
     if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
