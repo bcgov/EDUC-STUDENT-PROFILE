@@ -255,7 +255,8 @@ jobs:
           # Get status, returns 0 if rollout is successful
           oc rollout status deployment/${{ env.APP_NAME_BACKEND }}
           oc rollout status deployment/${{ env.APP_NAME_FRONTEND }}
+
       - name: ZAP Scan
-        uses: zaproxy/action-full-scan@v0.7.0
+        uses: zaproxy/action-full-scan@v0.12.0
         with:
           target: 'https://${{ env.HOST_ROUTE }}'
