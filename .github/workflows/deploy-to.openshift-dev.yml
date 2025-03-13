@@ -242,7 +242,9 @@ jobs:
             ${{ env.NAMESPACE }} \
             ${{ env.COMMON_NAMESPACE }} \
             ${{ env.SPLUNK_TOKEN }} \
-            ${{ env.BRANCH }}
+            ${{ env.BRANCH }} \
+            '${{ vars.JOURNEY_BUILDER }}' \
+            '${{ vars.BCEID_URL }}'
 
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
