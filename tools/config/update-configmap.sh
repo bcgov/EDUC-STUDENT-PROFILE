@@ -104,7 +104,7 @@ journey_builder_url=""
 if [ "$ENV_VALUE" = "tools" ] || [ "$ENV_VALUE" = "dev"  ] || [ "$ENV_VALUE" = "test"  ]
 then
     bceid_reg_url="https://www.test.bceid.ca/os/?7081&SkipTo=Basic#action"
-    journey_builder_url="https://www2.qa.gov.bc.ca/gov/content/education-training/k-12/support/pen"
+    journey_builder_url="https://www2.qa.gov.bc.ca/gov/content/education-training/k-12/support/pen-services/pen"
 else
     bceid_reg_url="https://www.bceid.ca/os/?7081&SkipTo=Basic#action"
     journey_builder_url="https://www2.gov.bc.ca/gov/content?id=74E29C67215B4988ABCD778F453A3129"
