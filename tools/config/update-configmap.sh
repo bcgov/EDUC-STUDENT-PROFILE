@@ -4,6 +4,8 @@ PEN_NAMESPACE=$3
 COMMON_NAMESPACE=$4
 SPLUNK_TOKEN=$5
 BRANCH=$6
+JOURNEY_BUILDER=$7
+BCEID_REGISTRATION=$8
 
 TZVALUE="America/Vancouver"
 SOAM_KC_REALM_ID="master"
@@ -99,17 +101,6 @@ studentProfileServiceClientSecret=$(curl -sX GET "https://$SOAM_KC/auth/admin/re
   -H "Authorization: Bearer $TKN" \
   | jq -r '.value')
 
-bceid_reg_url=""
-journey_builder_url=""
-if [ "$ENV_VALUE" = "tools" ] || [ "$ENV_VALUE" = "dev"  ] || [ "$ENV_VALUE" = "test"  ]
-then
-    bceid_reg_url="https://www.test.bceid.ca/os/?7081&SkipTo=Basic#action"
-    journey_builder_url="https://www2.qa.gov.bc.ca/gov/content/education-training/k-12/support/pen"
-else
-    bceid_reg_url="https://www.bceid.ca/os/?7081&SkipTo=Basic#action"
-    journey_builder_url="https://www2.gov.bc.ca/gov/content?id=74E29C67215B4988ABCD778F453A3129"
-fi
-
 if [ "$ENV_VALUE" = "dev" ]
 then
   bannerEnvironment="DEV"
@@ -165,9 +156,9 @@ oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-backend-config-map
   --from-literal=SCHEDULER_CRON_STALE_SAGA_RECORD_REDIS="0 0/5 * * * *" \
   --from-literal=MIN_TIME_BEFORE_SAGA_IS_STALE_IN_MINUTES=5 \
   --from-literal=PROFILE_REQUEST_SAGA_API_URL="http://student-profile-saga-api-master.$PEN_NAMESPACE-$ENV_VALUE.svc.cluster.local:8080/api/v1/student-profile-saga" \
-  --from-literal=BCEID_REG_URL="$bceid_reg_url" \
+  --from-literal=BCEID_REG_URL="$BCEID_REGISTRATION" \
   --from-literal=IDLE_TIMEOUT_IN_MILLIS=1800000 \
-  --from-literal=JOURNEY_BUILDER="$journey_builder_url" \
+  --from-literal=JOURNEY_BUILDER="$JOURNEY_BUILDER" \
   --from-literal=BANNER_COLOR="$bannerColor" \
   --from-literal=BANNER_ENVIRONMENT="$bannerEnvironment" \
   --from-literal=NODE_ENV="openshift" \
