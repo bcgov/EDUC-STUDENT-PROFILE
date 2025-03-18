@@ -1,36 +1,37 @@
-'use strict';
+import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
+import { Strategy as OidcStrategy } from 'passport-openidconnect-keycloak-idp';
+import dotenv from 'dotenv';
+import morgan from 'morgan';
+import session from 'express-session';
+import express from 'express';
+import passport from 'passport';
+import atob from 'atob';
+import helmet from 'helmet';
+import cors from 'cors';
+import noCache from 'nocache';
+import bodyParser from 'body-parser';
+import RedisStore from 'connect-redis';
+import { rateLimit } from 'express-rate-limit';
 
-const config = require('./config/index');
-const dotenv = require('dotenv');
-const log = require('./components/logger');
-const morgan = require('morgan');
-const session = require('express-session');
-const express = require('express');
-const passport = require('passport');
-const atob = require('atob');
-const helmet = require('helmet');
-const cors = require('cors');
-const utils = require('./components/utils');
-const auth = require('./components/auth');
-const bodyParser = require('body-parser');
-const connectRedis = require('connect-redis');
+import { init as initRedis, getRedisClient } from './util/redis/redis-client.js';
+import config from './config/index.js';
+import log from './components/logger.js';
+import * as utils from './components/utils.js';
+import * as auth from './components/auth.js';
+import { draftToAbandonRequestJob } from './schedulers/student-profile-scheduler.js';
+import authRouter from './routes/auth.js';
+import userRouter from './routes/user.js';
+import studentRequestRouter from './routes/studentRequest.js';
+import penRequestRouter from './routes/penRequest.js';
+import configRouter from './routes/config.js';
+import promMid from 'express-prometheus-middleware';
+import { init as initNats } from './messaging/message-subscriber.js';
+import healthCheckController from './routes/health-check.js';
+
 dotenv.config();
-
-const scheduler = require('./schedulers/student-profile-scheduler');
-const JWTStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const OidcStrategy = require('passport-openidconnect-keycloak-idp').Strategy;
-const noCache = require('nocache');
 const apiRouter = express.Router();
-const authRouter = require('./routes/auth');
-const userRouter = require('./routes/user');
-const studentRequestRouter = require('./routes/studentRequest');
-const penRequestRouter = require('./routes/penRequest');
-const configRouter = require('./routes/config');
-const promMid = require('express-prometheus-middleware');
-const messageSubscriber = require('./messaging/message-subscriber');
-messageSubscriber.init();
-messageSubscriber.callbacks();
+initNats();
+
 //initialize app
 const app = express();
 app.set('trust proxy', 1);
@@ -56,24 +57,22 @@ const logStream = {
   }
 };
 
-
-
-
-const Redis = require('./util/redis/redis-client');
-Redis.init(); // call the init to initialize appropriate client, and reuse it across the app.
-const RedisStore = connectRedis(session);
+initRedis();
 const dbSession = new RedisStore({
-  client: Redis.getRedisClient(),
+  client: getRedisClient(),
   prefix: 'student-profile-sess:',
 });
+
 const cookie = {
   secure: true,
   httpOnly: true,
   maxAge: 1800000 //30 minutes in ms. this is same as session time. DO NOT MODIFY, IF MODIFIED, MAKE SURE SAME AS SESSION TIME OUT VALUE.
 };
+
 if ('local' === config.get('environment')) {
   cookie.secure = false;
 }
+
 //sets cookies for security purposes (prevent cookie access, allow secure connections only, etc)
 app.use(session({
   name: 'student_profile_cookie',
@@ -83,12 +82,14 @@ app.use(session({
   cookie: cookie,
   store: dbSession
 }));
-app.use(require('./routes/health-check').router);
+
+app.use(healthCheckController.router);
+
 //initialize routing and session. Cookies are now only reachable via requests (not js)
 app.use(passport.initialize());
 app.use(passport.session());
 
-function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) {
+async function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) {
   passport.use(strategyName, new OidcStrategy({
     issuer: discovery.issuer,
     authorizationURL: discovery.authorization_endpoint,
@@ -97,9 +98,9 @@ function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) 
     clientID: config.get('oidc:clientId'),
     clientSecret: config.get('oidc:clientSecret'),
     callbackURL: callbackURI,
-    scope: discovery.scopes_supported,
+    scope: 'openid profile',
     kc_idp_hint: kc_idp_hint
-  }, (_issuer, profile, _context, _idToken, accessToken, refreshToken, done) => {
+  }, (_issuer, profile, _context, idToken, accessToken, refreshToken, done) => {
     if ((typeof (accessToken) === 'undefined') || (accessToken === null) ||
       (typeof (refreshToken) === 'undefined') || (refreshToken === null)) {
       return done('No access token', null);
@@ -109,6 +110,7 @@ function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) 
     profile.jwtFrontend = auth.generateUiToken();
     profile.jwt = accessToken;
     profile.refreshToken = refreshToken;
+    profile.idToken = idToken;
     profile._json = parseJwt(accessToken);
     return done(null, profile);
   }));
@@ -117,7 +119,7 @@ function addLoginPassportUse(discovery, strategyName, callbackURI, kc_idp_hint) 
 const parseJwt = (token) => {
   try {
     return JSON.parse(atob(token.split('.')[1]));
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -143,12 +145,12 @@ utils.getOidcDiscovery().then(discovery => {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: config.get('tokenGenerate:publicKey'),
     ignoreExpiration: true
-  }, (jwtPayload, done) => {
+  }, function(jwtPayload, done) {
     if ((typeof (jwtPayload) === 'undefined') || (jwtPayload === null)) {
       return done('No JWT token', null);
     }
 
-    done(null, {
+    return done(null, {
       email: jwtPayload.email,
       familyName: jwtPayload.family_name,
       givenName: jwtPayload.given_name,
@@ -159,10 +161,27 @@ utils.getOidcDiscovery().then(discovery => {
     });
   }));
 });
+
 //functions for serializing/deserializing users
 passport.serializeUser((user, next) => next(null, user));
 passport.deserializeUser((obj, next) => next(null, obj));
 
+// Implement rate limiting
+if (config.get('rateLimit:enabled')) {
+  const windowInSec = config.get('rateLimit:windowInSec');
+  const limit = config.get('rateLimit:limit');
+  const limiter = rateLimit({
+    windowMs: windowInSec * 1000,
+    limit,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: false,
+    message: async () => `You may only make ${limit} requests `
+      + `every ${windowInSec} seconds`
+  });
+
+  app.use(limiter);
+}
 
 // GetOK Base API Directory
 apiRouter.get('/', (_req, res) => {
@@ -205,5 +224,7 @@ process.on('unhandledRejection', err => {
   log.error('Unhandled Rejection at:', err?.stack || err);
   // res.redirect(config.get('server:frontend') + '/error?message=unhandled_rejection');
 });
-scheduler.draftToAbandonRequestJob.start();
-module.exports = app;
+
+draftToAbandonRequestJob.start();
+
+export default app;

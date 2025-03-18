@@ -1,14 +1,17 @@
 'use strict';
 
-const config = require('../config/index');
-const { createLogger, format, transports } = require('winston');
-require('winston-daily-rotate-file');
-const { inspect } = require('util');
-const { omit, pickBy } = require('lodash');
-const hasAnsi = require('has-ansi');
-const stripAnsi = require('strip-ansi');
-const safeStringify = require('fast-safe-stringify');
+import { createLogger, format, transports } from 'winston';
+import { inspect } from 'util';
+import lodash from 'lodash';
+import hasAnsi from 'has-ansi';
+import stripAnsi from 'strip-ansi';
+import safeStringify from 'fast-safe-stringify';
 
+import config from '../config/index.js';
+
+import 'winston-daily-rotate-file';
+
+const { omit, pickBy } = lodash;
 
 function isPrimitive(val) {
   return val === null || (typeof val !== 'object' && typeof val !== 'function');
@@ -113,4 +116,4 @@ logger.add(new transports.Console({
   format: getDomainWinstonLoggerFormat(true)
 }));
 
-module.exports = logger;
+export default logger;

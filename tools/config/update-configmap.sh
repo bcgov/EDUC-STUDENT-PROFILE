@@ -1,16 +1,20 @@
-envValue=$1
+ENV_VALUE=$1
 APP_NAME=$2
 PEN_NAMESPACE=$3
 COMMON_NAMESPACE=$4
 SPLUNK_TOKEN=$5
+BRANCH=$6
+JOURNEY_BUILDER=$7
+BCEID_REGISTRATION=$8
 
 TZVALUE="America/Vancouver"
 SOAM_KC_REALM_ID="master"
-SOAM_KC=soam-$envValue.apps.silver.devops.gov.bc.ca
+SOAM_KC="soam-$ENV_VALUE.apps.silver.devops.gov.bc.ca"
 siteMinderLogoutUrl=""
-HOST_ROUTE="${envValue}.getmypen.gov.bc.ca"
-SERVER_FRONTEND="https://${envValue}.getmypen.gov.bc.ca"
-if [ "$envValue" != "prod" ]
+HOST_ROUTE="$ENV_VALUE.getmypen.gov.bc.ca"
+SERVER_FRONTEND="https://$ENV_VALUE.getmypen.gov.bc.ca"
+
+if [ "$ENV_VALUE" != "prod" ]
 then
   siteMinderLogoutUrl="https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
 else
@@ -19,9 +23,9 @@ else
   siteMinderLogoutUrl="https://logon7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1&returl="
 fi
 NATS_CLUSTER=educ_nats_cluster
-NATS_URL="nats://nats.${COMMON_NAMESPACE}-${envValue}.svc.cluster.local:4222"
-SOAM_KC_LOAD_USER_ADMIN=$(oc -n $COMMON_NAMESPACE-$envValue -o json get secret sso-admin-${envValue} | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
-SOAM_KC_LOAD_USER_PASS=$(oc -n $COMMON_NAMESPACE-$envValue -o json get secret sso-admin-${envValue} | sed -n 's/.*"password": "\(.*\)",/\1/p' | base64 --decode)
+NATS_URL="nats://nats.${COMMON_NAMESPACE}-${ENV_VALUE}.svc.cluster.local:4222"
+SOAM_KC_LOAD_USER_ADMIN=$(oc -n "$COMMON_NAMESPACE-$ENV_VALUE" -o json get secret "sso-admin-${ENV_VALUE}" | sed -n 's/.*"username": "\(.*\)"/\1/p' | base64 --decode)
+SOAM_KC_LOAD_USER_PASS=$(oc -n "$COMMON_NAMESPACE-$ENV_VALUE" -o json get secret "sso-admin-${ENV_VALUE}" | sed -n 's/.*"password": "\(.*\)",/\1/p' | base64 --decode)
 
 echo Fetching SOAM token
 TKN=$(curl -s \
@@ -50,7 +54,7 @@ echo Removing student-profile-soam if exists
 curl -sX DELETE "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$studentProfileClientID" \
   -H "Authorization: Bearer $TKN"
 
-if [ "$studentProfileServiceClientSecret" != "" ] && [ "$envValue" = "dev" ]
+if [ "$studentProfileServiceClientSecret" != "" ] && [ "$ENV_VALUE" = "dev" ]
 then
   echo
   echo Creating client student-profile-soam with secret
@@ -71,7 +75,7 @@ echo Fetching public key from SOAM
 fullKey=$(curl -sX GET "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/keys" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
-  | jq -r '.keys | .[] | select(has("publicKey")) | .publicKey')
+  | jq -r '.keys | .[] | select(.algorithm == "RS256") | .publicKey')
 
 echo Fetching public key from SOAM
 soamFullPublicKey="-----BEGIN PUBLIC KEY----- $fullKey -----END PUBLIC KEY-----"
@@ -97,26 +101,19 @@ studentProfileServiceClientSecret=$(curl -sX GET "https://$SOAM_KC/auth/admin/re
   -H "Authorization: Bearer $TKN" \
   | jq -r '.value')
 
-bceid_reg_url=""
-journey_builder_url=""
-if [ "$envValue" = "tools" ] || [ "$envValue" = "dev"  ] || [ "$envValue" = "test"  ]
-then
-    bceid_reg_url="https://www.test.bceid.ca/os/?7081&SkipTo=Basic#action"
-    journey_builder_url="https://www2.qa.gov.bc.ca/gov/content/education-training/k-12/support/pen"
-else
-    bceid_reg_url="https://www.bceid.ca/os/?7081&SkipTo=Basic#action"
-    journey_builder_url="https://www2.gov.bc.ca/gov/content?id=74E29C67215B4988ABCD778F453A3129"
-fi
-
-if [ "$envValue" = "dev" ]
+if [ "$ENV_VALUE" = "dev" ]
 then
   bannerEnvironment="DEV"
   bannerColor="#8d28d7"
-elif [ "$envValue" = "test" ]
+elif [ "$ENV_VALUE" = "test" ]
 then
   bannerEnvironment="TEST"
   bannerColor="#dba424"
 fi
+
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_WINDOW_IN_SEC="60"
+RATE_LIMIT_LIMIT="1000"
 
 echo Generating private and public keys
 ssh-keygen -b 4096 -t rsa -f tempPenBackendkey -m pem -q -N ""
@@ -125,25 +122,25 @@ UI_PUBLIC_KEY_VAL="$(ssh-keygen -f tempPenBackendkey -e -m pem)"
 echo Removing key files
 rm tempPenBackendkey
 rm tempPenBackendkey.pub
-echo Creating config map $APP_NAME-backend-config-map
-oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map \
+echo Creating config map "$APP_NAME-backend-config-map"
+oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-backend-config-map" \
   --from-literal=TZ=$TZVALUE \
   --from-literal=UI_PRIVATE_KEY="$UI_PRIVATE_KEY_VAL" \
   --from-literal=UI_PUBLIC_KEY="$UI_PUBLIC_KEY_VAL" \
-  --from-literal=SOAM_CLIENT_ID=$APP_NAME-soam \
-  --from-literal=SOAM_CLIENT_SECRET=$studentProfileServiceClientSecret \
+  --from-literal=SOAM_CLIENT_ID="$APP_NAME-soam" \
+  --from-literal=SOAM_CLIENT_SECRET="$studentProfileServiceClientSecret" \
   --from-literal=SERVER_FRONTEND="$SERVER_FRONTEND" \
   --from-literal=ISSUER=PEN_Retrieval_Application \
-  --from-literal=STUDENT_PROFILE_API_ENDPOINT="http://student-profile-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student-profile" \
+  --from-literal=STUDENT_PROFILE_API_ENDPOINT="http://student-profile-api-master.$COMMON_NAMESPACE-$ENV_VALUE.svc.cluster.local:8080/api/v1/student-profile" \
   --from-literal=SOAM_PUBLIC_KEY="$formattedPublicKey" \
-  --from-literal=SOAM_DISCOVERY=https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/.well-known/openid-configuration \
-  --from-literal=SOAM_URL=https://$SOAM_KC \
-  --from-literal=STUDENT_API_ENDPOINT="http://student-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student" \
-  --from-literal=DIGITALID_API_ENDPOINT="http://digitalid-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/digital-id" \
-  --from-literal=STUDENT_PROFILE_EMAIL_API_ENDPOINT="http://student-profile-email-api-master.$PEN_NAMESPACE-$envValue.svc.cluster.local:8080" \
+  --from-literal=SOAM_DISCOVERY="https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/.well-known/openid-configuration" \
+  --from-literal=SOAM_URL="https://$SOAM_KC" \
+  --from-literal=STUDENT_API_ENDPOINT="http://student-api-master.$COMMON_NAMESPACE-$ENV_VALUE.svc.cluster.local:8080/api/v1/student" \
+  --from-literal=DIGITALID_API_ENDPOINT="http://digitalid-api-master.$COMMON_NAMESPACE-$ENV_VALUE.svc.cluster.local:8080/api/v1/digital-id" \
+  --from-literal=STUDENT_PROFILE_EMAIL_API_ENDPOINT="http://student-profile-email-api-master.$PEN_NAMESPACE-$ENV_VALUE.svc.cluster.local:8080" \
   --from-literal=STUDENT_PROFILE_EMAIL_SECRET_KEY="$JWT_SECRET_KEY" \
   --from-literal=SITEMINDER_LOGOUT_ENDPOINT="$siteMinderLogoutUrl" \
-  --from-literal=STUDENT_DEMOG_API_ENDPOINT="http://pen-demographics-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080" \
+  --from-literal=STUDENT_DEMOG_API_ENDPOINT="http://pen-demographics-api-master.$COMMON_NAMESPACE-$ENV_VALUE.svc.cluster.local:8080" \
   --from-literal=LOG_LEVEL=info \
   --from-literal=REDIS_HOST=redis \
   --from-literal=REDIS_PORT=6379 \
@@ -153,32 +150,39 @@ oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-backend-config-map \
   --from-literal=EXPECTED_DRAFT_REQUESTS=200  \
   --from-literal=NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_EMAIL=5 \
   --from-literal=NUM_DAYS_ALLOWED_IN_RETURN_STATUS_BEFORE_ABANDONED=7  \
-  --from-literal=PEN_REQUEST_API_ENDPOINT="http://pen-request-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/pen-request" \
+  --from-literal=PEN_REQUEST_API_ENDPOINT="http://pen-request-api-master.$COMMON_NAMESPACE-$ENV_VALUE.svc.cluster.local:8080/api/v1/pen-request" \
   --from-literal=NATS_URL="$NATS_URL" \
   --from-literal=NATS_CLUSTER="$NATS_CLUSTER" \
   --from-literal=SCHEDULER_CRON_STALE_SAGA_RECORD_REDIS="0 0/5 * * * *" \
   --from-literal=MIN_TIME_BEFORE_SAGA_IS_STALE_IN_MINUTES=5 \
-  --from-literal=PROFILE_REQUEST_SAGA_API_URL="http://student-profile-saga-api-master.$PEN_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student-profile-saga" \
-  --from-literal=BCEID_REG_URL="$bceid_reg_url" \
+  --from-literal=PROFILE_REQUEST_SAGA_API_URL="http://student-profile-saga-api-master.$PEN_NAMESPACE-$ENV_VALUE.svc.cluster.local:8080/api/v1/student-profile-saga" \
+  --from-literal=BCEID_REG_URL="$BCEID_REGISTRATION" \
   --from-literal=IDLE_TIMEOUT_IN_MILLIS=1800000 \
-  --from-literal=JOURNEY_BUILDER="$journey_builder_url" \
+  --from-literal=JOURNEY_BUILDER="$JOURNEY_BUILDER" \
   --from-literal=BANNER_COLOR="$bannerColor" \
   --from-literal=BANNER_ENVIRONMENT="$bannerEnvironment" \
   --from-literal=NODE_ENV="openshift" \
-  --dry-run -o yaml | oc apply -f -
+  --from-literal=RATE_LIMIT_ENABLED="$RATE_LIMIT_ENABLED" \
+  --from-literal=RATE_LIMIT_WINDOW_IN_SEC="$RATE_LIMIT_WINDOW_IN_SEC" \
+  --from-literal=RATE_LIMIT_LIMIT="$RATE_LIMIT_LIMIT" \
+  --dry-run=client -o yaml | oc apply -f -
 
 echo
-echo Setting environment variables for $APP_NAME-backend-$SOAM_KC_REALM_ID application
-oc -n $PEN_NAMESPACE-$envValue set env --from=configmap/$APP_NAME-backend-config-map dc/$APP_NAME-backend-$SOAM_KC_REALM_ID
+echo Setting environment variables for "$APP_NAME-backend-$SOAM_KC_REALM_ID" application
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env \
+  --from="configmap/$APP_NAME-backend-config-map" \
+  "deployment/$APP_NAME-backend-$BRANCH"
 
-echo Creating config map $APP_NAME-frontend-config-map
-oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-frontend-config-map \
-  --from-literal=TZ=$TZVALUE \
-  --from-literal=HOST_ROUTE=$HOST_ROUTE \
-  --dry-run -o yaml | oc apply -f -
+echo Creating config map "$APP_NAME-frontend-config-map"
+oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap "$APP_NAME-frontend-config-map" \
+  --from-literal=TZ="$TZVALUE" \
+  --from-literal=HOST_ROUTE="$HOST_ROUTE" \
+  --dry-run=client -o yaml | oc apply -f -
 echo
-echo Setting environment variables for $APP_NAME-frontend-$SOAM_KC_REALM_ID application
-oc -n $PEN_NAMESPACE-$envValue set env --from=configmap/$APP_NAME-frontend-config-map dc/$APP_NAME-frontend-$SOAM_KC_REALM_ID
+echo Setting environment variables for "$APP_NAME-frontend-$SOAM_KC_REALM_ID" application
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env \
+  --from="configmap/$APP_NAME-frontend-config-map" \
+  "deployment/$APP_NAME-frontend-$BRANCH"
 
 SPLUNK_URL="gww.splunk.educ.gov.bc.ca"
 FLB_CONFIG="[SERVICE]
@@ -216,9 +220,15 @@ PARSER_CONFIG="
     Format      json
 "
 
-echo Creating config map $APP_NAME-flb-sc-config-map
-oc create -n $PEN_NAMESPACE-$envValue configmap $APP_NAME-flb-sc-config-map --from-literal=fluent-bit.conf="$FLB_CONFIG"  --from-literal=parsers.conf="$PARSER_CONFIG" --dry-run -o yaml | oc apply -f -
+echo Creating config map "$APP_NAME-flb-sc-config-map"
+oc create -n "$PEN_NAMESPACE-$ENV_VALUE" configmap \
+  "$APP_NAME-flb-sc-config-map" \
+  --from-literal=fluent-bit.conf="$FLB_CONFIG" \
+  --from-literal=parsers.conf="$PARSER_CONFIG" \
+  --dry-run=client -o yaml | oc apply -f -
 
 echo Removing un-needed config entries
-oc -n "$PEN_NAMESPACE"-"$envValue" set env dc/$APP_NAME-backend-$SOAM_KC_REALM_ID STUDENT_PROFILE_CLIENT_ID-
-oc -n "$PEN_NAMESPACE"-"$envValue" set env dc/$APP_NAME-backend-$SOAM_KC_REALM_ID STUDENT_PROFILE_CLIENT_SECRET-
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env \
+  "deployment/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_ID-
+oc -n "$PEN_NAMESPACE-$ENV_VALUE" set env \
+  "deployment/$APP_NAME-backend-$SOAM_KC_REALM_ID" STUDENT_PROFILE_CLIENT_SECRET-

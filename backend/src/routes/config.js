@@ -1,6 +1,7 @@
-const express = require('express');
-const HttpStatus = require('http-status-codes');
-const config = require('../config/index');
+import express from 'express';
+import HttpStatus from 'http-status-codes';
+import config from '../config/index.js';
+
 const router = express.Router();
 
 router.get('/', getConfig);
@@ -12,4 +13,4 @@ async function getConfig(_req, res) {
   });
 }
 
-module.exports = router;
+export default router;
