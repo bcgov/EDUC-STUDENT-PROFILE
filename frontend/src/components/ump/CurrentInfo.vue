@@ -313,7 +313,7 @@ export default {
     },
     nextStep() {
       if (this.hasStudentRecord || this.validateForm()) {
-        this.setRecordedData(this.recordedData);
+        this.setRecordedData({...this.recordedData, dob: formatDob(this.recordedData.dob)});
         this.$emit('next');
       }
     },
