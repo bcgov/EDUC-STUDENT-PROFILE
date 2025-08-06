@@ -146,12 +146,11 @@ jobs:
             '${{ vars.BCEID_URL }}'
 
           # Start rollout (if necessary) and follow it
-          oc rollout latest deployment/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
+          oc rollout restart deployment/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
             || true && echo "Rollout in progress"
-          oc logs -f deployment/${{ env.APP_NAME_BACKEND }}
 
           oc rollout restart deployment/${{ env.APP_NAME_FRONTEND }} 2> /dev/null \
-          || true && echo "Rollout in progress"
+            || true && echo "Rollout in progress"
 
           # Get status, returns 0 if rollout is successful
           oc rollout status deployment/${{ env.APP_NAME_BACKEND }}
