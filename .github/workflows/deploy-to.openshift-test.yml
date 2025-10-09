@@ -144,6 +144,9 @@ jobs:
             ${{ env.BRANCH }} \
             '${{ vars.JOURNEY_BUILDER }}' \
             '${{ vars.BCEID_URL }}'
+                  
+          echo "Waiting a few seconds before deploy..."
+          sleep 10
 
           # Start rollout (if necessary) and follow it
           oc rollout restart deployment/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
