@@ -260,6 +260,11 @@ jobs:
           oc rollout status deployment/${{ env.APP_NAME_BACKEND }}
           oc rollout status deployment/${{ env.APP_NAME_FRONTEND }}
 
+          # Do the backend rollout again to ensure the correct configmap is attached
+          oc rollout restart deployment/${{ env.APP_NAME_BACKEND }} 2> /dev/null \
+            || true && echo "Rollout in progress"
+          oc rollout status deployment/${{ env.APP_NAME_BACKEND }}
+
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         with:
