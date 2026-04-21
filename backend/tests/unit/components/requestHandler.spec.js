@@ -353,7 +353,7 @@ describe('submitRequest', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should return UNAUTHORIZED if no session', async () => {
@@ -475,7 +475,7 @@ describe('setRequestAsSubsrev', () => {
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should return OK and request data', async () => {
@@ -557,7 +557,6 @@ describe('resendVerificationEmail', () => {
     utils.getAccessToken.mockReturnValue(accessToken);
     req = mockRequest(null, session);
     res = mockResponse();
-    sendVerificationEmailSpy.mockResolvedValue(resData);
   });
 
   afterEach(() => {
@@ -565,6 +564,7 @@ describe('resendVerificationEmail', () => {
   });
 
   it('should return OK and response data', async () => {
+    sendVerificationEmailSpy.mockResolvedValue(resData);
     await resendVerificationEmailHandler(req, res);
 
     expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
