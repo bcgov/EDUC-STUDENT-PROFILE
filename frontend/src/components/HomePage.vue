@@ -48,7 +48,7 @@
         </p>
         <p>
           <a
-            href="http://www.bced.gov.bc.ca/apps/imcl/imclWeb/Home.do"
+            href="https://bcschoolcontacts.gov.bc.ca"
             rel="noopener noreferrer"
             target="_blank"
           >Find your school's contact information</a>
