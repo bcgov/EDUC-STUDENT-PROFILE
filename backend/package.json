@@ -18,7 +18,8 @@
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "clean": "rm -rf coverage dist",
     "purge": "rm -rf node_modules",
-    "reinstall": "npm run purge && npm install",
+    "reinstall": "npm run purge && npm install && npm run rebuild:native",
+    "rebuild:native": "npm rebuild gc-stats --ignore-scripts=false",
     "test:unit-linux": "export NODE_ENV=test && npm run test"
   },
   "dependencies": {
@@ -30,7 +31,7 @@
     "config": "^3.3.12",
     "connect-redis": "^7.1.1",
     "cors": "^2.8.5",
-    "cron": "^3.1.7",
+    "cron": "^4.4.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-prometheus-middleware": "^1.2.0",
@@ -44,7 +45,6 @@
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
-    "moment-timezone": "^0.5.45",
     "morgan": "^1.10.0",
     "nats": "^2.28.2",
     "nconf": "^0.12.1",
